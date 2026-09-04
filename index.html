@@ -2551,7 +2551,7 @@
 <div id="stageContainer">
   <div id="fgContainer">
     <canvas id="fgCanvas"></canvas>
-    <video id="fgVideo" muted loop playsinline></video>
+    <video id="fgVideo" muted loop playsinline autoplay></video>
   </div>
 </div>
 
@@ -3836,12 +3836,32 @@
     requestAnimationFrame(processChroma);
   }
   fgVideo.addEventListener('play', () => requestAnimationFrame(processChroma));
+
+  // Función mejorada para iniciar la reproducción
   function startVisualMedia() {
-    document.getElementById('bg-video').play().then(() => document.getElementById('bg-video').style.opacity = '1').catch(()=>{});
+    // Intentar reproducir el video de fondo
+    document.getElementById('bg-video').play().then(() => {
+      document.getElementById('bg-video').style.opacity = '1';
+    }).catch(() => {});
+
+    // Intentar reproducir el chroma
     fgVideo.muted = true;
-    fgVideo.play().catch(()=>{});
+    fgVideo.play().catch(() => {
+      // Si falla, reintentar después de 1 segundo
+      setTimeout(() => {
+        fgVideo.play().catch(() => {});
+      }, 1000);
+    });
     randomizeFgPosition();
   }
+
+  // Listener global para ayudar al autoplay si el usuario interactúa
+  document.addEventListener('click', () => {
+    if (fgVideo.paused) {
+      fgVideo.play().catch(() => {});
+    }
+  }, { once: true });
+
   function createSparks(cx, cy) {
     const colors = ['#00f0ff','#b114ff','#ff1a6b','#ffd700'];
     for (let i = 0; i < 70; i++) {
