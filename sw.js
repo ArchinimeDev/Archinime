@@ -1,27 +1,30 @@
 /* ============================================================
    sw.js - Archinime OS Service Worker
-   Estrategia híbrida con control absoluto sobre catálogo.js
+   Estrategia híbrida con control absoluto sobre catalogo.js
    MEJORADO: Caché más inteligente, actualizaciones en caliente
    ACTUALIZADO: Rutas a la nueva estructura de carpetas
    ============================================================ */
 
-const CACHE_STATIC = 'archinime-static-v89';
-const CACHE_DYNAMIC = 'archinime-dynamic-v89';
-const CACHE_IMAGES = 'archinime-images-v89';
-const CACHE_FONTS = 'archinime-fonts-v89';
+const CACHE_STATIC = 'archinime-static-v91';
+const CACHE_DYNAMIC = 'archinime-dynamic-v91';
+const CACHE_IMAGES = 'archinime-images-v91';
+const CACHE_FONTS = 'archinime-fonts-v91';
 
 const STATIC_ASSETS = [
   '/',
   '/index.html',
-  '/anime-detail.html',
-  '/video-player.html',
+  '/pages/anime-detail.html',
+  '/pages/video-player.html',
+  '/pages/carga.html',
+  '/pages/opciones.html',
   '/manifest.json',
   '/assets/img/Logo_Archinime.avif',
   '/assets/img/Logo_Archinime.png',
   '/assets/img/invitado.avif',
   '/assets/img/galaxia-morado1.avif',
   '/assets/gifs/chica_corriendo.gif',
-  '/assets/img/youtube.avif'
+  '/assets/gifs/gokuu.gif',
+  '/assets/gifs/naruto.gif'
 ];
 
 // Instalación
