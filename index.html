@@ -9,7 +9,7 @@
  
   <title>ARCHINIME · La Nueva Era del Anime</title>
   <meta name="description" content="La interfaz más inmersiva para ver anime. Efectos visuales, comunidad y calidad HD.">
-  <link rel="canonical" href="https://archinime.github.io/-Archinime-/">
+  <link rel="canonical" href="https://archinimedev.github.io/Archinime/">
   
   <!-- VERSIÓN (forzar limpieza de caché) -->
   <script>
@@ -53,12 +53,12 @@
   <meta property="og:type" content="website">
   <meta property="og:title" content="Archinime - Anime Cyberpunk">
   <meta property="og:description" content="La experiencia definitiva de anime con interfaz de próxima generación.">
-  <meta property="og:url" content="https://archinime.github.io/-Archinime-/">
-  <meta property="og:image" content="https://cdn.jsdelivr.net/gh/Archinime/-Archinime-@main/Logo_Archinime_comprimida.png">
+  <meta property="og:url" content="https://archinimedev.github.io/Archinime/">
+  <meta property="og:image" content="https://archinimedev.github.io/Archinime/assets/img/Logo_Archinime.avif">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Archinime">
   <meta name="twitter:description" content="La experiencia definitiva de anime con interfaz de próxima generación.">
-  <meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/Archinime/-Archinime-@main/Logo_Archinime_comprimida.png">
+  <meta name="twitter:image" content="https://archinimedev.github.io/Archinime/assets/img/Logo_Archinime.avif">
 
   <link rel="icon" href="assets/img/Logo_Archinime.png" type="image/png">
   <link rel="manifest" href="manifest.json">
@@ -2183,15 +2183,15 @@
     .footer .socials a:hover { color: var(--neon-blue); transform: translateY(-3px); }
     .footer .credit { opacity: 0.5; }
 
-    /* ===== CHROMA KEY FIX (TAMAÑO FIJO) ===== */
+    /* ===== CHROMA KEY FIX (FONDO TRANSPARENTE, SIN MARCO, MÁS ABAJO) ===== */
     #stageContainer {
       position: fixed;
       bottom: 10px;
       right: 20px;
       z-index: 99;
       pointer-events: auto;
-      width: 180px;
-      height: 240px;
+      width: 220px;
+      height: auto;
       border-radius: 16px;
       overflow: hidden;
       background: transparent;
@@ -2201,17 +2201,16 @@
     #fgContainer {
       position: relative;
       width: 100%;
-      height: 100%;
+      height: auto;
       background: transparent;
     }
 
     #fgContainer canvas,
     #fgContainer video {
       width: 100% !important;
-      height: 100% !important;
+      height: auto !important;
       display: block;
       border-radius: 0;
-      object-fit: contain;
     }
 
     .fg-left {
@@ -2246,8 +2245,7 @@
 
     @media (max-width: 768px) {
       #stageContainer {
-        width: 140px;
-        height: 187px;
+        width: 150px;
         bottom: 10px;
         right: 10px;
       }
@@ -2256,8 +2254,7 @@
     }
     @media (max-width: 480px) {
       #stageContainer {
-        width: 110px;
-        height: 147px;
+        width: 120px;
         bottom: 10px;
         right: 6px;
       }
@@ -2343,7 +2340,7 @@
   <div class="loader-ring-outer">
     <div class="loader-ring-inner">
       <div class="gif-wrapper">
-        <img id="personaje-gif" src="assets/gifs/chica_corriendo.gif" alt="Cargando sistema">
+        <img id="personaje-gif" src="" alt="Cargando sistema">
       </div>
     </div>
   </div>
@@ -2367,7 +2364,7 @@
 
 <!-- ===== NAVBAR ===== -->
 <nav class="cyber-nav" role="navigation">
-  <a href="https://archinime.github.io/ArchiPapu/index.html" class="nav-logo">
+  <a href="./" class="nav-logo">
     <img id="logo" src="assets/img/Logo_Archinime.avif" alt="Logo" decoding="async" loading="lazy">
     <span class="nav-logo-text">ARCHINIME</span>
   </a>
@@ -2401,7 +2398,7 @@
   </div>
 </nav>
 
-<!-- ===== BANNER CARRUSEL ===== -->
+<!-- ===== BANNER CARRUSEL (se reemplazará en modo especial) ===== -->
 <div id="bannerContainer">
   <div class="banner-carousel" id="bannerCarousel">
     <div class="banner-dots" id="bannerDots"></div>
@@ -2644,7 +2641,7 @@
 <div id="stageContainer">
   <div id="fgContainer">
     <canvas id="fgCanvas"></canvas>
-    <video id="fgVideo" muted loop playsinline autoplay preload="auto"></video>
+    <video id="fgVideo" muted loop playsinline></video>
   </div>
 </div>
 
@@ -2666,7 +2663,6 @@
   const providerGoogle = new firebase.auth.GoogleAuthProvider();
 </script>
 
-<!-- Scripts en sus ubicaciones correctas según la estructura de carpetas -->
 <script src="data/catalogo.js?v=2025-04-07-v21.0-chat-fixes"></script>
 <script src="js/utils/animaciones.js"></script>
 <script src="js/utils/musica_fondo.js"></script>
@@ -2701,7 +2697,9 @@
           audioIndicator.innerHTML = '<i class="fas fa-volume-up"></i> <span>Sonido activado</span>';
         })
         .catch(() => {
+          // Si falla, mostrar indicador de clic
           audioIndicator.innerHTML = '<i class="fas fa-volume-mute"></i> <span>Haz clic para activar sonido</span>';
+          // Intentar de nuevo con muted
           specialVideo.muted = true;
           specialVideo.play().catch(() => {});
         });
@@ -2715,14 +2713,17 @@
             audioIndicator.innerHTML = '<i class="fas fa-volume-up"></i> <span>Sonido activado</span>';
           })
           .catch(() => {
+            // Si falla, mostrar mensaje
             audioIndicator.innerHTML = '<i class="fas fa-exclamation-triangle"></i> <span>Error al activar audio</span>';
           });
       });
 
+      // Reproducción en bucle
       specialVideo.addEventListener('ended', function() {
         specialVideo.play().catch(() => {});
       });
 
+      // Añadir clase especial al body para cambiar estilos (opcional)
       document.body.classList.add('special-mode');
     } else {
       console.log('Modo normal.');
@@ -2911,6 +2912,7 @@
     if (comentariosInicializados) return;
     comentariosInicializados = true;
     
+    // Ocultar el formulario de comentarios y mostrar mensaje de deshabilitado
     const formContainer = document.getElementById('comentarioFormContainer');
     const loginMsg = document.getElementById('comentarioLoginMessage');
     if (formContainer) formContainer.style.display = 'none';
@@ -2922,6 +2924,7 @@
       loginMsg.style.padding = '20px';
     }
     
+    // Solo mostrar comentarios existentes (lectura)
     setupComentariosRealtimeListener();
   }
 
@@ -3060,6 +3063,7 @@
     if (sidePanel.classList.contains('open')) {
       iniciarEscuchaChatPanel();
       cargarStickersChatPanel();
+      // Asegurar scroll al final después de abrir
       setTimeout(() => {
         const container = document.getElementById('chatMessagesPanel');
         if (container) container.scrollTop = container.scrollHeight;
@@ -3067,6 +3071,7 @@
     }
   };
 
+  // Función para actualizar la UI del chat según autenticación
   function actualizarEstadoChatPanel() {
     const user = auth.currentUser;
     const inputArea = document.getElementById('chatInputArea');
@@ -3149,6 +3154,7 @@
         `;
       });
       container.innerHTML = html;
+      // Scroll al final después de renderizar
       requestAnimationFrame(() => {
         container.scrollTop = container.scrollHeight;
       });
@@ -3171,6 +3177,7 @@
       `;
     });
 
+    // Actualizar UI según estado de autenticación
     actualizarEstadoChatPanel();
   }
 
@@ -3851,6 +3858,7 @@
       dAvatar.style.borderColor = 'var(--neon-blue)'; dAvatar.style.boxShadow = 'none';
       dName.style.color = 'var(--neon-blue)'; dName.style.textShadow = 'none';
     }
+    // Actualizar también el panel de chat si está abierto
     if (sidePanel.classList.contains('open')) {
       actualizarEstadoChatPanel();
     }
@@ -3929,7 +3937,7 @@
     });
   }
 
-  // ===== CHROMA KEY (TAMAÑO FIJO Y CARGA RÁPIDA) =====
+  // ===== CHROMA KEY (ANIMACIONES CON CAMBIO ALEATORIO MEJORADO) =====
   function randomizeFgPosition() {
     const container = document.getElementById('stageContainer');
     if (!container) return;
@@ -3941,49 +3949,29 @@
   const fgVideo = document.getElementById('fgVideo');
   const fgCanvas = document.getElementById('fgCanvas');
   const fgCtx = fgCanvas.getContext('2d', { willReadFrequently: true });
-
-  const CANVAS_W = 180;
-  const CANVAS_H = 240;
-  fgCanvas.width = CANVAS_W;
-  fgCanvas.height = CANVAS_H;
-
-  let currentAnim = videoList[Math.floor(Math.random() * videoList.length)];
+  let currentAnim = null;
   let isTransitioning = false;
-  fgVideo.style.display = 'none';
-  fgVideo.src = currentAnim.src;
-  fgVideo.preload = 'auto';
-  fgVideo.muted = true;
-  fgVideo.loop = false;
 
-  let videoReady = false;
-
-  fgVideo.addEventListener('loadeddata', () => {
-    videoReady = true;
-    fgVideo.play().catch(() => {
-      setTimeout(() => fgVideo.play().catch(() => {}), 500);
-    });
-  });
-
-  fgVideo.addEventListener('pause', () => {
-    if (!fgVideo.ended) {
-      setTimeout(() => fgVideo.play().catch(() => {}), 200);
+  // Inicializar con el primer video de la lista
+  function initChroma() {
+    if (!window.videoList || window.videoList.length === 0) {
+      console.warn('No hay videos en videoList');
+      return;
     }
-  });
-
-  fgVideo.addEventListener('ended', () => {
-    if (!isTransitioning) {
-      cambiarVideo();
-    }
-  });
-
-  function cambiarVideo() {
-    if (isTransitioning) return;
-    let newAnim;
-    do { newAnim = videoList[Math.floor(Math.random() * videoList.length)]; } while (newAnim.id === currentAnim.id && videoList.length > 1);
-    currentAnim = newAnim;
-    fgVideo.src = currentAnim.src;
+    currentAnim = window.videoList[Math.floor(Math.random() * window.videoList.length)];
+    fgVideo.src = currentAnim.src + '?t=' + Date.now();
     fgVideo.load();
-    videoReady = false;
+    fgVideo.play().catch(() => {});
+    // Configurar canvas cuando el video se cargue
+    fgVideo.addEventListener('loadedmetadata', () => {
+      const maxW = 300;
+      const ratio = fgVideo.videoWidth / fgVideo.videoHeight;
+      fgCanvas.width = maxW;
+      fgCanvas.height = maxW / ratio;
+    });
+    // Iniciar el procesamiento chroma
+    fgVideo.addEventListener('play', () => requestAnimationFrame(processChroma));
+    randomizeFgPosition();
   }
 
   let frameCount = 0;
@@ -3997,66 +3985,19 @@
       requestAnimationFrame(processChroma);
       return;
     }
-    
-    fgCtx.clearRect(0, 0, CANVAS_W, CANVAS_H);
-    
-    const vw = fgVideo.videoWidth;
-    const vh = fgVideo.videoHeight;
-    if (!vw || !vh) { requestAnimationFrame(processChroma); return; }
-    
-    let drawW, drawH, offsetX = 0, offsetY = 0;
-    const ratio = vw / vh;
-    const canvasRatio = CANVAS_W / CANVAS_H;
-    if (ratio > canvasRatio) {
-      drawW = CANVAS_W;
-      drawH = CANVAS_W / ratio;
-      offsetY = (CANVAS_H - drawH) / 2;
-    } else {
-      drawH = CANVAS_H;
-      drawW = CANVAS_H * ratio;
-      offsetX = (CANVAS_W - drawW) / 2;
-    }
-    
-    fgCtx.drawImage(fgVideo, offsetX, offsetY, drawW, drawH);
-    
-    const imageData = fgCtx.getImageData(0, 0, CANVAS_W, CANVAS_H);
-    const data = imageData.data;
+    fgCtx.drawImage(fgVideo, 0, 0, fgCanvas.width, fgCanvas.height);
+    const frame = fgCtx.getImageData(0, 0, fgCanvas.width, fgCanvas.height);
+    const data = frame.data;
     const key = currentAnim.keyColor || 'green';
     const thresh = currentAnim.preset?.threshold ? currentAnim.preset.threshold * 255 : 30;
     for (let i = 0; i < data.length; i += 4) {
       let r = data[i], g = data[i+1], b = data[i+2];
-      if (key === 'blue') {
-        if (b > r + thresh && b > g + thresh) data[i+3] = 0;
-      } else {
-        if (g > r + thresh && g > b + thresh) data[i+3] = 0;
-      }
+      if (key === 'blue') { if (b > r + thresh && b > g + thresh) data[i+3] = 0; }
+      else { if (g > r + thresh && g > b + thresh) data[i+3] = 0; }
     }
-    fgCtx.putImageData(imageData, 0, 0);
+    fgCtx.putImageData(frame, 0, 0);
     requestAnimationFrame(processChroma);
   }
-
-  fgVideo.addEventListener('play', () => requestAnimationFrame(processChroma));
-
-  function startVisualMedia() {
-    document.getElementById('bg-video').play().then(() => {
-      document.getElementById('bg-video').style.opacity = '1';
-    }).catch(() => {});
-
-    fgVideo.play().catch(() => {
-      const interval = setInterval(() => {
-        if (!fgVideo.paused) { clearInterval(interval); return; }
-        fgVideo.play().catch(() => {});
-      }, 2000);
-    });
-    randomizeFgPosition();
-  }
-
-  document.addEventListener('click', function forcePlay() {
-    if (fgVideo.paused) {
-      fgVideo.play().catch(() => {});
-    }
-    document.removeEventListener('click', forcePlay);
-  });
 
   function createSparks(cx, cy) {
     const colors = ['#00f0ff','#b114ff','#ff1a6b','#ffd700'];
@@ -4077,31 +4018,54 @@
     }
   }
 
+  // Evento de clic para cambiar de animación (ALEATORIO, sin repetir la actual)
   fgContainer.addEventListener('click', (e) => {
     e.stopPropagation();
     if (isTransitioning) return;
+    if (!window.videoList || window.videoList.length < 2) {
+      // Si solo hay un video, no se puede cambiar, pero podemos recargarlo
+      fgVideo.pause();
+      fgVideo.currentTime = 0;
+      fgVideo.play().catch(() => {});
+      return;
+    }
     createSparks(e.clientX, e.clientY);
     isTransitioning = true;
     fgContainer.classList.add('poof');
+
     setTimeout(() => {
-      cambiarVideo();
-      const checkReady = setInterval(() => {
-        if (videoReady) {
-          clearInterval(checkReady);
-          fgVideo.play().then(() => {
-            isTransitioning = false;
-            fgContainer.classList.remove('poof');
-            randomizeFgPosition();
-          }).catch(() => {
-            isTransitioning = false;
-            fgContainer.classList.remove('poof');
-          });
-        }
-      }, 200);
+      // Obtener lista de videos excluyendo el actual
+      let available = window.videoList.filter(v => v.id !== currentAnim.id);
+      if (available.length === 0) available = window.videoList; // fallback
+      const newAnim = available[Math.floor(Math.random() * available.length)];
+      currentAnim = newAnim;
+
+      // Detener y limpiar
+      fgVideo.pause();
+      fgVideo.currentTime = 0;
+      // Cambiar src con timestamp para evitar caché
+      fgVideo.src = currentAnim.src + '?t=' + Date.now();
+      fgVideo.load();
+      fgVideo.play().then(() => {
+        isTransitioning = false;
+        fgContainer.classList.remove('poof');
+        randomizeFgPosition();
+      }).catch(err => {
+        console.warn('Error al reproducir video:', err);
+        isTransitioning = false;
+        fgContainer.classList.remove('poof');
+      });
     }, 600);
   });
 
-  window.addEventListener('DOMContentLoaded', startVisualMedia);
+  // Iniciar chroma cuando el DOM esté listo
+  window.addEventListener('DOMContentLoaded', () => {
+    // Reproducir video de fondo
+    document.getElementById('bg-video').play().then(() => {
+      document.getElementById('bg-video').style.opacity = '1';
+    }).catch(() => {});
+    initChroma();
+  });
 
   // ===== FUNCIONES DE DETALLE Y EVENTOS =====
   function buildContentDetails(anime) {
@@ -4166,7 +4130,7 @@
     }
     document.getElementById('detailDesc').innerHTML = buildContentDetails(anime);
     document.getElementById('detailWatchBtn').onclick = function() {
-      window.location.href = `pages/anime-detail.html?id=${anime.id}`;
+      window.location.href = `anime-detail.html?id=${anime.id}`;
     };
     document.getElementById('detailModal').classList.add('show');
     disableBodyScroll();
@@ -4190,7 +4154,7 @@
     document.getElementById('eventDesc').textContent = eventData.desc || 'Descripción no disponible.';
     document.getElementById('eventBadge').textContent = eventData.updateType || '🔥 NUEVO';
     document.getElementById('eventBtn').onclick = function() {
-      window.location.href = `pages/anime-detail.html?id=${eventData.id}`;
+      window.location.href = `anime-detail.html?id=${eventData.id}`;
     };
     document.getElementById('eventModal').classList.add('show');
     disableBodyScroll();
