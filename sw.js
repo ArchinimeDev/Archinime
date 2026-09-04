@@ -5,10 +5,10 @@
    ACTUALIZADO: Rutas a la nueva estructura de carpetas
    ============================================================ */
 
-const CACHE_STATIC = 'archinime-static-v93';
-const CACHE_DYNAMIC = 'archinime-dynamic-v93';
-const CACHE_IMAGES = 'archinime-images-v93';
-const CACHE_FONTS = 'archinime-fonts-v93';
+const CACHE_STATIC = 'archinime-static-v94';
+const CACHE_DYNAMIC = 'archinime-dynamic-v94';
+const CACHE_IMAGES = 'archinime-images-v94';
+const CACHE_FONTS = 'archinime-fonts-v94';
 
 const STATIC_ASSETS = [
   '/',
