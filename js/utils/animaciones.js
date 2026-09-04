@@ -10,4 +10,5 @@ const videoList = [
   { id: 'reze',  src: 'assets/videos/reze.mp4',  preset: { threshold: 0.10, diff: 0, soft: 100  } },
   { id: 'levi',  src: 'assets/videos/levi.mp4',  preset: { threshold: 0.10, diff: 0, soft: 100  } },
   { id: 'gojo',  src: 'assets/videos/gojo.mp4',  preset: { threshold: 0.10, diff: 0, soft: 100  } },
+  { id: 'shinobu',  src: 'assets/videos/shinobu.mp4',  preset: { threshold: 0.10, diff: 0, soft: 100  } },
 ];
