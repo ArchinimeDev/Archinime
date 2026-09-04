@@ -14,7 +14,7 @@
   <!-- VERSIÓN (forzar limpieza de caché) -->
   <script>
     (function() {
-      const APP_VERSION = "2025-04-07-v21.0-chat-fixes";
+      const APP_VERSION = "2025-04-08-v23.0-final";
       const stored = localStorage.getItem('archinime_app_version');
       if (stored !== APP_VERSION) {
         localStorage.setItem('archinime_app_version', APP_VERSION);
@@ -2266,7 +2266,7 @@
   <div class="loader-ring-outer">
     <div class="loader-ring-inner">
       <div class="gif-wrapper">
-        <img id="personaje-gif" src="" alt="Cargando sistema">
+        <img id="personaje-gif" src="https://cdn.jsdelivr.net/gh/ArchinimeDev/Archinime@main/assets/gifs/chica_corriendo.gif" alt="Cargando sistema">
       </div>
     </div>
   </div>
@@ -3167,3 +3167,967 @@
         document.body.appendChild(modal);
       }
       const isVideo = url.match(/\.(mp4|webm)$/i);
+      const imgEl = document.getElementById('stickerModalImgGlobal');
+      const vidEl = document.getElementById('stickerModalVidGlobal');
+      if (isVideo) { imgEl.style.display = 'none'; vidEl.src = url; vidEl.style.display = 'block'; }
+      else { vidEl.style.display = 'none'; imgEl.src = url; imgEl.style.display = 'block'; }
+      document.getElementById('stickerModalStealBtnGlobal').onclick = () => {
+        if (auth.currentUser) {
+          if (typeof window.robarStickerSistema === 'function') {
+            window.robarStickerSistema(url);
+          } else {
+            db.collection('userStickers').doc(auth.currentUser.uid).set({
+              stickers: firebase.firestore.FieldValue.arrayUnion(url)
+            }, { merge: true }).then(() => {
+              alert('Sticker robado!');
+              cargarStickersChatPanel();
+              loadUserStickers();
+            }).catch(alert);
+          }
+          cerrarStickerModalGlobal();
+        } else {
+          alert('Inicia sesión para robar stickers');
+        }
+      };
+      modal.style.display = 'flex';
+      setTimeout(() => modal.style.opacity = '1', 10);
+    }
+  }
+
+  function cerrarStickerModalGlobal() {
+    const modal = document.getElementById('stickerViewModalGlobal');
+    if (modal) {
+      modal.style.opacity = '0';
+      setTimeout(() => { modal.style.display = 'none'; const vid = document.getElementById('stickerModalVidGlobal'); if (vid) vid.src = ''; }, 300);
+    }
+  }
+  window.abrirStickerModal = abrirStickerModalGlobal;
+  window.cerrarStickerModal = cerrarStickerModalGlobal;
+
+  // ============================================
+  // RESTO DEL CÓDIGO (catálogo, filtros, etc.)
+  // ============================================
+  window.videoList = videoList || [];
+  window.musicListGlobal = musicListGlobal || [];
+  window.toggleNotifMenu = function() {
+    document.getElementById('notifMenu').classList.toggle('active');
+  };
+  window.startNotificationSequence = function() { console.log("Notificaciones listas"); };
+
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js').then(reg => {
+        console.log('SW registrado:', reg);
+      }).catch(err => console.error('SW error:', err));
+    });
+  }
+
+  let deferredPrompt;
+  const installBtn = document.getElementById('installBtn');
+  const isIos = () => /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
+  const isStandalone = () => window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+  const isMobile = () => window.matchMedia('(max-width: 780px)').matches;
+
+  function updateButtons() {
+    if (!isMobile() || isStandalone()) { installBtn.style.display = 'none'; return; }
+    installBtn.style.display = 'flex';
+  }
+  window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredPrompt = e; updateButtons(); });
+  installBtn.addEventListener('click', () => {
+    if (isIos()) {
+      document.getElementById('iosInstallModal').style.display = 'flex';
+    } else if (deferredPrompt) {
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then(() => { deferredPrompt = null; updateButtons(); });
+    } else {
+      alert("📲 Instala la app desde el menú de Chrome.");
+    }
+  });
+  window.matchMedia('(display-mode: standalone)').addEventListener('change', updateButtons);
+  window.addEventListener('DOMContentLoaded', updateButtons);
+
+  let isMusicStarted = false, currentAudio = null;
+  function playNextTrack() {
+    if (!isMusicStarted) return;
+    if (currentAudio) { currentAudio.pause(); currentAudio.onended = null; currentAudio = null; }
+    const track = musicListGlobal[Math.floor(Math.random() * musicListGlobal.length)];
+    if (!track) { setTimeout(playNextTrack, 5000); return; }
+    currentAudio = new Audio(track);
+    currentAudio.volume = 0.25;
+    currentAudio.onended = playNextTrack;
+    currentAudio.play().catch(e => setTimeout(playNextTrack, 3000));
+  }
+  function startMusic() { if (isMusicStarted) return; isMusicStarted = true; playNextTrack(); }
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden && isMusicStarted && currentAudio?.paused) currentAudio.play().catch(()=>{});
+  });
+  window.addEventListener('load', startMusic);
+
+  // ===== LOADER (con GIF) =====
+  let loadingCompleted = false;
+  const loadingScreen = document.getElementById('loadingScreen');
+  const percentEl = document.getElementById('loadingPercentage');
+  const lineEl = document.getElementById('loaderLine');
+  const gifImg = document.getElementById('personaje-gif');
+
+  // Ya tenemos el GIF desde CDN, pero si existe listaDeGifs, usamos uno aleatorio
+  if (typeof listaDeGifs !== 'undefined' && listaDeGifs.length > 0) {
+    const gifElegido = listaDeGifs[Math.floor(Math.random() * listaDeGifs.length)];
+    gifImg.src = gifElegido;
+  }
+
+  function updateProgress(p) {
+    const v = Math.min(99, Math.max(0, Math.floor(p)));
+    percentEl.textContent = v + '%';
+    lineEl.style.width = v + '%';
+  }
+
+  function finishLoading() {
+    if (loadingCompleted) return;
+    loadingCompleted = true;
+    updateProgress(100);
+    percentEl.textContent = 'SISTEMA LISTO';
+    setTimeout(() => {
+      loadingScreen.classList.add('hidden');
+      document.body.style.overflow = '';
+    }, 700);
+  }
+
+  let prog = 0;
+  const loadInterval = setInterval(() => {
+    if (loadingCompleted) { clearInterval(loadInterval); return; }
+    if (prog < 85) { prog += Math.random() * 8; if (prog > 85) prog = 85; updateProgress(prog); }
+  }, 200);
+  
+  // Escuchar evento de carga de animes
+  window.addEventListener('firstAnimesLoaded', () => { 
+    clearInterval(loadInterval); 
+    updateProgress(100); 
+    finishLoading(); 
+  });
+  
+  // Fallback: si después de 8 segundos no se cargaron los animes, forzar fin del loader
+  setTimeout(() => { 
+    if (!loadingCompleted) finishLoading(); 
+  }, 8000);
+
+  // ===== RESTO DEL CÓDIGO (catálogo, filtros, etc.) =====
+  function shuffleArray(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+
+  let firestoreRatings = new Map();
+  async function loadRatings() {
+    try {
+      const snap = await db.collection('animeRatings').get();
+      snap.forEach(doc => {
+        const d = doc.data();
+        if (typeof d.avg === 'number') firestoreRatings.set(parseInt(doc.id), { avg: d.avg, count: d.count || 0 });
+      });
+    } catch (e) { console.warn('Error ratings:', e); }
+  }
+  function getDisplayRating(anime) {
+    const id = parseInt(anime.id);
+    if (firestoreRatings.has(id)) return firestoreRatings.get(id).avg.toFixed(1);
+    return '—';
+  }
+  function getNumericRating(anime) {
+    const id = parseInt(anime.id);
+    if (firestoreRatings.has(id)) return firestoreRatings.get(id).avg;
+    return 0;
+  }
+  function normalizeText(s) { return (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''); }
+
+  let anuncioActual = null, cachedAdCard = null;
+  function inicializarAnuncio() {
+    if (typeof window.listaAnuncios !== 'undefined' && window.listaAnuncios.length > 0) {
+      anuncioActual = window.listaAnuncios[Math.floor(Math.random() * window.listaAnuncios.length)];
+    }
+  }
+  function crearTarjetaAnuncio() {
+    if (cachedAdCard) return cachedAdCard;
+    if (!anuncioActual) return null;
+    const card = document.createElement('div');
+    card.className = 'card card-ad';
+    const inner = document.createElement('div');
+    inner.innerHTML = anuncioActual.codigo;
+    inner.querySelectorAll('script').forEach(old => {
+      const ns = document.createElement('script');
+      if (old.src) { ns.src = old.src; ns.async = true; } else { ns.textContent = old.textContent; }
+      inner.appendChild(ns); old.remove();
+    });
+    card.appendChild(inner);
+    cachedAdCard = card;
+    return card;
+  }
+
+  let baseAnimes = [];
+  let searchableIndex = [];
+  function buildSearchableIndex(animes) {
+    return animes.map(a => ({
+      id: a.id,
+      title: a.title,
+      img: a.img || 'https://cdn.jsdelivr.net/gh/ArchinimeDev/Archinime@main/assets/img/placeholder.webp',
+      genres: a.genres || [],
+      searchStr: normalizeText(a.title) + ' ' + (a.aliases || []).map(normalizeText).join(' ')
+    }));
+  }
+
+  let allAnimes = [], currentPage = 1, totalPages = 1, itemsPerPage = 36;
+  let currentFilters = { search: '', genre: '', demographic: '', rating: '' };
+  const grid = document.getElementById('grid');
+  const paginationContainer = document.getElementById('pagination');
+  const searchInput = document.getElementById('search');
+  const suggestionsDesktop = document.getElementById('searchSuggestions');
+
+  function renderSuggestions(term) {
+    if (!suggestionsDesktop) return;
+    if (term.length < 1) {
+      suggestionsDesktop.classList.remove('active');
+      suggestionsDesktop.innerHTML = '';
+      return;
+    }
+    const normTerm = normalizeText(term);
+    const matches = searchableIndex.filter(item => item.searchStr.includes(normTerm)).slice(0, 8);
+    if (matches.length === 0) {
+      suggestionsDesktop.innerHTML = `<div class="suggestion-item"><span class="s-empty">No se encontraron resultados</span></div>`;
+      suggestionsDesktop.classList.add('active');
+      return;
+    }
+    let html = '';
+    matches.forEach(item => {
+      const title = item.title;
+      const idx = normalizeText(title).indexOf(normTerm);
+      let displayTitle = title;
+      if (idx !== -1) {
+        const start = title.substring(0, idx);
+        const match = title.substring(idx, idx + term.length);
+        const end = title.substring(idx + term.length);
+        displayTitle = `${start}<strong>${match}</strong>${end}`;
+      }
+      const genreStr = item.genres.slice(0, 2).join(', ') || 'Anime';
+      html += `
+        <div class="suggestion-item" data-id="${item.id}">
+          <img src="${item.img}" alt="${item.title}" loading="lazy">
+          <div class="s-info">
+            <div class="s-title">${displayTitle}</div>
+            <div class="s-genre">${genreStr}</div>
+          </div>
+        </div>
+      `;
+    });
+    suggestionsDesktop.innerHTML = html;
+    suggestionsDesktop.classList.add('active');
+    suggestionsDesktop.querySelectorAll('.suggestion-item[data-id]').forEach(el => {
+      el.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        const id = el.dataset.id;
+        const anime = baseAnimes.find(a => a.id == id);
+        if (anime) {
+          searchInput.value = anime.title;
+          hideAllSuggestions();
+          openDetail(id);
+        }
+      });
+    });
+  }
+
+  function hideAllSuggestions() {
+    if (suggestionsDesktop) suggestionsDesktop.classList.remove('active');
+  }
+
+  function applyFilters() {
+    let result = baseAnimes.slice();
+    if (currentFilters.genre) result = result.filter(a => a.genres && a.genres.includes(currentFilters.genre));
+    if (currentFilters.demographic) result = result.filter(a => a.genres && a.genres.includes(currentFilters.demographic));
+    if (currentFilters.search) {
+      const term = normalizeText(currentFilters.search);
+      result = result.filter(a => {
+        const titleMatch = normalizeText(a.title).includes(term);
+        if (titleMatch) return true;
+        if (a.aliases) return a.aliases.some(alias => normalizeText(alias).includes(term));
+        return false;
+      });
+    }
+    if (currentFilters.rating) {
+      result = result.filter(a => {
+        const r = getNumericRating(a);
+        if (currentFilters.rating === 'excellent') return r >= 4.8;
+        if (currentFilters.rating === 'good') return r >= 4.6 && r < 4.8;
+        if (currentFilters.rating === 'regular') return r < 4.6;
+        return true;
+      });
+    }
+    return result;
+  }
+
+  function cargarDatosYMostrar() {
+    grid.innerHTML = '<div style="text-align:center; padding:40px; color:var(--text-secondary);"><i class="fas fa-spinner fa-spin"></i> Cargando catálogo...</div>';
+    paginationContainer.innerHTML = '';
+    try {
+      const filtered = applyFilters();
+      allAnimes = filtered;
+      totalPages = Math.ceil(allAnimes.length / itemsPerPage);
+      currentPage = 1;
+      if (!allAnimes.length) { mostrarNoResultados(); paginationContainer.innerHTML = ''; } else renderPage();
+      if (!window.firstAnimesDispatched) { window.firstAnimesDispatched = true; window.dispatchEvent(new CustomEvent('firstAnimesLoaded')); }
+    } catch (e) {
+      grid.innerHTML = `<div style="text-align:center;padding:40px;color:var(--neon-pink);">Error: ${e.message}</div>`;
+    }
+  }
+
+  function renderPage() {
+    const start = (currentPage - 1) * itemsPerPage;
+    const end = start + itemsPerPage;
+    const pageItems = allAnimes.slice(start, end);
+    renderAnimes(pageItems, false);
+    renderPagination();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function renderAnimes(animes, append = false) {
+    if (!append) grid.innerHTML = '';
+    if (!animes.length) { mostrarNoResultados(); paginationContainer.innerHTML = ''; return; }
+    const frag = document.createDocumentFragment();
+    const hasFilters = currentFilters.search || currentFilters.genre || currentFilters.demographic || currentFilters.rating;
+    const insertAd = !hasFilters && anuncioActual !== null;
+    let adPos = -1;
+    if (insertAd && animes.length >= 5) {
+      adPos = Math.floor(Math.random() * (animes.length - 4)) + 4;
+    }
+    for (let i = 0; i < animes.length; i++) {
+      if (insertAd && i === adPos) {
+        const ad = crearTarjetaAnuncio();
+        if (ad) frag.appendChild(ad);
+      }
+      const anime = animes[i];
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.dataset.id = anime.id;
+      card.setAttribute('onclick', `openDetail('${anime.id}')`);
+      const rating = getDisplayRating(anime);
+      const img = anime.img || 'https://cdn.jsdelivr.net/gh/ArchinimeDev/Archinime@main/assets/img/placeholder.webp';
+      const ratingVal = getNumericRating(anime);
+      const roundedRating = Math.round(ratingVal * 10) / 10;
+      const badge = (roundedRating >= 4.9 && roundedRating <= 5.0) ? '<div class="badge">🔥 TOP</div>' : '';
+      card.innerHTML = `
+        <img src="${img}" alt="${anime.title}" loading="eager" decoding="async" style="background:#0b0e14;">
+        ${badge}
+        <div class="info">
+          <strong>${anime.title}</strong>
+          <span>⭐ ${rating}</span>
+        </div>
+      `;
+      frag.appendChild(card);
+    }
+    grid.appendChild(frag);
+    aplicarTilt();
+  }
+
+  function mostrarNoResultados() {
+    grid.innerHTML = `<div class="cyber-no-results">
+      <i class="fas fa-satellite-dish"></i>
+      <h2>Sin Resultados</h2>
+      <p>Prueba con otros filtros o busca por alias.</p>
+      <button onclick="resetearFiltrosGlobal()">Restaurar Radares</button>
+    </div>`;
+  }
+
+  function renderPagination() {
+    if (totalPages <= 1) { paginationContainer.innerHTML = ''; return; }
+    let html = `<button class="pagination-btn" ${currentPage===1?'disabled':''} onclick="changePage(${currentPage-1})"><i class="fas fa-chevron-left"></i></button>`;
+    const maxV = 5;
+    let s = Math.max(1, currentPage - Math.floor(maxV/2));
+    let e = Math.min(totalPages, s + maxV - 1);
+    if (e - s + 1 < maxV) s = Math.max(1, e - maxV + 1);
+    if (s > 1) { html += `<button class="pagination-btn" onclick="changePage(1)">1</button>`; if (s > 2) html += `<span class="pagination-ellipsis">...</span>`; }
+    for (let i = s; i <= e; i++) html += `<button class="pagination-btn ${i===currentPage?'active':''}" onclick="changePage(${i})">${i}</button>`;
+    if (e < totalPages) { if (e < totalPages - 1) html += `<span class="pagination-ellipsis">...</span>`; html += `<button class="pagination-btn" onclick="changePage(${totalPages})">${totalPages}</button>`; }
+    html += `<button class="pagination-btn" ${currentPage===totalPages?'disabled':''} onclick="changePage(${currentPage+1})"><i class="fas fa-chevron-right"></i></button>`;
+    paginationContainer.innerHTML = html;
+  }
+
+  window.changePage = function(p) { if (p < 1 || p > totalPages) return; currentPage = p; renderPage(); };
+
+  function handleSearchInput(e) {
+    const term = e.target.value;
+    currentFilters.search = term;
+    renderSuggestions(term);
+  }
+  function handleSearchKeydown(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      hideAllSuggestions();
+      cargarDatosYMostrar();
+    }
+    if (e.key === 'Escape') {
+      hideAllSuggestions();
+    }
+  }
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.search-wrapper')) {
+      hideAllSuggestions();
+    }
+  });
+  searchInput.addEventListener('input', handleSearchInput);
+  searchInput.addEventListener('keydown', handleSearchKeydown);
+
+  document.getElementById('searchToggleMobile').addEventListener('click', () => {
+    const wrapper = document.getElementById('searchWrapper');
+    wrapper.classList.toggle('active');
+    if (wrapper.classList.contains('active')) {
+      setTimeout(() => searchInput.focus(), 150);
+    }
+  });
+
+  document.getElementById('genre-select').addEventListener('change', e => { currentFilters.genre = e.target.value; cargarDatosYMostrar(); });
+  document.getElementById('demographic-select').addEventListener('change', e => { currentFilters.demographic = e.target.value; cargarDatosYMostrar(); });
+  document.getElementById('rating-select').addEventListener('change', e => { currentFilters.rating = e.target.value; cargarDatosYMostrar(); });
+
+  window.resetearFiltrosGlobal = function() {
+    document.getElementById('search').value = '';
+    document.getElementById('genre-select').value = '';
+    document.getElementById('demographic-select').value = '';
+    document.getElementById('rating-select').value = '';
+    currentFilters = { search: '', genre: '', demographic: '', rating: '' };
+    hideAllSuggestions();
+    cargarDatosYMostrar();
+  };
+
+  // ===== AUTENTICACIÓN =====
+  let currentUser = null, newAvatarUrl = null, lastProfileUpdate = 0;
+  const CLOUDINARY_URL = 'https://api.cloudinary.com/v1_1/dbcqcai1q/upload';
+  const CLOUDINARY_PRESET = 'stickers_archinime';
+
+  function getNeonColor(str) {
+    const colors = ['#00f0ff','#ff1a6b','#b114ff','#ffd700','#00ff33','#ffaa00'];
+    let h = 0; for (let i=0; i<str.length; i++) h = str.charCodeAt(i) + ((h<<5)-h);
+    return colors[Math.abs(h)%colors.length];
+  }
+
+  function showProfileModal() {
+    if (!currentUser) { showAuthModal(); document.getElementById('authError').textContent = "⚠️ Inicia sesión para configurar."; return; }
+    document.getElementById('profileAvatar').src = currentUser.photoURL || 'https://cdn.jsdelivr.net/gh/ArchinimeDev/Archinime@main/assets/img/invitado.avif';
+    newAvatarUrl = currentUser.photoURL;
+    document.getElementById('profileUid').value = currentUser.uid;
+    document.getElementById('profileDisplayName').value = currentUser.displayName || currentUser.email.split('@')[0];
+    db.collection('users').doc(currentUser.uid).get().then(doc => {
+      let color = doc.exists && doc.data().customColor ? doc.data().customColor : getNeonColor(currentUser.uid);
+      document.getElementById('profileNameColor').value = color;
+      if (doc.exists && doc.data().lastProfileUpdate) lastProfileUpdate = doc.data().lastProfileUpdate.toMillis();
+    });
+    document.getElementById('profileModal').classList.add('show');
+    disableBodyScroll();
+  }
+  function closeProfileModal() { document.getElementById('profileModal').classList.remove('show'); enableBodyScroll(); }
+  function copiarUID() {
+    const uid = document.getElementById('profileUid').value;
+    if (uid) { navigator.clipboard.writeText(uid); const msg = document.getElementById('profileStatusMsg'); msg.style.color='var(--neon-blue)'; msg.textContent='¡ID copiado!'; setTimeout(()=>{ if(msg.textContent.includes('copiado')) msg.textContent=''; },3000); }
+  }
+  document.getElementById('profileAvatarInput').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file || file.size > 2*1024*1024) { alert('Máximo 2 MB'); e.target.value=''; return; }
+    const label = document.querySelector('#profileModal .profile-upload-btn');
+    label.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Subiendo...';
+    try {
+      const fd = new FormData(); fd.append('file', file); fd.append('upload_preset', CLOUDINARY_PRESET);
+      const res = await fetch(CLOUDINARY_URL, { method:'POST', body:fd });
+      const data = await res.json();
+      if (data.secure_url) { newAvatarUrl = data.secure_url; document.getElementById('profileAvatar').src = newAvatarUrl; }
+    } catch (err) { alert('Error al subir'); }
+    finally { label.innerHTML = '<i class="fas fa-upload"></i> Subir avatar'; }
+  });
+  async function guardarCambiosPerfil() {
+    if (!currentUser) return;
+    const btn = document.getElementById('profileSaveBtn');
+    const msg = document.getElementById('profileStatusMsg');
+    const name = document.getElementById('profileDisplayName').value.trim();
+    const color = document.getElementById('profileNameColor').value;
+    if (!name) { msg.style.color='var(--neon-pink)'; msg.textContent='El nombre no puede estar vacío.'; return; }
+    const isAdmin = currentUser.email === 'archinime12@gmail.com';
+    const now = Date.now();
+    const fiveDays = 5*24*60*60*1000;
+    if (!isAdmin && lastProfileUpdate > 0 && (now - lastProfileUpdate < fiveDays)) {
+      const days = Math.ceil((fiveDays - (now - lastProfileUpdate))/(1000*60*60*24));
+      msg.style.color='var(--neon-pink)'; msg.textContent=`⏳ Espera ${days} días para cambiar de nuevo.`;
+      return;
+    }
+    btn.disabled = true; btn.textContent = 'GUARDANDO...'; msg.textContent = '';
+    try {
+      await currentUser.updateProfile({ displayName: name, photoURL: newAvatarUrl });
+      await db.collection('users').doc(currentUser.uid).set({ customColor: color, lastProfileUpdate: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
+      const commentsRef = db.collection('comments').where('userId', '==', currentUser.uid);
+      const snap = await commentsRef.get();
+      const batch = db.batch();
+      snap.forEach(d => batch.update(d.ref, { userName: name, userAvatar: newAvatarUrl, customColor: color }));
+      if (snap.size > 0) await batch.commit();
+      lastProfileUpdate = Date.now();
+      msg.style.color='var(--neon-blue)'; msg.textContent='¡Cambios guardados!';
+      document.getElementById('userAvatarBtn').src = newAvatarUrl || 'https://cdn.jsdelivr.net/gh/ArchinimeDev/Archinime@main/assets/img/invitado.avif';
+      document.getElementById('dropdownAvatar').src = newAvatarUrl || 'https://cdn.jsdelivr.net/gh/ArchinimeDev/Archinime@main/assets/img/invitado.avif';
+      document.getElementById('dropdownName').textContent = name;
+      const c = color;
+      document.getElementById('userAvatarBtn').style.borderColor = c;
+      document.getElementById('userAvatarBtn').style.boxShadow = `0 0 20px ${c}`;
+      document.getElementById('dropdownAvatar').style.borderColor = c;
+      document.getElementById('dropdownAvatar').style.boxShadow = `0 0 20px ${c}`;
+      document.getElementById('dropdownName').style.color = c;
+      document.getElementById('dropdownName').style.textShadow = `0 0 10px ${c}`;
+    } catch (err) { msg.style.color='var(--neon-pink)'; msg.textContent='Error al guardar.'; }
+    finally { btn.disabled = false; btn.textContent = 'GUARDAR CAMBIOS'; }
+  }
+
+  document.querySelectorAll('.auth-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      const target = tab.dataset.tab;
+      document.getElementById('authLoginForm').style.display = target === 'login' ? 'flex' : 'none';
+      document.getElementById('authRegisterForm').style.display = target === 'register' ? 'flex' : 'none';
+    });
+  });
+  function showAuthModal() { document.getElementById('authModal').classList.add('show'); disableBodyScroll(); }
+  function closeAuthModal() { document.getElementById('authModal').classList.remove('show'); enableBodyScroll(); document.getElementById('authError').textContent = ''; }
+  async function loginWithEmail() {
+    const email = document.getElementById('loginEmail').value, pass = document.getElementById('loginPassword').value;
+    try { await auth.signInWithEmailAndPassword(email, pass); closeAuthModal(); } catch (e) { document.getElementById('authError').textContent = e.message; }
+  }
+  async function registerWithEmail() {
+    const email = document.getElementById('registerEmail').value, pass = document.getElementById('registerPassword').value, conf = document.getElementById('registerConfirm').value;
+    if (pass !== conf) { document.getElementById('authError').textContent = 'Las contraseñas no coinciden'; return; }
+    try { await auth.createUserWithEmailAndPassword(email, pass); closeAuthModal(); } catch (e) { document.getElementById('authError').textContent = e.message; }
+  }
+  async function loginWithGoogle() { try { await auth.signInWithPopup(providerGoogle); closeAuthModal(); } catch (e) { document.getElementById('authError').textContent = e.message; } }
+  function logoutUser() { auth.signOut().then(() => location.reload()); }
+  function updateUserUI(user) {
+    currentUser = user;
+    const avatar = document.getElementById('userAvatarBtn'), dAvatar = document.getElementById('dropdownAvatar'), dName = document.getElementById('dropdownName'), loginItem = document.getElementById('loginBtnItem');
+    if (user) {
+      const photo = user.photoURL || 'https://cdn.jsdelivr.net/gh/ArchinimeDev/Archinime@main/assets/img/invitado.avif';
+      avatar.src = photo; dAvatar.src = photo;
+      dName.textContent = user.displayName || user.email.split('@')[0];
+      loginItem.innerHTML = '<i class="fas fa-sign-out-alt"></i> Cerrar sesión'; loginItem.onclick = logoutUser;
+      db.collection('users').doc(user.uid).get().then(doc => {
+        const color = doc.exists && doc.data().customColor ? doc.data().customColor : getNeonColor(user.uid);
+        avatar.style.borderColor = color; avatar.style.boxShadow = `0 0 20px ${color}`;
+        dAvatar.style.borderColor = color; dAvatar.style.boxShadow = `0 0 20px ${color}`;
+        dName.style.color = color; dName.style.textShadow = `0 0 10px ${color}`;
+      });
+    } else {
+      avatar.src = 'https://cdn.jsdelivr.net/gh/ArchinimeDev/Archinime@main/assets/img/invitado.avif'; 
+      dAvatar.src = 'https://cdn.jsdelivr.net/gh/ArchinimeDev/Archinime@main/assets/img/invitado.avif';
+      dName.textContent = 'Invitado';
+      loginItem.innerHTML = '<i class="fas fa-sign-in-alt"></i> Iniciar sesión'; loginItem.onclick = showAuthModal;
+      avatar.style.borderColor = 'var(--neon-blue)'; avatar.style.boxShadow = 'none';
+      dAvatar.style.borderColor = 'var(--neon-blue)'; dAvatar.style.boxShadow = 'none';
+      dName.style.color = 'var(--neon-blue)'; dName.style.textShadow = 'none';
+    }
+    // Actualizar también el panel de chat si está abierto
+    if (sidePanel.classList.contains('open')) {
+      actualizarEstadoChatPanel();
+    }
+  }
+  document.getElementById('profileDropdownBtn').addEventListener('click', (e) => { e.stopPropagation(); showProfileModal(); });
+  document.getElementById('userAvatarBtn').addEventListener('click', e => { e.stopPropagation(); document.getElementById('userDropdown').classList.toggle('active'); });
+  document.addEventListener('click', e => {
+    const dd = document.getElementById('userDropdown');
+    if (!e.target.closest('.user-menu')) dd.classList.remove('active');
+  });
+  auth.onAuthStateChanged(updateUserUI);
+
+  // ===== CUSTOM SELECTS =====
+  (function() {
+    const selects = ['genre-select', 'demographic-select', 'rating-select'];
+    const isMobileSelect = window.matchMedia('(max-width: 768px)').matches;
+    function updateTrigger(trigger, select) { trigger.textContent = select.options[select.selectedIndex]?.textContent || select.options[0].textContent; }
+    selects.forEach(id => {
+      const select = document.getElementById(id); if (!select) return;
+      const trigger = document.createElement('div'); trigger.className = 'custom-select-trigger'; updateTrigger(trigger, select);
+      select.parentNode.insertBefore(trigger, select);
+      trigger.addEventListener('click', () => {
+        if (isMobileSelect) {
+          const overlay = document.createElement('div'); overlay.className = 'select-popup-overlay';
+          const popup = document.createElement('div'); popup.className = 'select-popup';
+          const header = document.createElement('div'); header.className = 'select-popup-header'; header.textContent = select.getAttribute('aria-label') || 'Seleccionar';
+          popup.appendChild(header);
+          Array.from(select.options).forEach(opt => {
+            const optDiv = document.createElement('div'); optDiv.className = 'select-popup-option'; if (opt.value === select.value) optDiv.classList.add('selected');
+            optDiv.textContent = opt.textContent;
+            optDiv.addEventListener('click', () => { select.value = opt.value; select.dispatchEvent(new Event('change')); updateTrigger(trigger, select); overlay.classList.remove('active'); enableBodyScroll(); setTimeout(() => overlay.remove(), 300); });
+            popup.appendChild(optDiv);
+          });
+          overlay.appendChild(popup); document.body.appendChild(overlay);
+          overlay.addEventListener('click', e => { if (e.target === overlay) { overlay.classList.remove('active'); enableBodyScroll(); setTimeout(() => overlay.remove(), 300); } });
+          disableBodyScroll();
+          setTimeout(() => overlay.classList.add('active'), 10);
+        } else {
+          const existing = document.querySelector('.custom-select-dropdown');
+          if (existing) existing.remove();
+          const rect = trigger.getBoundingClientRect();
+          const dropdown = document.createElement('div'); dropdown.className = 'custom-select-dropdown';
+          dropdown.style.top = (rect.bottom + window.scrollY) + 'px';
+          dropdown.style.left = (rect.left + window.scrollX) + 'px';
+          dropdown.style.minWidth = rect.width + 'px';
+          Array.from(select.options).forEach(opt => {
+            const optDiv = document.createElement('div'); optDiv.className = 'custom-select-option'; optDiv.textContent = opt.textContent;
+            if (opt.value === select.value) { optDiv.style.background = 'rgba(0, 240, 255, 0.05)'; optDiv.style.color = '#fff'; }
+            optDiv.addEventListener('click', () => { select.value = opt.value; select.dispatchEvent(new Event('change')); updateTrigger(trigger, select); dropdown.remove(); });
+            dropdown.appendChild(optDiv);
+          });
+          document.body.appendChild(dropdown);
+          const close = e => { if (!dropdown.contains(e.target) && e.target !== trigger) { dropdown.remove(); document.removeEventListener('click', close); document.removeEventListener('scroll', close); } };
+          setTimeout(() => { document.addEventListener('click', close); document.addEventListener('scroll', close, { passive: true }); }, 10);
+        }
+      });
+    });
+  })();
+
+  function aplicarTilt() {
+    const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    if (isTouch) return;
+    document.querySelectorAll('.card:not([data-tilt])').forEach(card => {
+      card.dataset.tilt = 'true';
+      card.addEventListener('mousemove', e => {
+        if (card._raf) cancelAnimationFrame(card._raf);
+        card._raf = requestAnimationFrame(() => {
+          const rect = card.getBoundingClientRect();
+          const x = e.clientX - rect.left, y = e.clientY - rect.top;
+          const rx = ((y - rect.height/2) / (rect.height/2)) * -5;
+          const ry = ((x - rect.width/2) / (rect.width/2)) * 5;
+          card.style.transform = `perspective(1000px) rotateX(${rx}deg) rotateY(${ry}deg) scale(1.02)`;
+        });
+      });
+      card.addEventListener('mouseleave', () => { if (card._raf) cancelAnimationFrame(card._raf); card.style.transform = ''; });
+    });
+  }
+
+  // ===== CHROMA KEY (ANIMACIONES FIJAS) =====
+  function randomizeFgPosition() {
+    const container = document.getElementById('stageContainer');
+    if (!container) return;
+    container.classList.remove('fg-left', 'fg-right');
+    container.classList.add(Math.random() < 0.5 ? 'fg-left' : 'fg-right');
+  }
+
+  const fgContainer = document.getElementById('fgContainer');
+  const fgVideo = document.getElementById('fgVideo');
+  const fgCanvas = document.getElementById('fgCanvas');
+  const fgCtx = fgCanvas.getContext('2d', { willReadFrequently: true });
+  let currentAnim = videoList[Math.floor(Math.random() * videoList.length)];
+  let isTransitioning = false;
+  fgVideo.style.display = 'none';
+  fgVideo.src = currentAnim.src;
+  fgVideo.addEventListener('loadedmetadata', () => {
+    const maxW = 300;
+    const ratio = fgVideo.videoWidth / fgVideo.videoHeight;
+    fgCanvas.width = maxW;
+    fgCanvas.height = maxW / ratio;
+  });
+  let frameCount = 0;
+  let chromaActive = true;
+  function processChroma() {
+    if (fgVideo.paused || fgVideo.ended || isTransitioning) {
+      requestAnimationFrame(processChroma);
+      return;
+    }
+    frameCount++;
+    if (frameCount % 4 !== 0) {
+      requestAnimationFrame(processChroma);
+      return;
+    }
+    fgCtx.drawImage(fgVideo, 0, 0, fgCanvas.width, fgCanvas.height);
+    const frame = fgCtx.getImageData(0, 0, fgCanvas.width, fgCanvas.height);
+    const data = frame.data;
+    const key = currentAnim.keyColor || 'green';
+    const thresh = currentAnim.preset?.threshold ? currentAnim.preset.threshold * 255 : 30;
+    for (let i = 0; i < data.length; i += 4) {
+      let r = data[i], g = data[i+1], b = data[i+2];
+      if (key === 'blue') { if (b > r + thresh && b > g + thresh) data[i+3] = 0; }
+      else { if (g > r + thresh && g > b + thresh) data[i+3] = 0; }
+    }
+    fgCtx.putImageData(frame, 0, 0);
+    requestAnimationFrame(processChroma);
+  }
+  fgVideo.addEventListener('play', () => requestAnimationFrame(processChroma));
+  function startVisualMedia() {
+    document.getElementById('bg-video').play().then(() => document.getElementById('bg-video').style.opacity = '1').catch(()=>{});
+    fgVideo.muted = true;
+    fgVideo.play().catch(()=>{});
+    randomizeFgPosition();
+  }
+  function createSparks(cx, cy) {
+    const colors = ['#00f0ff','#b114ff','#ff1a6b','#ffd700'];
+    for (let i = 0; i < 70; i++) {
+      const s = document.createElement('div');
+      s.className = 'spark';
+      const size = Math.random() * 5 + 3;
+      s.style.width = size + 'px'; s.style.height = size + 'px';
+      s.style.left = cx + 'px'; s.style.top = cy + 'px';
+      s.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+      s.style.boxShadow = `0 0 15px ${s.style.backgroundColor}`;
+      const ang = Math.random() * Math.PI * 2;
+      const dist = Math.random() * 200 + 60;
+      s.style.setProperty('--tx', Math.cos(ang) * dist + 'px');
+      s.style.setProperty('--ty', Math.sin(ang) * dist + 'px');
+      document.body.appendChild(s);
+      setTimeout(() => s.remove(), 800);
+    }
+  }
+  fgContainer.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (isTransitioning) return;
+    createSparks(e.clientX, e.clientY);
+    isTransitioning = true;
+    fgContainer.classList.add('poof');
+    setTimeout(() => {
+      let newAnim;
+      do { newAnim = videoList[Math.floor(Math.random() * videoList.length)]; } while (newAnim.id === currentAnim.id && videoList.length > 1);
+      currentAnim = newAnim;
+      fgVideo.src = currentAnim.src;
+      fgVideo.play().then(() => {
+        isTransitioning = false;
+        fgContainer.classList.remove('poof');
+        randomizeFgPosition();
+      }).catch(() => { isTransitioning = false; });
+    }, 600);
+  });
+  window.addEventListener('DOMContentLoaded', startVisualMedia);
+
+  // ===== FUNCIONES DE DETALLE Y EVENTOS =====
+  function buildContentDetails(anime) {
+    if (!anime.seasons || anime.seasons.length === 0) {
+      return `<p style="color: var(--text-secondary); line-height: 1.6;">${anime.desc || 'Descripción no disponible.'}</p>`;
+    }
+    const sumTypes = ['OVA', 'Especial', 'Tráiler'];
+    const typeLabels = {
+      'Temporada': { icon: 'fa-tv', label: 'Temporada(s)' },
+      'OVA': { icon: 'fa-compact-disc', label: 'OVA(s)' },
+      'Spin-Off': { icon: 'fa-code-branch', label: 'Spin-Off(s)' },
+      'Pelicula': { icon: 'fa-film', label: 'Película(s)' },
+      'Especial': { icon: 'fa-star', label: 'Especial(es)' },
+      'Tráiler': { icon: 'fa-video', label: 'Tráiler(es)' }
+    };
+    const typeCounts = {};
+    let totalEpisodios = 0;
+    anime.seasons.forEach(season => {
+      const type = season.type || 'Temporada';
+      const epsCount = season.eps ? season.eps.length : 0;
+      if (sumTypes.includes(type)) {
+        typeCounts[type] = (typeCounts[type] || 0) + epsCount;
+      } else {
+        typeCounts[type] = (typeCounts[type] || 0) + 1;
+      }
+      totalEpisodios += epsCount;
+    });
+    let hasItems = false;
+    let html = '<div style="display: flex; flex-wrap: wrap; gap: 10px; margin: 10px 0;">';
+    for (const [type, count] of Object.entries(typeCounts)) {
+      const config = typeLabels[type];
+      if (config && count > 0) {
+        hasItems = true;
+        html += `<span class="content-chip"><i class="fas ${config.icon}"></i> ${count} ${config.label}</span>`;
+      }
+    }
+    if (totalEpisodios > 0) {
+      hasItems = true;
+      html += `<span class="content-chip"><i class="fas fa-list"></i> ${totalEpisodios} Episodio(s) Total</span>`;
+    }
+    html += '</div>';
+    if (!hasItems) {
+      return `<p style="color: var(--text-secondary); line-height: 1.6;">${anime.desc || 'Descripción no disponible.'}</p>`;
+    }
+    return html;
+  }
+
+  function openDetail(id) {
+    const anime = baseAnimes.find(a => a.id == id);
+    if (!anime) { alert('Anime no encontrado'); return; }
+    document.getElementById('detailCoverImg').src = anime.img || 'https://cdn.jsdelivr.net/gh/ArchinimeDev/Archinime@main/assets/img/placeholder.webp';
+    document.getElementById('detailCoverImg').alt = anime.title;
+    document.getElementById('detailTitle').textContent = anime.title;
+    const rating = getDisplayRating(anime);
+    const genres = anime.genres?.join(', ') || 'Sin género';
+    document.getElementById('detailMeta').innerHTML = `<span>⭐ ${rating}</span><span>${genres}</span>`;
+    const airingBadge = document.getElementById('detailAiringBadge');
+    if (anime.isAiring === true) {
+      airingBadge.style.display = 'block';
+    } else {
+      airingBadge.style.display = 'none';
+    }
+    document.getElementById('detailDesc').innerHTML = buildContentDetails(anime);
+    document.getElementById('detailWatchBtn').onclick = function() {
+      window.location.href = `pages/anime-detail.html?id=${anime.id}`;
+    };
+    document.getElementById('detailModal').classList.add('show');
+    disableBodyScroll();
+  }
+  function closeDetailModal() { document.getElementById('detailModal').classList.remove('show'); enableBodyScroll(); }
+  window.openDetail = openDetail;
+  window.closeDetailModal = closeDetailModal;
+
+  // Event modal
+  let eventQueue = [];
+  let isEventModalShowing = false;
+  function showNextEvent() {
+    if (eventQueue.length === 0 || isEventModalShowing) return;
+    isEventModalShowing = true;
+    const eventData = eventQueue.shift();
+    document.getElementById('eventBg').style.backgroundImage = `url(${eventData.img || 'https://cdn.jsdelivr.net/gh/ArchinimeDev/Archinime@main/assets/img/placeholder.webp'})`;
+    document.getElementById('eventCoverBack').src = eventData.img || 'https://cdn.jsdelivr.net/gh/ArchinimeDev/Archinime@main/assets/img/placeholder.webp';
+    document.getElementById('eventCoverFront').src = eventData.img || 'https://cdn.jsdelivr.net/gh/ArchinimeDev/Archinime@main/assets/img/placeholder.webp';
+    document.getElementById('eventTitle').textContent = eventData.title || 'Nuevo Anime';
+    document.getElementById('eventMeta').textContent = `⭐ ${getDisplayRating(eventData)} · ${eventData.genres?.slice(0,2).join(', ') || 'Anime'}`;
+    document.getElementById('eventDesc').textContent = eventData.desc || 'Descripción no disponible.';
+    document.getElementById('eventBadge').textContent = eventData.updateType || '🔥 NUEVO';
+    document.getElementById('eventBtn').onclick = function() {
+      window.location.href = `pages/anime-detail.html?id=${eventData.id}`;
+    };
+    document.getElementById('eventModal').classList.add('show');
+    disableBodyScroll();
+    if (window.eventTimeout) clearTimeout(window.eventTimeout);
+    window.eventTimeout = setTimeout(() => {
+      closeEventModal();
+    }, 8000);
+  }
+  function closeEventModal() {
+    document.getElementById('eventModal').classList.remove('show');
+    enableBodyScroll();
+    isEventModalShowing = false;
+    setTimeout(() => {
+      showNextEvent();
+    }, 1500);
+  }
+  window.closeEventModal = closeEventModal;
+  function addEventToQueue(anime) {
+    if (eventQueue.length >= 5) return;
+    eventQueue.push(anime);
+    if (!isEventModalShowing) {
+      showNextEvent();
+    }
+  }
+  function checkForNewAnimes() {
+    const newAnimes = baseAnimes.slice(0, 3);
+    newAnimes.forEach(anime => {
+      addEventToQueue(anime);
+    });
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      closeAuthModal(); closeProfileModal(); closeDetailModal(); closeEventModal();
+      sidePanel.classList.remove('open');
+      document.body.style.overflow = '';
+      hideAllSuggestions();
+      cerrarStickerModalGlobal();
+    }
+  });
+
+  function disableBodyScroll() { const sw = window.innerWidth - document.documentElement.clientWidth; document.body.style.paddingRight = sw + 'px'; document.body.classList.add('modal-open'); }
+  function enableBodyScroll() { document.body.style.paddingRight = ''; document.body.classList.remove('modal-open'); }
+
+  window.loginWithEmail = loginWithEmail;
+  window.registerWithEmail = registerWithEmail;
+  window.loginWithGoogle = loginWithGoogle;
+  window.showAuthModal = showAuthModal;
+  window.closeAuthModal = closeAuthModal;
+  window.guardarCambiosPerfil = guardarCambiosPerfil;
+  window.closeProfileModal = closeProfileModal;
+  window.copiarUID = copiarUID;
+
+  // ===== INICIALIZACIÓN FINAL =====
+  inicializarAnuncio();
+  loadRatings().then(() => {
+    if (typeof catalogoArray !== 'undefined') {
+      baseAnimes = shuffleArray([...catalogoArray]);
+      searchableIndex = buildSearchableIndex(baseAnimes);
+    } else {
+      baseAnimes = [];
+      searchableIndex = [];
+    }
+    cargarDatosYMostrar();
+    setTimeout(() => {
+      checkForNewAnimes();
+    }, 3000);
+  }).catch(err => {
+    console.error('Error al cargar ratings:', err);
+    if (typeof catalogoArray !== 'undefined') {
+      baseAnimes = shuffleArray([...catalogoArray]);
+      searchableIndex = buildSearchableIndex(baseAnimes);
+    } else {
+      baseAnimes = [];
+      searchableIndex = [];
+    }
+    cargarDatosYMostrar();
+    setTimeout(() => {
+      checkForNewAnimes();
+    }, 3000);
+  });
+
+  window.addEventListener('load', () => { if (window.startNotificationSequence) window.startNotificationSequence(); });
+
+  if (window.matchMedia('(max-width: 768px)').matches) {
+    const logo = document.querySelector('.nav-logo');
+    if (logo) {
+      logo.removeAttribute('target');
+      logo.addEventListener('click', function(e) { e.preventDefault(); window.location.href = this.href; });
+    }
+  }
+
+  // ===== PAUSAR BANNERS =====
+  (function pauseBannersWhenHidden() {
+    const carousel = document.getElementById('bannerCarousel');
+    if (!carousel) return;
+    function pauseAllVideos() {
+      carousel.querySelectorAll('video').forEach(v => v.pause());
+    }
+    function resumeActiveVideo() {
+      const activeSlide = carousel.querySelector('.banner-slide.active');
+      if (!activeSlide) return;
+      const video = activeSlide.querySelector('video');
+      if (video) video.play().catch(() => {});
+    }
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) resumeActiveVideo();
+        else pauseAllVideos();
+      });
+    }, { threshold: 0.1 });
+    observer.observe(carousel);
+    const slideObserver = new MutationObserver(() => {
+      const rect = carousel.getBoundingClientRect();
+      const isVisible = (
+        rect.top < window.innerHeight &&
+        rect.bottom > 0 &&
+        rect.left < window.innerWidth &&
+        rect.right > 0
+      );
+      if (isVisible) resumeActiveVideo();
+      else pauseAllVideos();
+    });
+    slideObserver.observe(carousel, { attributes: true, attributeFilter: ['class'], subtree: true });
+  })();
+
+  // ===== OPTIMIZACIÓN PARTÍCULAS EN MÓVIL =====
+  (function reduceParticlesOnMobile() {
+    const canvas = document.getElementById('particlesCanvas');
+    if (!canvas) return;
+    if (window.matchMedia('(max-width: 768px)').matches) {
+      canvas.dataset.mobile = 'true';
+    }
+  })();
+
+  // ===== REDIMENSIONAR CANVAS DE PARTÍCULAS =====
+  (function resizeParticlesCanvas() {
+    const canvas = document.getElementById('particlesCanvas');
+    if (!canvas) return;
+    function resize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+  })();
+
+  console.log('🚀 Archinime cargado correctamente con optimizaciones para móviles.');
+</script>
+
+</body>
+</html>
