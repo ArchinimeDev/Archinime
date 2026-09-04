@@ -2117,7 +2117,7 @@
       z-index: 99;
       pointer-events: auto;
       width: 180px;
-      height: 240px;  /* Alto fijo para que todos los recuadros tengan el mismo tamaño */
+      height: 240px;
       border-radius: 16px;
       overflow: hidden;
       background: transparent;
@@ -2173,7 +2173,7 @@
     @media (max-width: 768px) {
       #stageContainer {
         width: 140px;
-        height: 187px;  /* Mantener relación 3:4 */
+        height: 187px;
         bottom: 10px;
         right: 10px;
       }
@@ -3791,7 +3791,7 @@
     });
   }
 
-  // ===== CHROMA KEY (ANIMACIONES FIJAS) - TAMAÑO FIJO Y CARGA RÁPIDA =====
+  // ===== CHROMA KEY (ANIMACIONES FIJAS) - CON CDN Y REPRODUCCIÓN ROBUSTA =====
   function randomizeFgPosition() {
     const container = document.getElementById('stageContainer');
     if (!container) return;
@@ -3804,7 +3804,7 @@
   const fgCanvas = document.getElementById('fgCanvas');
   const fgCtx = fgCanvas.getContext('2d', { willReadFrequently: true });
 
-  // Fijamos el tamaño del canvas (3:4)
+  // Tamaño fijo del canvas (3:4)
   const CANVAS_W = 180;
   const CANVAS_H = 240;
   fgCanvas.width = CANVAS_W;
@@ -3816,15 +3816,50 @@
   fgVideo.style.display = 'none';
   fgVideo.src = currentAnim.src;
   fgVideo.preload = 'auto';
+  fgVideo.muted = true;
+  fgVideo.loop = false;
 
-  // Cuando el video esté listo, lo mostramos
+  // Variable para controlar el estado de reproducción
+  let videoReady = false;
+
+  // Cuando el video esté listo para reproducirse
   fgVideo.addEventListener('loadeddata', () => {
-    fgVideo.play().catch(() => {});
+    videoReady = true;
+    fgVideo.play().catch(() => {
+      // Si falla, lo intentamos de nuevo después de un breve retraso
+      setTimeout(() => fgVideo.play().catch(() => {}), 500);
+    });
   });
+
+  // Si el video se detiene, intentamos reproducir de nuevo (por si el usuario hace clic)
+  fgVideo.addEventListener('pause', () => {
+    if (!fgVideo.ended) {
+      setTimeout(() => fgVideo.play().catch(() => {}), 200);
+    }
+  });
+
+  // Cuando el video termina, cambiamos a otro
+  fgVideo.addEventListener('ended', () => {
+    if (!isTransitioning) {
+      cambiarVideo();
+    }
+  });
+
+  function cambiarVideo() {
+    if (isTransitioning) return;
+    let newAnim;
+    do { newAnim = videoList[Math.floor(Math.random() * videoList.length)]; } while (newAnim.id === currentAnim.id && videoList.length > 1);
+    currentAnim = newAnim;
+    fgVideo.src = currentAnim.src;
+    fgVideo.load();
+    videoReady = false;
+    // La reproducción comenzará al dispararse loadeddata
+  }
 
   // Procesar chroma (siempre en el mismo canvas)
   let frameCount = 0;
   function processChroma() {
+    // Si el video no se está reproduciendo o está en transición, esperamos
     if (fgVideo.paused || fgVideo.ended || isTransitioning) {
       requestAnimationFrame(processChroma);
       return;
@@ -3834,10 +3869,11 @@
       requestAnimationFrame(processChroma);
       return;
     }
+    
     // Limpiar canvas
     fgCtx.clearRect(0, 0, CANVAS_W, CANVAS_H);
     
-    // Dibujar el video escalado para que quepa dentro del canvas (manteniendo relación)
+    // Dibujar el video escalado para que quepa dentro del canvas
     const vw = fgVideo.videoWidth;
     const vh = fgVideo.videoHeight;
     if (!vw || !vh) { requestAnimationFrame(processChroma); return; }
@@ -3874,8 +3910,11 @@
     fgCtx.putImageData(imageData, 0, 0);
     requestAnimationFrame(processChroma);
   }
+
+  // Iniciar el bucle de procesamiento
   fgVideo.addEventListener('play', () => requestAnimationFrame(processChroma));
 
+  // Función para iniciar la reproducción de los videos
   function startVisualMedia() {
     // Video de fondo
     document.getElementById('bg-video').play().then(() => {
@@ -3883,17 +3922,24 @@
     }).catch(() => {});
 
     // Chroma
-    fgVideo.muted = true;
-    fgVideo.play().catch(() => {});
+    fgVideo.play().catch(() => {
+      // Si falla, lo intentamos cada 2 segundos hasta que el usuario interactúe
+      const interval = setInterval(() => {
+        if (!fgVideo.paused) { clearInterval(interval); return; }
+        fgVideo.play().catch(() => {});
+      }, 2000);
+    });
     randomizeFgPosition();
   }
 
-  // Forzar reproducción con clic del usuario
-  document.addEventListener('click', () => {
+  // Forzar reproducción con clic del usuario (para autoplay bloqueado)
+  document.addEventListener('click', function forcePlay() {
     if (fgVideo.paused) {
       fgVideo.play().catch(() => {});
     }
-  }, { once: true });
+    // Quitamos el listener después del primer clic para no interferir
+    document.removeEventListener('click', forcePlay);
+  });
 
   function createSparks(cx, cy) {
     const colors = ['#00f0ff','#b114ff','#ff1a6b','#ffd700'];
@@ -3913,6 +3959,7 @@
       setTimeout(() => s.remove(), 800);
     }
   }
+
   fgContainer.addEventListener('click', (e) => {
     e.stopPropagation();
     if (isTransitioning) return;
@@ -3920,17 +3967,24 @@
     isTransitioning = true;
     fgContainer.classList.add('poof');
     setTimeout(() => {
-      let newAnim;
-      do { newAnim = videoList[Math.floor(Math.random() * videoList.length)]; } while (newAnim.id === currentAnim.id && videoList.length > 1);
-      currentAnim = newAnim;
-      fgVideo.src = currentAnim.src;
-      fgVideo.play().then(() => {
-        isTransitioning = false;
-        fgContainer.classList.remove('poof');
-        randomizeFgPosition();
-      }).catch(() => { isTransitioning = false; });
+      cambiarVideo();
+      // Esperamos a que el video se cargue y luego lo reproducimos
+      const checkReady = setInterval(() => {
+        if (videoReady) {
+          clearInterval(checkReady);
+          fgVideo.play().then(() => {
+            isTransitioning = false;
+            fgContainer.classList.remove('poof');
+            randomizeFgPosition();
+          }).catch(() => {
+            isTransitioning = false;
+            fgContainer.classList.remove('poof');
+          });
+        }
+      }, 200);
     }, 600);
   });
+
   window.addEventListener('DOMContentLoaded', startVisualMedia);
 
   // ===== FUNCIONES DE DETALLE Y EVENTOS =====
