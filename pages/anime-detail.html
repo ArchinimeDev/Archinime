@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Cargando Anime... - Archinime OS</title>
+  <meta name="description" content="Sumérgete en la experiencia definitiva de anime. Interfaz Cyberpunk, sonido envolvente y la mejor calidad.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+  <link rel="preconnect" href="https://www.gstatic.com">
+
+  <script>
+    (function() {
+      const colors = ["#00f3ff", "#0066ff", "#bc13fe", "#ff0055", "#bc13fe", "#0066ff", "#00f3ff"];
+      const animationDuration = 20000;
+      const segments = colors.length - 1;
+      
+      let metaTag = document.querySelector('meta[name="theme-color"]');
+      if (!metaTag) {
+        metaTag = document.createElement('meta');
+        metaTag.name = "theme-color";
+        document.head.appendChild(metaTag);
+      }
+
+      const hexToRgb = (hex) => {
+        const bigint = parseInt(hex.slice(1), 16);
+        return [(bigint >> 16) & 255, (bigint >> 8) & 255, bigint & 255];
+      };
+      const rgbToHex = (r, g, b) => "#" + [r, g, b].map(x => Math.round(x).toString(16).padStart(2,'0')).join('');
+      const lerp = (start, end, t) => start + (end - start) * t;
+
+      let startTimestamp = null;
+      let lastUpdate = 0;
+
+      function step(timestamp) {
+        if (!startTimestamp) startTimestamp = timestamp;
+        const progress = timestamp - startTimestamp;
+        
+        if (timestamp - lastUpdate > 100) {
+          let currentProgress = (progress / animationDuration) * segments;
+          currentProgress %= segments;
+          
+          const index = Math.floor(currentProgress);
+          const t = currentProgress - index;
+          const colorStart = hexToRgb(colors[index]);
+          const colorEnd = hexToRgb(colors[index + 1]);
+          
+          const r = lerp(colorStart[0], colorEnd[0], t);
+          const g = lerp(colorStart[1], colorEnd[1], t);
+          const b = lerp(colorStart[2], colorEnd[2], t);
+          
+          metaTag.setAttribute('content', rgbToHex(r, g, b));
+          lastUpdate = timestamp;
+        }
+        requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    })();
+  </script>
+
+  <meta property="og:type" content="video.movie">
+  <meta property="og:title" content="Archinime OS">
+  <meta property="og:description" content="Disfruta del mejor anime online con interfaz Cyberpunk.">
+  <meta property="og:image" content="assets/img/Logo_Archinime.avif">
+  <meta property="og:url" content="">
+  <meta property="og:site_name" content="Archinime">
+
+  <link rel="icon" href="assets/img/Logo_Archinime.png" type="image/png">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* ===== ESTILOS OPTIMIZADOS (sin cambios) ===== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --neon-cyan: #00f3ff;
+      --neon-purple: #bc13fe;
+      --neon-pink: #ff0055;
+      --neon-yellow: #f1c40f;
+      --dark-bg: #050505;
+      --glass-bg: rgba(10, 12, 16, 0.7);
+      --text: #ffffff;
+      --header-height: 72px;
+      --glow-intensity: 0.2;
+      --transition-smooth: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      --radius: 16px;
+    }
+
+    html, body {
+      height: 100%;
+      overflow-x: hidden;
+      font-family: 'Poppins', sans-serif;
+      color: var(--text);
+      background: transparent;
+      scroll-behavior: smooth;
+    }
+
+    #bg-video {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: -2;
+      background: url('assets/img/galaxia-morado1.avif') center/cover no-repeat;
+      opacity: 1;
+      transition: opacity 1.2s ease;
+      pointer-events: none;
+      filter: contrast(1.2) brightness(1.25) saturate(1.4);
+      transform: translateZ(0); 
+      will-change: opacity;
+    }
+    #bg-video.loaded { opacity: 1; }
+    
+    #overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(ellipse at 30% 40%, rgba(188, 19, 254, 0.06) 0%, rgba(0,0,0,0.8) 90%);
+      z-index: -1;
+      pointer-events: none;
+      transform: translateZ(0);
+    }
+    
+    #scanlines {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: repeating-linear-gradient(0deg, rgba(0,0,0,0.03) 0px, rgba(0,0,0,0.03) 2px, transparent 2px, transparent 6px);
+      z-index: -1;
+      pointer-events: none;
+      opacity: 0.15;
+      transform: translateZ(0);
+    }
+
+    /* Pantalla de carga */
+    #loadingScreen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at center, #0a0a0f 0%, #010101 100%);
+      z-index: 100000;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Orbitron', sans-serif;
+      transition: opacity 0.8s var(--transition-smooth), visibility 0.8s;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      will-change: opacity;
+    }
+    #loadingScreen.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+    .loader-content {
+      text-align: center;
+      transform: translateZ(0);
+      animation: fadeInUp 0.8s ease;
+    }
+    .gif-wrapper {
+      position: relative;
+      width: 200px;
+      height: 200px;
+      margin: 0 auto 30px;
+      border-radius: 50%;
+      padding: 5px;
+      background: linear-gradient(45deg, var(--neon-cyan), var(--neon-purple), var(--neon-pink));
+      animation: spinGradient 3s linear infinite, floatAnim 2s ease-in-out infinite alternate;
+      box-shadow: 0 0 40px rgba(188, 19, 254, 0.6), inset 0 0 20px rgba(0, 243, 255, 0.5);
+    }
+    .gif-inner {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      overflow: hidden;
+      background: #000;
+    }
+    .gif-inner img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .loader-title {
+      font-size: 2.2rem;
+      font-weight: 900;
+      letter-spacing: 6px;
+      background: linear-gradient(135deg, #fff, var(--neon-cyan), var(--neon-purple));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 20px;
+      text-shadow: 0 0 20px rgba(0,243,255,0.5);
+    }
+    @media (min-width: 769px) { .loader-title { animation: glitchText 3s infinite; } }
+    .loader-percentage {
+      font-size: 1.4rem;
+      font-weight: 900;
+      color: var(--neon-cyan);
+      text-shadow: 0 0 12px var(--neon-cyan);
+      margin-bottom: 20px;
+      font-family: 'Orbitron', monospace;
+    }
+    .loader-line-container {
+      width: 320px;
+      height: 6px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: inset 0 0 8px rgba(0,0,0,0.8);
+      border: 1px solid rgba(0, 243, 255, 0.4);
+      margin-top: 10px;
+    }
+    .loader-line {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, var(--neon-pink), var(--neon-purple), var(--neon-cyan), #fff);
+      border-radius: 10px;
+      transition: width 0.2s linear;
+      box-shadow: 0 0 12px var(--neon-cyan);
+    }
+    .loader-sub { margin-top: 20px; font-size: 0.75rem; color: #aaa; letter-spacing: 1px; display: flex; gap: 12px; justify-content: center; }
+    .loader-sub i { color: var(--neon-purple); }
+    @keyframes spinGradient { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(360deg); } }
+    @keyframes floatAnim { 0% { transform: translateY(0px); } 100% { transform: translateY(-12px); } }
+    @keyframes glitchText {
+      0%,100% { opacity: 1; transform: skewX(0deg); }
+      94% { opacity: 1; transform: skewX(0deg); }
+      96% { opacity: 0.8; transform: skewX(6deg); text-shadow: 2px 0 var(--neon-pink), -2px 0 var(--neon-cyan); }
+      98% { opacity: 0.9; transform: skewX(-6deg); text-shadow: -2px 0 var(--neon-pink), 2px 0 var(--neon-cyan); }
+    }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 1200px;
+      margin: 100px auto 60px;
+      padding: 25px 30px;
+      background: rgba(5, 5, 10, 0.6);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 24px;
+      border: 1px solid rgba(0, 243, 255, 0.2);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+      transition: all 0.3s ease;
+      animation: fadeInUp 0.6s var(--transition-smooth);
+      transform: translateZ(0);
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .top-buttons {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+      flex-wrap: wrap;
+      margin: -25px -30px 25px -30px;
+      padding: 15px 25px;
+      background: linear-gradient(135deg, rgba(0, 243, 255, 0.08), rgba(188, 19, 254, 0.04));
+      border-bottom: 1px solid rgba(0, 243, 255, 0.2);
+      border-radius: 24px 24px 0 0;
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+    }
+    .back, .share-detail {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(0,0,0,0.4);
+      border: 1px solid rgba(0, 243, 255, 0.3);
+      padding: 8px 18px;
+      border-radius: 40px;
+      color: var(--neon-cyan);
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      white-space: nowrap;
+      will-change: transform;
+    }
+    .back:hover, .share-detail:hover {
+      background: rgba(0, 243, 255, 0.1);
+      box-shadow: 0 0 8px rgba(0, 243, 255, 0.15);
+      transform: translateY(-2px);
+      border-color: var(--neon-cyan);
+    }
+    .search-container {
+      position: relative;
+      flex: 1;
+      max-width: 350px;
+    }
+    .search-container input {
+      width: 100%;
+      background: rgba(0,0,0,0.4);
+      border: 1px solid rgba(0, 243, 255, 0.25);
+      border-radius: 40px;
+      padding: 8px 16px;
+      color: white;
+      font-size: 0.85rem;
+      outline: none;
+      transition: 0.2s;
+    }
+    .search-container input:focus {
+      border-color: var(--neon-cyan);
+      box-shadow: 0 0 8px rgba(0,243,255,0.15);
+      background: rgba(0,0,0,0.6);
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        margin: 70px 12px 30px;
+        padding: 15px;
+      }
+      .top-buttons {
+        margin: -15px -15px 20px -15px;
+        padding: 10px 15px;
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 8px;
+        align-items: center;
+      }
+      .back, .share-detail {
+        padding: 6px 12px;
+        font-size: 0.75rem;
+        gap: 4px;
+      }
+      .search-container {
+        max-width: none;
+        width: 100%;
+      }
+    }
+
+    .floating-dropdown {
+      position: fixed;
+      background: #0f0f13;
+      border: 1px solid var(--neon-purple);
+      border-radius: var(--radius);
+      max-height: 60vh;
+      overflow-y: auto;
+      z-index: 99999;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      width: auto;
+      min-width: 200px;
+      transform: translateZ(0);
+      will-change: top, left;
+    }
+    @media (max-width: 768px) {
+      .floating-dropdown {
+        left: 5% !important;
+        width: 90% !important;
+        max-width: 90vw;
+        right: 5%;
+      }
+    }
+    .search-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px;
+      cursor: pointer;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      transform: translateZ(0);
+    }
+    .search-item:hover { background: rgba(0,243,255,0.1); }
+    .search-item img { width: 40px; height: 55px; object-fit: cover; border-radius: 6px; }
+
+    .anime-cover {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .anime-cover img {
+      max-height: 420px;
+      width: auto;
+      max-width: 90%;
+      border-radius: 20px;
+      box-shadow: 0 15px 30px rgba(0,0,0,0.5), 0 0 0 1px rgba(0, 243, 255, 0.15);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      will-change: transform;
+    }
+    .anime-cover img:hover {
+      transform: scale(1.02);
+      box-shadow: 0 20px 35px rgba(0,0,0,0.7), 0 0 0 2px rgba(0, 243, 255, 0.3);
+    }
+    h1 {
+      text-align: center;
+      font-size: 2.2rem;
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 800;
+      letter-spacing: 2px;
+      background: linear-gradient(135deg, #fff, var(--neon-cyan), var(--neon-purple));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: 0 0 6px rgba(0,243,255,0.15);
+      margin: 25px 0 20px;
+    }
+    .genres-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 30px;
+    }
+    .genre-chip {
+      background: rgba(0, 243, 255, 0.06);
+      border: 1px solid rgba(0, 243, 255, 0.3);
+      padding: 6px 14px;
+      border-radius: 30px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--neon-cyan);
+      backdrop-filter: blur(4px);
+    }
+    .desc {
+      background: rgba(0,0,0,0.3);
+      border-left: 3px solid var(--neon-pink);
+      padding: 18px 20px;
+      border-radius: var(--radius);
+      margin-bottom: 25px;
+      line-height: 1.6;
+      color: #e0e0e0;
+      font-size: 0.95rem;
+    }
+    .rating-section {
+      background: linear-gradient(135deg, rgba(0,0,0,0.4), rgba(188,19,254,0.06));
+      border: 1px solid rgba(0, 243, 255, 0.2);
+      border-radius: 20px;
+      padding: 20px;
+      margin: 20px 0;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+    .rating-stats {
+      display: flex;
+      align-items: baseline;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+    #averageRatingDisplay {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: var(--neon-yellow);
+      text-shadow: 0 0 6px rgba(241,196,15,0.2);
+      font-family: 'Orbitron', monospace;
+    }
+    #voteCountDisplay {
+      color: #aaa;
+      font-size: 0.85rem;
+    }
+    .star {
+      font-size: 2rem;
+      cursor: pointer;
+      color: #444;
+      transition: all 0.2s;
+    }
+    .star.hover, .star.selected {
+      color: #facc15;
+      text-shadow: 0 0 6px #ffaa00;
+      transform: scale(1.1);
+      will-change: transform;
+    }
+    .star.disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+    #ratingMessage {
+      margin-top: 12px;
+      font-size: 0.8rem;
+      color: var(--neon-cyan);
+    }
+    details {
+      margin-bottom: 15px;
+      background: rgba(10, 10, 15, 0.5);
+      border: 1px solid rgba(188, 19, 254, 0.25);
+      border-radius: var(--radius);
+      overflow: hidden;
+      transition: 0.2s;
+    }
+    details[open] {
+      background: rgba(15, 15, 25, 0.6);
+      border-color: var(--neon-cyan);
+      box-shadow: 0 0 8px rgba(0,243,255,0.1);
+    }
+    summary {
+      padding: 16px 20px;
+      font-weight: 800;
+      font-family: 'Orbitron', sans-serif;
+      color: var(--neon-cyan);
+      cursor: pointer;
+      list-style: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(0,0,0,0.15);
+    }
+    summary::-webkit-details-marker { display: none; }
+    summary::after {
+      content: '▼';
+      font-size: 1.2rem;
+      transition: transform 0.2s;
+    }
+    details[open] summary::after { transform: rotate(180deg); }
+    .season-content {
+      padding: 15px;
+      border-top: 1px solid rgba(0,243,255,0.1);
+    }
+    .video-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 12px;
+    }
+    .ep-btn {
+      background: rgba(0,0,0,0.4);
+      border: 1px solid #330c4d;
+      border-radius: 12px;
+      padding: 12px 5px;
+      text-align: center;
+      text-decoration: none;
+      color: #ddd;
+      font-size: 0.8rem;
+      font-weight: 500;
+      transition: all 0.2s;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      will-change: transform;
+    }
+    .ep-btn:hover {
+      background: rgba(0, 243, 255, 0.08);
+      border-color: var(--neon-cyan);
+      color: white;
+      transform: translateY(-3px);
+      box-shadow: 0 5px 12px rgba(0,243,255,0.1);
+    }
+    .ep-btn.watched {
+      background: #0f1d18;
+      border-color: #00ff9d;
+      color: #ccffdd;
+    }
+    .ep-action-btn {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      background: rgba(0,0,0,0.7);
+      border: none;
+      border-radius: 20px;
+      width: 24px;
+      height: 24px;
+      color: #00ff9d;
+      cursor: pointer;
+      opacity: 0;
+      transition: 0.2s;
+    }
+    .ep-btn:hover .ep-action-btn { opacity: 1; }
+    .recommendations {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(0,243,255,0.15);
+    }
+    .rec-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.2rem;
+      margin-bottom: 20px;
+      color: var(--neon-cyan);
+      letter-spacing: 1px;
+      border-left: 3px solid var(--neon-pink);
+      padding-left: 15px;
+    }
+    .rec-grid {
+      display: grid;
+      gap: 15px;
+    }
+    @media (min-width: 1200px) { .rec-grid { grid-template-columns: repeat(6, 1fr); } }
+    @media (min-width: 768px) and (max-width: 1199px) { .rec-grid { grid-template-columns: repeat(4, 1fr); } }
+    @media (max-width: 767px) {
+      .rec-grid { grid-template-columns: repeat(2, 1fr); }
+      .video-list { grid-template-columns: repeat(2, 1fr); }
+      h1 { font-size: 1.6rem; margin: 15px 0 10px; }
+      .star { font-size: 1.5rem; }
+    }
+    
+    .rec-card {
+      background: rgba(0,0,0,0.35);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: 0.2s;
+      cursor: pointer;
+      border: 1px solid rgba(188,19,254,0.15);
+      display: flex;
+      flex-direction: column;
+      aspect-ratio: 2/3;
+      width: 100%;
+      will-change: transform;
+    }
+    .rec-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--neon-cyan);
+      box-shadow: 0 8px 20px rgba(0,243,255,0.08);
+    }
+    .rec-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+    .rec-card p {
+      padding: 25px 8px 8px;
+      margin: 0;
+      text-align: center;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: #eee;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      background: linear-gradient(to top, #000000e6 0%, rgba(5,5,5,0.9) 60%, transparent 100%);
+      flex-shrink: 0;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+    }
+    .rec-card {
+      position: relative;
+    }
+    .rec-card img {
+      position: relative;
+      z-index: 1;
+    }
+    .rec-card p {
+      z-index: 2;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #0a0a0f;
+      border: 1px solid var(--neon-cyan);
+      border-radius: 40px;
+      padding: 10px 24px;
+      color: var(--neon-cyan);
+      font-weight: bold;
+      display: none;
+      z-index: 9999;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      box-shadow: 0 0 12px rgba(0,243,255,0.15);
+    }
+  </style>
+</head>
+<body>
+
+<div id="loadingScreen">
+  <div class="loader-content">
+    <div class="gif-wrapper">
+      <div class="gif-inner">
+        <img id="personaje-gif" src="assets/gifs/chica_corriendo.gif" alt="Cargando sistema">
+      </div>
+    </div>
+    <div class="loader-title">ARCHINIME</div>
+    <div class="loader-percentage" id="loadingPercentage">0%</div>
+    <div class="loader-line-container">
+      <div class="loader-line" id="loaderLine"></div>
+    </div>
+    <div class="loader-sub">
+      <span><i class="fas fa-hand-spock"></i> ¡Bienvenido!</span>
+      <span><i class="fas fa-sync-alt fa-spin"></i> Sincronizando datos</span>
+    </div>
+  </div>
+</div>
+
+<video id="bg-video" autoplay muted loop playsinline poster="assets/img/galaxia-morado1.avif">
+  <source src="assets/videos/galaxia.mp4" type="video/mp4">
+</video>
+<div id="overlay"></div>
+<div id="scanlines"></div>
+
+<div class="container">
+  <div class="top-buttons">
+    <a href="index.html" class="back"><i class="fas fa-arrow-left"></i> Volver</a>
+    <div class="search-container">
+      <input type="text" id="quick-search" placeholder="🔍 Buscar anime..." autocomplete="off">
+    </div>
+    <span id="share-detail" class="share-detail"><i class="fas fa-share-alt"></i> Compartir</span>
+  </div>
+  <div id="contenido"></div>
+  <div class="recommendations">
+    <div class="rec-title"><i class="fas fa-bolt"></i> QUIZÁS TE GUSTE</div>
+    <div class="rec-grid" id="rec-grid"></div>
+  </div>
+</div>
+
+<div id="toast" class="toast">Enlace copiado</div>
+
+<!-- Firebase y dependencias -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script>
+
+<!-- Scripts con rutas actualizadas -->
+<script src="data/catalogo.js"></script>
+<script src="js/pages/anime-detail-core.js?v=20250406"></script>
+<script src="js/utils/gifs.js"></script>
+
+<script>
+  // GIF aleatorio (usa listaDeGifs desde gifs.js)
+  if (typeof listaDeGifs !== 'undefined' && listaDeGifs.length > 0) {
+    const gifElegido = listaDeGifs[Math.floor(Math.random() * listaDeGifs.length)];
+    document.getElementById('personaje-gif').src = gifElegido;
+  }
+
+  let loadingCompleted = false;
+  const loadingScreen = document.getElementById('loadingScreen');
+  const percentEl = document.getElementById('loadingPercentage');
+  const lineEl = document.getElementById('loaderLine');
+
+  function updateProgress(percent) {
+    const p = Math.min(99, Math.max(0, Math.floor(percent)));
+    if (percentEl) percentEl.innerText = p + '%';
+    if (lineEl) lineEl.style.width = p + '%';
+  }
+
+  function finishLoading() {
+    if (loadingCompleted) return;
+    loadingCompleted = true;
+    updateProgress(100);
+    if (percentEl) percentEl.innerText = "SISTEMA LISTO";
+    setTimeout(() => { if (loadingScreen) loadingScreen.classList.add('hidden'); }, 800);
+  }
+
+  let progressValue = 0;
+  const interval = setInterval(() => {
+    if (loadingCompleted) { clearInterval(interval); return; }
+    if (progressValue < 85) {
+      progressValue += Math.random() * 8;
+      if (progressValue > 85) progressValue = 85;
+      updateProgress(progressValue);
+    }
+  }, 200);
+
+  window.addEventListener('load', () => {
+    const bgVideo = document.getElementById('bg-video');
+    if (bgVideo) bgVideo.play().catch(()=>{});
+    clearInterval(interval);
+    updateProgress(95);
+    setTimeout(() => { updateProgress(100); finishLoading(); }, 300);
+  });
+
+  window.playUISound = function(type) {
+    if (window._playUISound) window._playUISound(type);
+  };
+
+  window.escapeHtml = function(str) { 
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); 
+  };
+</script>
+
+</body>
+</html>
