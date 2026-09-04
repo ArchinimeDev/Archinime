@@ -60,7 +60,7 @@
   <meta name="twitter:description" content="La experiencia definitiva de anime con interfaz de próxima generación.">
   <meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/Archinime/-Archinime-@main/Logo_Archinime_comprimida.png">
 
-  <link rel="icon" href="assets/img/Logo_Archinime.png" type="image/png">
+  <link rel="icon" href="Logo_Archinime.png" type="image/png">
   <link rel="manifest" href="manifest.json">
   <meta name="google-adsense-account" content="ca-pub-3917033517052949">
 
@@ -700,7 +700,7 @@
       max-width: 100%;
     }
 
-    /* ===== BANNER ===== */
+    /* ===== BANNER (se modificará dinámicamente) ===== */
     .banner-carousel {
       position: relative;
       width: 100%;
@@ -711,6 +711,7 @@
       height: 280px;
       box-shadow: 0 10px 40px rgba(0,0,0,0.7);
       border: 1px solid rgba(0, 240, 255, 0.05);
+      transition: all 0.5s ease;
     }
     .banner-slide {
       position: absolute;
@@ -768,6 +769,79 @@
       .banner-slide .banner-info { max-width: 80%; padding: 12px 16px; }
       .banner-slide .banner-info h2 { font-size: 1.1rem; }
       .banner-slide .banner-info p { font-size: 0.75rem; }
+    }
+
+    /* ===== MODO ESPECIAL (video en el banner) ===== */
+    .banner-special {
+      position: relative;
+      width: 100%;
+      max-width: 1400px;
+      margin: 10px auto 20px;
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      height: 280px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.7);
+      border: 2px solid var(--neon-pink);
+      background: #000;
+    }
+    .banner-special video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: brightness(0.7) saturate(1.2);
+    }
+    .banner-special .overlay-text {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      background: rgba(0,0,0,0.4);
+      z-index: 1;
+      pointer-events: none;
+    }
+    .banner-special .overlay-text h2 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2rem;
+      color: var(--neon-gold);
+      text-shadow: 0 0 30px var(--neon-gold);
+      letter-spacing: 4px;
+    }
+    .banner-special .overlay-text p {
+      color: #fff;
+      font-size: 1rem;
+      margin-top: 8px;
+    }
+    .banner-special .audio-indicator {
+      position: absolute;
+      bottom: 16px;
+      right: 24px;
+      z-index: 2;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(6px);
+      padding: 6px 16px;
+      border-radius: 30px;
+      border: 1px solid var(--neon-gold);
+      color: var(--neon-gold);
+      font-size: 0.8rem;
+      font-weight: 600;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .banner-special .audio-indicator i {
+      animation: pulseIcon 1.8s infinite alternate;
+    }
+    @keyframes pulseIcon {
+      0% { transform: scale(1); opacity: 0.6; }
+      100% { transform: scale(1.15); opacity: 1; }
+    }
+    @media (max-width: 768px) {
+      .banner-special { height: 180px; border-radius: var(--radius-md); }
+      .banner-special .overlay-text h2 { font-size: 1.4rem; }
+      .banner-special .overlay-text p { font-size: 0.8rem; }
     }
 
     /* ===== FILTROS ===== */
@@ -2109,7 +2183,7 @@
     .footer .socials a:hover { color: var(--neon-blue); transform: translateY(-3px); }
     .footer .credit { opacity: 0.5; }
 
-    /* ===== CHROMA KEY FIX (FONDO TRANSPARENTE, SIN MARCO, MÁS ABAJO) ===== */
+    /* ===== CHROMA KEY FIX (TAMAÑO FIJO) ===== */
     #stageContainer {
       position: fixed;
       bottom: 10px;
@@ -2117,7 +2191,7 @@
       z-index: 99;
       pointer-events: auto;
       width: 180px;
-      height: 240px;  /* Alto fijo para que todos los recuadros tengan el mismo tamaño */
+      height: 240px;
       border-radius: 16px;
       overflow: hidden;
       background: transparent;
@@ -2173,7 +2247,7 @@
     @media (max-width: 768px) {
       #stageContainer {
         width: 140px;
-        height: 187px;  /* Mantener relación 3:4 */
+        height: 187px;
         bottom: 10px;
         right: 10px;
       }
@@ -2286,15 +2360,15 @@
 <canvas id="particlesCanvas"></canvas>
 
 <!-- ===== FONDO VIDEO ===== -->
-<video id="bg-video" poster="assets/img/galaxia-morado1.avif" autoplay muted loop playsinline preload="auto" style="position:fixed; inset:0; width:100%; height:100%; object-fit:cover; z-index:-2; opacity:0; transition:opacity 1.2s; filter:brightness(0.5) contrast(1.1);">
-  <source src="assets/videos/galaxia.mp4" type="video/mp4">
+<video id="bg-video" poster="galaxia-morado1.avif" autoplay muted loop playsinline preload="auto" style="position:fixed; inset:0; width:100%; height:100%; object-fit:cover; z-index:-2; opacity:0; transition:opacity 1.2s; filter:brightness(0.5) contrast(1.1);">
+  <source src="galaxia.mp4" type="video/mp4">
 </video>
 <div id="overlay" style="position:fixed; inset:0; z-index:-1; background:radial-gradient(ellipse at 30% 40%, rgba(177,20,255,0.08), rgba(5,7,10,0.9)); pointer-events:none;"></div>
 
 <!-- ===== NAVBAR ===== -->
 <nav class="cyber-nav" role="navigation">
   <a href="https://archinime.github.io/ArchiPapu/index.html" class="nav-logo">
-    <img id="logo" src="assets/img/Logo_Archinime.avif" alt="Logo" decoding="async" loading="lazy">
+    <img id="logo" src="Logo_Archinime.avif" alt="Logo" decoding="async" loading="lazy">
     <span class="nav-logo-text">ARCHINIME</span>
   </a>
   <div class="search-wrapper" id="searchWrapper">
@@ -2315,10 +2389,10 @@
       </div>
     </div>
     <div class="user-menu">
-      <img id="userAvatarBtn" src="assets/img/invitado.avif" alt="Usuario">
+      <img id="userAvatarBtn" src="invitado.avif" alt="Usuario">
       <div id="userDropdown" class="user-dropdown">
         <div class="user-dropdown-header" id="profileDropdownBtn">
-          <img id="dropdownAvatar" src="assets/img/invitado.avif">
+          <img id="dropdownAvatar" src="invitado.avif">
           <div><div id="dropdownName" style="color:var(--neon-blue);">Invitado</div><div style="font-size:0.7rem; color:var(--text-secondary);"><i class="fas fa-cog"></i> Opciones</div></div>
         </div>
         <div id="userDropdownItems"><div class="user-dropdown-item" id="loginBtnItem"><i class="fas fa-sign-in-alt"></i> Iniciar sesión</div></div>
@@ -2327,9 +2401,25 @@
   </div>
 </nav>
 
-<!-- ===== BANNER CARRUSEL ===== -->
-<div class="banner-carousel" id="bannerCarousel">
-  <div class="banner-dots" id="bannerDots"></div>
+<!-- ===== BANNER CARRUSEL (se reemplazará en modo especial) ===== -->
+<div id="bannerContainer">
+  <div class="banner-carousel" id="bannerCarousel">
+    <div class="banner-dots" id="bannerDots"></div>
+  </div>
+</div>
+
+<!-- ===== MODO ESPECIAL (se activa dinámicamente) ===== -->
+<div id="specialBanner" style="display:none;" class="banner-special">
+  <video id="specialVideo" muted loop playsinline>
+    <source src="atrevete.mp4" type="video/mp4">
+  </video>
+  <div class="overlay-text">
+    <h2>🌟 MODO ESPECIAL</h2>
+    <p>Disfruta de este tráiler exclusivo</p>
+  </div>
+  <div class="audio-indicator" id="specialAudioIndicator">
+    <i class="fas fa-volume-mute"></i> <span>Haz clic para activar sonido</span>
+  </div>
 </div>
 
 <!-- ===== FILTROS ===== -->
@@ -2479,7 +2569,7 @@
     <div class="profile-close" onclick="closeProfileModal()"><i class="fas fa-times"></i></div>
     <h2 style="font-family:'Orbitron'; text-align:center; color:var(--neon-blue); margin-bottom:16px; font-size:1.2rem;">CONFIGURACIÓN</h2>
     <div class="profile-avatar">
-      <img id="profileAvatar" src="assets/img/invitado.avif">
+      <img id="profileAvatar" src="invitado.avif">
       <label class="profile-upload-btn" for="profileAvatarInput"><i class="fas fa-upload"></i> Subir avatar</label>
       <input type="file" id="profileAvatarInput" accept="image/*" style="display:none;">
     </div>
@@ -2510,7 +2600,7 @@
 <div id="detailModal" class="detail-modal">
   <div class="detail-card">
     <div class="detail-cover" id="detailCover">
-      <img id="detailCoverImg" src="assets/img/placeholder.webp" alt="Portada">
+      <img id="detailCoverImg" src="placeholder.webp" alt="Portada">
       <div class="overlay"></div>
       <div class="detail-close" onclick="closeDetailModal()"><i class="fas fa-times"></i></div>
     </div>
@@ -2534,10 +2624,10 @@
   <div class="event-card">
     <div class="event-close" onclick="closeEventModal()"><i class="fas fa-times"></i></div>
     <div class="event-visuals">
-      <div class="visual-bg" id="eventBg" style="background-image: url('assets/img/placeholder.webp');"></div>
+      <div class="visual-bg" id="eventBg" style="background-image: url('placeholder.webp');"></div>
       <div class="covers-container">
-        <img class="cover-back" id="eventCoverBack" src="assets/img/placeholder.webp" alt="poster secundario">
-        <img class="cover-front" id="eventCoverFront" src="assets/img/placeholder.webp" alt="poster principal">
+        <img class="cover-back" id="eventCoverBack" src="placeholder.webp" alt="poster secundario">
+        <img class="cover-front" id="eventCoverFront" src="placeholder.webp" alt="poster principal">
       </div>
       <div class="event-type-badge" id="eventBadge">🔥 NUEVO</div>
     </div>
@@ -2550,7 +2640,7 @@
   </div>
 </div>
 
-<!-- ===== CHROMA KEY ===== -->
+<!-- ===== CHROMA KEY (TAMAÑO FIJO) ===== -->
 <div id="stageContainer">
   <div id="fgContainer">
     <canvas id="fgCanvas"></canvas>
@@ -2576,14 +2666,73 @@
   const providerGoogle = new firebase.auth.GoogleAuthProvider();
 </script>
 
-<script src="data/catalogo.js?v=2025-04-07-v21.0-chat-fixes"></script>
-<script src="js/utils/animaciones.js"></script>
-<script src="js/utils/musica_fondo.js"></script>
-<script src="js/components/notification-system.js"></script>
-<script src="js/utils/gifs.js"></script>
-<script src="js/components/banner-carousel.js?v=2025-04-07-v21.0-chat-fixes"></script>
+<script src="catalogo.js?v=2025-04-07-v21.0-chat-fixes"></script>
+<script src="animaciones.js"></script>
+<script src="musica_fondo.js"></script>
+<script src="notification-system.js"></script>
+<script src="gifs.js"></script>
+<script src="banner-carousel.js?v=2025-04-07-v21.0-chat-fixes"></script>
 
 <script>
+  // ============================================
+  // MODO ESPECIAL - ACTIVACIÓN CON PROBABILIDAD
+  // ============================================
+  (function() {
+    const PROBABILITY = 0.10; // 10%
+    const isSpecial = Math.random() < PROBABILITY;
+
+    if (isSpecial) {
+      console.log('🎬 Modo Especial activado (banner con video)');
+
+      const carousel = document.getElementById('bannerCarousel');
+      const specialBanner = document.getElementById('specialBanner');
+      const specialVideo = document.getElementById('specialVideo');
+      const audioIndicator = document.getElementById('specialAudioIndicator');
+
+      // Ocultar el carrusel normal y mostrar el especial
+      carousel.style.display = 'none';
+      specialBanner.style.display = 'block';
+
+      // Intentar reproducir el video con mute primero
+      specialVideo.muted = true;
+      specialVideo.play()
+        .then(() => {
+          audioIndicator.innerHTML = '<i class="fas fa-volume-up"></i> <span>Sonido activado</span>';
+        })
+        .catch(() => {
+          // Si falla, mostrar indicador de clic
+          audioIndicator.innerHTML = '<i class="fas fa-volume-mute"></i> <span>Haz clic para activar sonido</span>';
+          // Intentar de nuevo con muted
+          specialVideo.muted = true;
+          specialVideo.play().catch(() => {});
+        });
+
+      // Al hacer clic en el banner, activar audio
+      specialBanner.addEventListener('click', function() {
+        specialVideo.muted = false;
+        specialVideo.volume = 0.8;
+        specialVideo.play()
+          .then(() => {
+            audioIndicator.innerHTML = '<i class="fas fa-volume-up"></i> <span>Sonido activado</span>';
+          })
+          .catch(() => {
+            // Si falla, mostrar mensaje
+            audioIndicator.innerHTML = '<i class="fas fa-exclamation-triangle"></i> <span>Error al activar audio</span>';
+          });
+      });
+
+      // Reproducción en bucle
+      specialVideo.addEventListener('ended', function() {
+        specialVideo.play().catch(() => {});
+      });
+
+      // Añadir clase especial al body para cambiar estilos (opcional)
+      document.body.classList.add('special-mode');
+    } else {
+      console.log('Modo normal.');
+    }
+  })();
+
   // ============================================
   // SISTEMA DE STICKERS (CORREGIDO)
   // ============================================
@@ -2810,7 +2959,7 @@
       snapshot.docs.reverse().forEach(doc => {
         const data = doc.data();
         const userName = data.userName || 'Usuario';
-        const userAvatar = data.userAvatar || 'assets/img/invitado.avif';
+        const userAvatar = data.userAvatar || 'invitado.avif';
         let texto = data.texto || '';
         const timestamp = data.timestamp?.toDate() || new Date();
         const fecha = timestamp.toLocaleString();
@@ -2962,7 +3111,7 @@
       docs.forEach(doc => {
         const data = doc.data();
         const userName = data.userName || 'Usuario';
-        const userAvatar = data.userAvatar || 'assets/img/invitado.avif';
+        const userAvatar = data.userAvatar || 'invitado.avif';
         let texto = data.texto || '';
         const timestamp = data.timestamp?.toDate() || new Date();
         const fecha = timestamp.toLocaleString();
@@ -2994,7 +3143,7 @@
 
         html += `
           <div class="chat-message" data-id="${doc.id}">
-            <img src="${userAvatar}" onerror="this.src='assets/img/invitado.avif'">
+            <img src="${userAvatar}" onerror="this.src='invitado.avif'">
             <div class="msg-content">
               <div>
                 <span class="msg-user" style="color:${customColor}; text-shadow:0 0 8px ${customColor}40;">${escapeHtml(userName)}</span>
@@ -3065,7 +3214,7 @@
       await db.collection('globalChat').add({
         userId: user.uid,
         userName: user.displayName || user.email.split('@')[0] || 'Usuario',
-        userAvatar: user.photoURL || 'assets/img/invitado.avif',
+        userAvatar: user.photoURL || 'invitado.avif',
         texto: textoFinal,
         esSticker: !!sticker,
         stickerUrl: sticker || null,
@@ -3276,7 +3425,7 @@
     const gifElegido = listaDeGifs[Math.floor(Math.random() * listaDeGifs.length)];
     gifImg.src = gifElegido;
   } else {
-    gifImg.src = 'assets/gifs/chica_corriendo.gif';
+    gifImg.src = 'chica_corriendo.gif';
   }
 
   function updateProgress(p) {
@@ -3358,7 +3507,7 @@
     return animes.map(a => ({
       id: a.id,
       title: a.title,
-      img: a.img || 'assets/img/placeholder.webp',
+      img: a.img || 'placeholder.webp',
       genres: a.genres || [],
       searchStr: normalizeText(a.title) + ' ' + (a.aliases || []).map(normalizeText).join(' ')
     }));
@@ -3497,7 +3646,7 @@
       card.dataset.id = anime.id;
       card.setAttribute('onclick', `openDetail('${anime.id}')`);
       const rating = getDisplayRating(anime);
-      const img = anime.img || 'assets/img/placeholder.webp';
+      const img = anime.img || 'placeholder.webp';
       const ratingVal = getNumericRating(anime);
       const roundedRating = Math.round(ratingVal * 10) / 10;
       const badge = (roundedRating >= 4.9 && roundedRating <= 5.0) ? '<div class="badge">🔥 TOP</div>' : '';
@@ -3598,7 +3747,7 @@
 
   function showProfileModal() {
     if (!currentUser) { showAuthModal(); document.getElementById('authError').textContent = "⚠️ Inicia sesión para configurar."; return; }
-    document.getElementById('profileAvatar').src = currentUser.photoURL || 'assets/img/invitado.avif';
+    document.getElementById('profileAvatar').src = currentUser.photoURL || 'invitado.avif';
     newAvatarUrl = currentUser.photoURL;
     document.getElementById('profileUid').value = currentUser.uid;
     document.getElementById('profileDisplayName').value = currentUser.displayName || currentUser.email.split('@')[0];
@@ -3654,8 +3803,8 @@
       if (snap.size > 0) await batch.commit();
       lastProfileUpdate = Date.now();
       msg.style.color='var(--neon-blue)'; msg.textContent='¡Cambios guardados!';
-      document.getElementById('userAvatarBtn').src = newAvatarUrl || 'assets/img/invitado.avif';
-      document.getElementById('dropdownAvatar').src = newAvatarUrl || 'assets/img/invitado.avif';
+      document.getElementById('userAvatarBtn').src = newAvatarUrl || 'invitado.avif';
+      document.getElementById('dropdownAvatar').src = newAvatarUrl || 'invitado.avif';
       document.getElementById('dropdownName').textContent = name;
       const c = color;
       document.getElementById('userAvatarBtn').style.borderColor = c;
@@ -3694,7 +3843,7 @@
     currentUser = user;
     const avatar = document.getElementById('userAvatarBtn'), dAvatar = document.getElementById('dropdownAvatar'), dName = document.getElementById('dropdownName'), loginItem = document.getElementById('loginBtnItem');
     if (user) {
-      const photo = user.photoURL || 'assets/img/invitado.avif';
+      const photo = user.photoURL || 'invitado.avif';
       avatar.src = photo; dAvatar.src = photo;
       dName.textContent = user.displayName || user.email.split('@')[0];
       loginItem.innerHTML = '<i class="fas fa-sign-out-alt"></i> Cerrar sesión'; loginItem.onclick = logoutUser;
@@ -3705,7 +3854,7 @@
         dName.style.color = color; dName.style.textShadow = `0 0 10px ${color}`;
       });
     } else {
-      avatar.src = 'assets/img/invitado.avif'; dAvatar.src = 'assets/img/invitado.avif';
+      avatar.src = 'invitado.avif'; dAvatar.src = 'invitado.avif';
       dName.textContent = 'Invitado';
       loginItem.innerHTML = '<i class="fas fa-sign-in-alt"></i> Iniciar sesión'; loginItem.onclick = showAuthModal;
       avatar.style.borderColor = 'var(--neon-blue)'; avatar.style.boxShadow = 'none';
@@ -3791,7 +3940,7 @@
     });
   }
 
-  // ===== CHROMA KEY (ANIMACIONES FIJAS) - TAMAÑO FIJO Y CARGA RÁPIDA =====
+  // ===== CHROMA KEY (TAMAÑO FIJO Y CARGA RÁPIDA) =====
   function randomizeFgPosition() {
     const container = document.getElementById('stageContainer');
     if (!container) return;
@@ -3804,7 +3953,7 @@
   const fgCanvas = document.getElementById('fgCanvas');
   const fgCtx = fgCanvas.getContext('2d', { willReadFrequently: true });
 
-  // Fijamos el tamaño del canvas (3:4)
+  // Tamaño fijo del canvas (3:4)
   const CANVAS_W = 180;
   const CANVAS_H = 240;
   fgCanvas.width = CANVAS_W;
@@ -3816,11 +3965,42 @@
   fgVideo.style.display = 'none';
   fgVideo.src = currentAnim.src;
   fgVideo.preload = 'auto';
+  fgVideo.muted = true;
+  fgVideo.loop = false;
 
-  // Cuando el video esté listo, lo mostramos
+  let videoReady = false;
+
+  // Cuando el video esté listo para reproducirse
   fgVideo.addEventListener('loadeddata', () => {
-    fgVideo.play().catch(() => {});
+    videoReady = true;
+    fgVideo.play().catch(() => {
+      setTimeout(() => fgVideo.play().catch(() => {}), 500);
+    });
   });
+
+  // Si el video se detiene, intentamos reproducir de nuevo
+  fgVideo.addEventListener('pause', () => {
+    if (!fgVideo.ended) {
+      setTimeout(() => fgVideo.play().catch(() => {}), 200);
+    }
+  });
+
+  // Cuando el video termina, cambiamos a otro
+  fgVideo.addEventListener('ended', () => {
+    if (!isTransitioning) {
+      cambiarVideo();
+    }
+  });
+
+  function cambiarVideo() {
+    if (isTransitioning) return;
+    let newAnim;
+    do { newAnim = videoList[Math.floor(Math.random() * videoList.length)]; } while (newAnim.id === currentAnim.id && videoList.length > 1);
+    currentAnim = newAnim;
+    fgVideo.src = currentAnim.src;
+    fgVideo.load();
+    videoReady = false;
+  }
 
   // Procesar chroma (siempre en el mismo canvas)
   let frameCount = 0;
@@ -3834,10 +4014,9 @@
       requestAnimationFrame(processChroma);
       return;
     }
-    // Limpiar canvas
+    
     fgCtx.clearRect(0, 0, CANVAS_W, CANVAS_H);
     
-    // Dibujar el video escalado para que quepa dentro del canvas (manteniendo relación)
     const vw = fgVideo.videoWidth;
     const vh = fgVideo.videoHeight;
     if (!vw || !vh) { requestAnimationFrame(processChroma); return; }
@@ -3855,10 +4034,9 @@
       offsetX = (CANVAS_W - drawW) / 2;
     }
     
-    // Dibujar el frame
     fgCtx.drawImage(fgVideo, offsetX, offsetY, drawW, drawH);
     
-    // Procesar chroma key (eliminar fondo verde/azul)
+    // Chroma key
     const imageData = fgCtx.getImageData(0, 0, CANVAS_W, CANVAS_H);
     const data = imageData.data;
     const key = currentAnim.keyColor || 'green';
@@ -3874,26 +4052,29 @@
     fgCtx.putImageData(imageData, 0, 0);
     requestAnimationFrame(processChroma);
   }
+
   fgVideo.addEventListener('play', () => requestAnimationFrame(processChroma));
 
   function startVisualMedia() {
-    // Video de fondo
     document.getElementById('bg-video').play().then(() => {
       document.getElementById('bg-video').style.opacity = '1';
     }).catch(() => {});
 
-    // Chroma
-    fgVideo.muted = true;
-    fgVideo.play().catch(() => {});
+    fgVideo.play().catch(() => {
+      const interval = setInterval(() => {
+        if (!fgVideo.paused) { clearInterval(interval); return; }
+        fgVideo.play().catch(() => {});
+      }, 2000);
+    });
     randomizeFgPosition();
   }
 
-  // Forzar reproducción con clic del usuario
-  document.addEventListener('click', () => {
+  document.addEventListener('click', function forcePlay() {
     if (fgVideo.paused) {
       fgVideo.play().catch(() => {});
     }
-  }, { once: true });
+    document.removeEventListener('click', forcePlay);
+  });
 
   function createSparks(cx, cy) {
     const colors = ['#00f0ff','#b114ff','#ff1a6b','#ffd700'];
@@ -3913,6 +4094,7 @@
       setTimeout(() => s.remove(), 800);
     }
   }
+
   fgContainer.addEventListener('click', (e) => {
     e.stopPropagation();
     if (isTransitioning) return;
@@ -3920,17 +4102,23 @@
     isTransitioning = true;
     fgContainer.classList.add('poof');
     setTimeout(() => {
-      let newAnim;
-      do { newAnim = videoList[Math.floor(Math.random() * videoList.length)]; } while (newAnim.id === currentAnim.id && videoList.length > 1);
-      currentAnim = newAnim;
-      fgVideo.src = currentAnim.src;
-      fgVideo.play().then(() => {
-        isTransitioning = false;
-        fgContainer.classList.remove('poof');
-        randomizeFgPosition();
-      }).catch(() => { isTransitioning = false; });
+      cambiarVideo();
+      const checkReady = setInterval(() => {
+        if (videoReady) {
+          clearInterval(checkReady);
+          fgVideo.play().then(() => {
+            isTransitioning = false;
+            fgContainer.classList.remove('poof');
+            randomizeFgPosition();
+          }).catch(() => {
+            isTransitioning = false;
+            fgContainer.classList.remove('poof');
+          });
+        }
+      }, 200);
     }, 600);
   });
+
   window.addEventListener('DOMContentLoaded', startVisualMedia);
 
   // ===== FUNCIONES DE DETALLE Y EVENTOS =====
@@ -3982,7 +4170,7 @@
   function openDetail(id) {
     const anime = baseAnimes.find(a => a.id == id);
     if (!anime) { alert('Anime no encontrado'); return; }
-    document.getElementById('detailCoverImg').src = anime.img || 'assets/img/placeholder.webp';
+    document.getElementById('detailCoverImg').src = anime.img || 'placeholder.webp';
     document.getElementById('detailCoverImg').alt = anime.title;
     document.getElementById('detailTitle').textContent = anime.title;
     const rating = getDisplayRating(anime);
@@ -3996,7 +4184,7 @@
     }
     document.getElementById('detailDesc').innerHTML = buildContentDetails(anime);
     document.getElementById('detailWatchBtn').onclick = function() {
-      window.location.href = `pages/anime-detail.html?id=${anime.id}`;
+      window.location.href = `anime-detail.html?id=${anime.id}`;
     };
     document.getElementById('detailModal').classList.add('show');
     disableBodyScroll();
@@ -4012,15 +4200,15 @@
     if (eventQueue.length === 0 || isEventModalShowing) return;
     isEventModalShowing = true;
     const eventData = eventQueue.shift();
-    document.getElementById('eventBg').style.backgroundImage = `url(${eventData.img || 'assets/img/placeholder.webp'})`;
-    document.getElementById('eventCoverBack').src = eventData.img || 'assets/img/placeholder.webp';
-    document.getElementById('eventCoverFront').src = eventData.img || 'assets/img/placeholder.webp';
+    document.getElementById('eventBg').style.backgroundImage = `url(${eventData.img || 'placeholder.webp'})`;
+    document.getElementById('eventCoverBack').src = eventData.img || 'placeholder.webp';
+    document.getElementById('eventCoverFront').src = eventData.img || 'placeholder.webp';
     document.getElementById('eventTitle').textContent = eventData.title || 'Nuevo Anime';
     document.getElementById('eventMeta').textContent = `⭐ ${getDisplayRating(eventData)} · ${eventData.genres?.slice(0,2).join(', ') || 'Anime'}`;
     document.getElementById('eventDesc').textContent = eventData.desc || 'Descripción no disponible.';
     document.getElementById('eventBadge').textContent = eventData.updateType || '🔥 NUEVO';
     document.getElementById('eventBtn').onclick = function() {
-      window.location.href = `pages/anime-detail.html?id=${eventData.id}`;
+      window.location.href = `anime-detail.html?id=${eventData.id}`;
     };
     document.getElementById('eventModal').classList.add('show');
     disableBodyScroll();
