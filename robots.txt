@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://archinime.github.io/-Archinime-/sitemap.xml
