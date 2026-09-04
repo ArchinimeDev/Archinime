@@ -14,7 +14,7 @@
   <!-- VERSIÓN (forzar limpieza de caché) -->
   <script>
     (function() {
-      const APP_VERSION = "2025-04-07-v21.0-chat-fixes";
+      const APP_VERSION = "2025-04-07-v22.0-modular";
       const stored = localStorage.getItem('archinime_app_version');
       if (stored !== APP_VERSION) {
         localStorage.setItem('archinime_app_version', APP_VERSION);
@@ -379,7 +379,25 @@
   </div>
 </div>
 
-<!-- ===== SCRIPTS (con rutas actualizadas) ===== -->
+<!-- ===== MODAL PARA iOS (INSTALACIÓN) ===== -->
+<div id="iosInstallModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:99999; align-items:center; justify-content:center; backdrop-filter:blur(10px);">
+  <div style="background:#0a0a0f; padding:30px; border-radius:20px; max-width:400px; border:1px solid var(--neon-blue); text-align:center; margin:20px;">
+    <h3 style="font-family:'Orbitron'; color:var(--neon-blue);">📲 Instalar Archinime</h3>
+    <p style="color:#aaa; margin:15px 0;">Para instalar en iOS:</p>
+    <ol style="text-align:left; color:#ddd; font-size:0.9rem; padding-left:20px;">
+      <li>Toca el botón <strong>Compartir</strong> <i class="fas fa-share-alt" style="color:var(--neon-blue);"></i></li>
+      <li>Desplázate y selecciona <strong>Agregar a pantalla de inicio</strong></li>
+      <li>Confirma tocando <strong>Agregar</strong></li>
+    </ol>
+    <button onclick="closeIosModal()" style="margin-top:20px; background:var(--neon-blue); border:none; color:#000; padding:10px 30px; border-radius:30px; font-weight:bold; cursor:pointer;">Entendido</button>
+  </div>
+</div>
+
+<!-- ========================================================== -->
+<!-- ===== SCRIPTS ===== -->
+<!-- ========================================================== -->
+
+<!-- 1. Configuración Firebase (inline) -->
 <script>
   const firebaseConfig = {
     apiKey: "AIzaSyBpzYARIxaJijLbbL-2S6F9MWecbAbvK_I",
@@ -397,19 +415,33 @@
   const providerGoogle = new firebase.auth.GoogleAuthProvider();
 </script>
 
-<!-- Catálogo (datos) -->
-<script src="data/catalogo.js?v=2025-04-07-v21.0-chat-fixes"></script>
+<!-- 2. Scripts Core -->
+<script src="js/core/state.js"></script>
+<script src="js/core/app-core.js"></script>
+<script src="js/core/dompurify-config.js"></script>
 
-<!-- Utilidades -->
+<!-- 3. Componentes reutilizables -->
+<script src="js/components/pwa-handler.js"></script>
+<script src="js/components/notification-system.js"></script>
+<script src="js/components/banner-carousel.js?v=2025-04-07-v22.0-modular"></script>
+
+<!-- 4. MÓDULO DE CARGA DE ANIMES (anime-loader.js) -->
+<script src="js/components/anime-loader.js"></script>
+
+<!-- 5. MÓDULO DE CHAT GLOBAL (chat-global.js) -->
+<script src="js/components/chat-global.js"></script>
+
+<!-- 6. Utilidades -->
 <script src="js/utils/animaciones.js"></script>
 <script src="js/utils/musica_fondo.js"></script>
 <script src="js/utils/gifs.js"></script>
 
-<!-- Componentes -->
-<script src="js/components/notification-system.js"></script>
-<script src="js/components/banner-carousel.js?v=2025-04-07-v21.0-chat-fixes"></script>
+<!-- 7. Datos (catálogo) -->
+<script src="data/catalogo.js?v=2025-04-07-v22.0-modular"></script>
 
-<!-- ===== TODO EL RESTO DEL CÓDIGO JS (embebido) ===== -->
+<!-- ========================================================== -->
+<!-- ===== LÓGICA INLINE RESTANTE (Específica de la página) ===== -->
+<!-- ========================================================== -->
 <script>
   // ============================================
   // SISTEMA DE STICKERS (CORREGIDO)
@@ -680,11 +712,17 @@
   });
 
   // ============================================
-  // CHAT GLOBAL (PANEL LATERAL) - CORREGIDO
+  // FUNCIONES DEL CHAT (Sobrescriben las de chat-global.js para usar IDs específicos)
   // ============================================
-  const sidePanel = document.getElementById('sidePanel');
-  const sideClose = document.getElementById('sidePanelClose');
-  sideClose.addEventListener('click', () => sidePanel.classList.remove('open'));
+  // Estas funciones mantienen la integración con el HTML de index.html
+  // mientras chat-global.js maneja la lógica de fondo.
+  
+  // NOTA: chat-global.js expone funciones, pero aquí las sobrescribimos
+  // para que usen los IDs específicos de index.html (Panel lateral).
+  // chat-global.js usa 'chatModal', 'chatMessages', etc., que NO existen aquí.
+  // Por eso, necesitamos mantener estas implementaciones locales.
+  // Si chat-global.js se actualiza para ser más flexible, podríamos eliminarlas.
+  // Por ahora, las mantenemos para no romper nada.
 
   let chatUnsubscribePanel = null;
   let stickerSeleccionadoPanel = null;
@@ -738,6 +776,7 @@
   };
 
   window.abrirChatPanel = function() {
+    const sidePanel = document.getElementById('sidePanel');
     sidePanel.classList.toggle('open');
     if (sidePanel.classList.contains('open')) {
       iniciarEscuchaChatPanel();
@@ -1028,385 +1067,8 @@
   window.cerrarStickerModal = cerrarStickerModalGlobal;
 
   // ============================================
-  // RESTO DEL CÓDIGO (catálogo, filtros, etc.)
+  // AUTENTICACIÓN (Login, Registro, Perfil)
   // ============================================
-  window.videoList = videoList || [];
-  window.musicListGlobal = musicListGlobal || [];
-  window.toggleNotifMenu = function() {
-    document.getElementById('notifMenu').classList.toggle('active');
-  };
-  window.startNotificationSequence = function() { console.log("Notificaciones listas"); };
-
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js').then(reg => {
-        console.log('SW registrado:', reg);
-      }).catch(err => console.error('SW error:', err));
-    });
-  }
-
-  let deferredPrompt;
-  const installBtn = document.getElementById('installBtn');
-  const isIos = () => /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
-  const isStandalone = () => window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
-  const isMobile = () => window.matchMedia('(max-width: 780px)').matches;
-
-  function updateButtons() {
-    if (!isMobile() || isStandalone()) { installBtn.style.display = 'none'; return; }
-    installBtn.style.display = 'flex';
-  }
-  window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredPrompt = e; updateButtons(); });
-  installBtn.addEventListener('click', () => {
-    if (isIos()) {
-      document.getElementById('iosInstallModal').style.display = 'flex';
-    } else if (deferredPrompt) {
-      deferredPrompt.prompt();
-      deferredPrompt.userChoice.then(() => { deferredPrompt = null; updateButtons(); });
-    } else {
-      alert("📲 Instala la app desde el menú de Chrome.");
-    }
-  });
-  window.matchMedia('(display-mode: standalone)').addEventListener('change', updateButtons);
-  window.addEventListener('DOMContentLoaded', updateButtons);
-
-  let isMusicStarted = false, currentAudio = null;
-  function playNextTrack() {
-    if (!isMusicStarted) return;
-    if (currentAudio) { currentAudio.pause(); currentAudio.onended = null; currentAudio = null; }
-    const track = musicListGlobal[Math.floor(Math.random() * musicListGlobal.length)];
-    if (!track) { setTimeout(playNextTrack, 5000); return; }
-    currentAudio = new Audio(track);
-    currentAudio.volume = 0.25;
-    currentAudio.onended = playNextTrack;
-    currentAudio.play().catch(e => setTimeout(playNextTrack, 3000));
-  }
-  function startMusic() { if (isMusicStarted) return; isMusicStarted = true; playNextTrack(); }
-  document.addEventListener('visibilitychange', () => {
-    if (!document.hidden && isMusicStarted && currentAudio?.paused) currentAudio.play().catch(()=>{});
-  });
-  window.addEventListener('load', startMusic);
-
-  // ===== LOADER (con GIF) =====
-  let loadingCompleted = false;
-  const loadingScreen = document.getElementById('loadingScreen');
-  const percentEl = document.getElementById('loadingPercentage');
-  const lineEl = document.getElementById('loaderLine');
-  const gifImg = document.getElementById('personaje-gif');
-
-  if (typeof listaDeGifs !== 'undefined' && listaDeGifs.length > 0) {
-    const gifElegido = listaDeGifs[Math.floor(Math.random() * listaDeGifs.length)];
-    gifImg.src = gifElegido;
-  } else {
-    gifImg.src = 'assets/gifs/chica_corriendo.gif';
-  }
-
-  function updateProgress(p) {
-    const v = Math.min(99, Math.max(0, Math.floor(p)));
-    percentEl.textContent = v + '%';
-    lineEl.style.width = v + '%';
-  }
-
-  function finishLoading() {
-    if (loadingCompleted) return;
-    loadingCompleted = true;
-    updateProgress(100);
-    percentEl.textContent = 'SISTEMA LISTO';
-    setTimeout(() => {
-      loadingScreen.classList.add('hidden');
-      document.body.style.overflow = '';
-    }, 700);
-  }
-
-  let prog = 0;
-  const loadInterval = setInterval(() => {
-    if (loadingCompleted) { clearInterval(loadInterval); return; }
-    if (prog < 85) { prog += Math.random() * 8; if (prog > 85) prog = 85; updateProgress(prog); }
-  }, 200);
-  window.addEventListener('firstAnimesLoaded', () => { clearInterval(loadInterval); updateProgress(100); finishLoading(); });
-  setTimeout(() => { if (!loadingCompleted) finishLoading(); }, 8000);
-
-  // ===== RESTO DEL CÓDIGO (catálogo, filtros, etc.) =====
-  function shuffleArray(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
-
-  let firestoreRatings = new Map();
-  async function loadRatings() {
-    try {
-      const snap = await db.collection('animeRatings').get();
-      snap.forEach(doc => {
-        const d = doc.data();
-        if (typeof d.avg === 'number') firestoreRatings.set(parseInt(doc.id), { avg: d.avg, count: d.count || 0 });
-      });
-    } catch (e) { console.warn('Error ratings:', e); }
-  }
-  function getDisplayRating(anime) {
-    const id = parseInt(anime.id);
-    if (firestoreRatings.has(id)) return firestoreRatings.get(id).avg.toFixed(1);
-    return '—';
-  }
-  function getNumericRating(anime) {
-    const id = parseInt(anime.id);
-    if (firestoreRatings.has(id)) return firestoreRatings.get(id).avg;
-    return 0;
-  }
-  function normalizeText(s) { return (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''); }
-
-  let anuncioActual = null, cachedAdCard = null;
-  function inicializarAnuncio() {
-    if (typeof window.listaAnuncios !== 'undefined' && window.listaAnuncios.length > 0) {
-      anuncioActual = window.listaAnuncios[Math.floor(Math.random() * window.listaAnuncios.length)];
-    }
-  }
-  function crearTarjetaAnuncio() {
-    if (cachedAdCard) return cachedAdCard;
-    if (!anuncioActual) return null;
-    const card = document.createElement('div');
-    card.className = 'card card-ad';
-    const inner = document.createElement('div');
-    inner.innerHTML = anuncioActual.codigo;
-    inner.querySelectorAll('script').forEach(old => {
-      const ns = document.createElement('script');
-      if (old.src) { ns.src = old.src; ns.async = true; } else { ns.textContent = old.textContent; }
-      inner.appendChild(ns); old.remove();
-    });
-    card.appendChild(inner);
-    cachedAdCard = card;
-    return card;
-  }
-
-  let baseAnimes = [];
-  let searchableIndex = [];
-  function buildSearchableIndex(animes) {
-    return animes.map(a => ({
-      id: a.id,
-      title: a.title,
-      img: a.img || 'assets/img/placeholder.webp',
-      genres: a.genres || [],
-      searchStr: normalizeText(a.title) + ' ' + (a.aliases || []).map(normalizeText).join(' ')
-    }));
-  }
-
-  let allAnimes = [], currentPage = 1, totalPages = 1, itemsPerPage = 36;
-  let currentFilters = { search: '', genre: '', demographic: '', rating: '' };
-  const grid = document.getElementById('grid');
-  const paginationContainer = document.getElementById('pagination');
-  const searchInput = document.getElementById('search');
-  const suggestionsDesktop = document.getElementById('searchSuggestions');
-
-  function renderSuggestions(term) {
-    if (!suggestionsDesktop) return;
-    if (term.length < 1) {
-      suggestionsDesktop.classList.remove('active');
-      suggestionsDesktop.innerHTML = '';
-      return;
-    }
-    const normTerm = normalizeText(term);
-    const matches = searchableIndex.filter(item => item.searchStr.includes(normTerm)).slice(0, 8);
-    if (matches.length === 0) {
-      suggestionsDesktop.innerHTML = `<div class="suggestion-item"><span class="s-empty">No se encontraron resultados</span></div>`;
-      suggestionsDesktop.classList.add('active');
-      return;
-    }
-    let html = '';
-    matches.forEach(item => {
-      const title = item.title;
-      const idx = normalizeText(title).indexOf(normTerm);
-      let displayTitle = title;
-      if (idx !== -1) {
-        const start = title.substring(0, idx);
-        const match = title.substring(idx, idx + term.length);
-        const end = title.substring(idx + term.length);
-        displayTitle = `${start}<strong>${match}</strong>${end}`;
-      }
-      const genreStr = item.genres.slice(0, 2).join(', ') || 'Anime';
-      html += `
-        <div class="suggestion-item" data-id="${item.id}">
-          <img src="${item.img}" alt="${item.title}" loading="lazy">
-          <div class="s-info">
-            <div class="s-title">${displayTitle}</div>
-            <div class="s-genre">${genreStr}</div>
-          </div>
-        </div>
-      `;
-    });
-    suggestionsDesktop.innerHTML = html;
-    suggestionsDesktop.classList.add('active');
-    suggestionsDesktop.querySelectorAll('.suggestion-item[data-id]').forEach(el => {
-      el.addEventListener('mousedown', (e) => {
-        e.preventDefault();
-        const id = el.dataset.id;
-        const anime = baseAnimes.find(a => a.id == id);
-        if (anime) {
-          searchInput.value = anime.title;
-          hideAllSuggestions();
-          openDetail(id);
-        }
-      });
-    });
-  }
-
-  function hideAllSuggestions() {
-    if (suggestionsDesktop) suggestionsDesktop.classList.remove('active');
-  }
-
-  function applyFilters() {
-    let result = baseAnimes.slice();
-    if (currentFilters.genre) result = result.filter(a => a.genres && a.genres.includes(currentFilters.genre));
-    if (currentFilters.demographic) result = result.filter(a => a.genres && a.genres.includes(currentFilters.demographic));
-    if (currentFilters.search) {
-      const term = normalizeText(currentFilters.search);
-      result = result.filter(a => {
-        const titleMatch = normalizeText(a.title).includes(term);
-        if (titleMatch) return true;
-        if (a.aliases) return a.aliases.some(alias => normalizeText(alias).includes(term));
-        return false;
-      });
-    }
-    if (currentFilters.rating) {
-      result = result.filter(a => {
-        const r = getNumericRating(a);
-        if (currentFilters.rating === 'excellent') return r >= 4.8;
-        if (currentFilters.rating === 'good') return r >= 4.6 && r < 4.8;
-        if (currentFilters.rating === 'regular') return r < 4.6;
-        return true;
-      });
-    }
-    return result;
-  }
-
-  function cargarDatosYMostrar() {
-    grid.innerHTML = '<div style="text-align:center; padding:40px; color:var(--text-secondary);"><i class="fas fa-spinner fa-spin"></i> Cargando catálogo...</div>';
-    paginationContainer.innerHTML = '';
-    try {
-      const filtered = applyFilters();
-      allAnimes = filtered;
-      totalPages = Math.ceil(allAnimes.length / itemsPerPage);
-      currentPage = 1;
-      if (!allAnimes.length) { mostrarNoResultados(); paginationContainer.innerHTML = ''; } else renderPage();
-      if (!window.firstAnimesDispatched) { window.firstAnimesDispatched = true; window.dispatchEvent(new CustomEvent('firstAnimesLoaded')); }
-    } catch (e) {
-      grid.innerHTML = `<div style="text-align:center;padding:40px;color:var(--neon-pink);">Error: ${e.message}</div>`;
-    }
-  }
-
-  function renderPage() {
-    const start = (currentPage - 1) * itemsPerPage;
-    const end = start + itemsPerPage;
-    const pageItems = allAnimes.slice(start, end);
-    renderAnimes(pageItems, false);
-    renderPagination();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-
-  function renderAnimes(animes, append = false) {
-    if (!append) grid.innerHTML = '';
-    if (!animes.length) { mostrarNoResultados(); paginationContainer.innerHTML = ''; return; }
-    const frag = document.createDocumentFragment();
-    const hasFilters = currentFilters.search || currentFilters.genre || currentFilters.demographic || currentFilters.rating;
-    const insertAd = !hasFilters && anuncioActual !== null;
-    let adPos = -1;
-    if (insertAd && animes.length >= 5) {
-      adPos = Math.floor(Math.random() * (animes.length - 4)) + 4;
-    }
-    for (let i = 0; i < animes.length; i++) {
-      if (insertAd && i === adPos) {
-        const ad = crearTarjetaAnuncio();
-        if (ad) frag.appendChild(ad);
-      }
-      const anime = animes[i];
-      const card = document.createElement('div');
-      card.className = 'card';
-      card.dataset.id = anime.id;
-      card.setAttribute('onclick', `openDetail('${anime.id}')`);
-      const rating = getDisplayRating(anime);
-      const img = anime.img || 'assets/img/placeholder.webp';
-      const ratingVal = getNumericRating(anime);
-      const roundedRating = Math.round(ratingVal * 10) / 10;
-      const badge = (roundedRating >= 4.9 && roundedRating <= 5.0) ? '<div class="badge">🔥 TOP</div>' : '';
-      card.innerHTML = `
-        <img src="${img}" alt="${anime.title}" loading="eager" decoding="async" style="background:#0b0e14;">
-        ${badge}
-        <div class="info">
-          <strong>${anime.title}</strong>
-          <span>⭐ ${rating}</span>
-        </div>
-      `;
-      frag.appendChild(card);
-    }
-    grid.appendChild(frag);
-    aplicarTilt();
-  }
-
-  function mostrarNoResultados() {
-    grid.innerHTML = `<div class="cyber-no-results">
-      <i class="fas fa-satellite-dish"></i>
-      <h2>Sin Resultados</h2>
-      <p>Prueba con otros filtros o busca por alias.</p>
-      <button onclick="resetearFiltrosGlobal()">Restaurar Radares</button>
-    </div>`;
-  }
-
-  function renderPagination() {
-    if (totalPages <= 1) { paginationContainer.innerHTML = ''; return; }
-    let html = `<button class="pagination-btn" ${currentPage===1?'disabled':''} onclick="changePage(${currentPage-1})"><i class="fas fa-chevron-left"></i></button>`;
-    const maxV = 5;
-    let s = Math.max(1, currentPage - Math.floor(maxV/2));
-    let e = Math.min(totalPages, s + maxV - 1);
-    if (e - s + 1 < maxV) s = Math.max(1, e - maxV + 1);
-    if (s > 1) { html += `<button class="pagination-btn" onclick="changePage(1)">1</button>`; if (s > 2) html += `<span class="pagination-ellipsis">...</span>`; }
-    for (let i = s; i <= e; i++) html += `<button class="pagination-btn ${i===currentPage?'active':''}" onclick="changePage(${i})">${i}</button>`;
-    if (e < totalPages) { if (e < totalPages - 1) html += `<span class="pagination-ellipsis">...</span>`; html += `<button class="pagination-btn" onclick="changePage(${totalPages})">${totalPages}</button>`; }
-    html += `<button class="pagination-btn" ${currentPage===totalPages?'disabled':''} onclick="changePage(${currentPage+1})"><i class="fas fa-chevron-right"></i></button>`;
-    paginationContainer.innerHTML = html;
-  }
-
-  window.changePage = function(p) { if (p < 1 || p > totalPages) return; currentPage = p; renderPage(); };
-
-  function handleSearchInput(e) {
-    const term = e.target.value;
-    currentFilters.search = term;
-    renderSuggestions(term);
-  }
-  function handleSearchKeydown(e) {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      hideAllSuggestions();
-      cargarDatosYMostrar();
-    }
-    if (e.key === 'Escape') {
-      hideAllSuggestions();
-    }
-  }
-  document.addEventListener('click', function(e) {
-    if (!e.target.closest('.search-wrapper')) {
-      hideAllSuggestions();
-    }
-  });
-  searchInput.addEventListener('input', handleSearchInput);
-  searchInput.addEventListener('keydown', handleSearchKeydown);
-
-  document.getElementById('searchToggleMobile').addEventListener('click', () => {
-    const wrapper = document.getElementById('searchWrapper');
-    wrapper.classList.toggle('active');
-    if (wrapper.classList.contains('active')) {
-      setTimeout(() => searchInput.focus(), 150);
-    }
-  });
-
-  document.getElementById('genre-select').addEventListener('change', e => { currentFilters.genre = e.target.value; cargarDatosYMostrar(); });
-  document.getElementById('demographic-select').addEventListener('change', e => { currentFilters.demographic = e.target.value; cargarDatosYMostrar(); });
-  document.getElementById('rating-select').addEventListener('change', e => { currentFilters.rating = e.target.value; cargarDatosYMostrar(); });
-
-  window.resetearFiltrosGlobal = function() {
-    document.getElementById('search').value = '';
-    document.getElementById('genre-select').value = '';
-    document.getElementById('demographic-select').value = '';
-    document.getElementById('rating-select').value = '';
-    currentFilters = { search: '', genre: '', demographic: '', rating: '' };
-    hideAllSuggestions();
-    cargarDatosYMostrar();
-  };
-
-  // ===== AUTENTICACIÓN =====
   let currentUser = null, newAvatarUrl = null, lastProfileUpdate = 0;
   const CLOUDINARY_URL = 'https://api.cloudinary.com/v1_1/dbcqcai1q/upload';
   const CLOUDINARY_PRESET = 'stickers_archinime';
@@ -1533,7 +1195,7 @@
       dAvatar.style.borderColor = 'var(--neon-blue)'; dAvatar.style.boxShadow = 'none';
       dName.style.color = 'var(--neon-blue)'; dName.style.textShadow = 'none';
     }
-    if (sidePanel.classList.contains('open')) {
+    if (document.getElementById('sidePanel')?.classList.contains('open')) {
       actualizarEstadoChatPanel();
     }
   }
@@ -1545,7 +1207,9 @@
   });
   auth.onAuthStateChanged(updateUserUI);
 
-  // ===== CUSTOM SELECTS =====
+  // ============================================
+  // CUSTOM SELECTS (UI)
+  // ============================================
   (function() {
     const selects = ['genre-select', 'demographic-select', 'rating-select'];
     const isMobileSelect = window.matchMedia('(max-width: 768px)').matches;
@@ -1592,6 +1256,9 @@
     });
   })();
 
+  // ============================================
+  // EFECTOS TILT EN TARJETAS
+  // ============================================
   function aplicarTilt() {
     const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
     if (isTouch) return;
@@ -1611,7 +1278,9 @@
     });
   }
 
-  // ===== CHROMA KEY (ANIMACIONES FIJAS) =====
+  // ============================================
+  // CHROMA KEY (ANIMACIONES FIJAS)
+  // ============================================
   function randomizeFgPosition() {
     const container = document.getElementById('stageContainer');
     if (!container) return;
@@ -1703,7 +1372,9 @@
   });
   window.addEventListener('DOMContentLoaded', startVisualMedia);
 
-  // ===== FUNCIONES DE DETALLE Y EVENTOS =====
+  // ============================================
+  // FUNCIONES DE DETALLE Y EVENTOS
+  // ============================================
   function buildContentDetails(anime) {
     if (!anime.seasons || anime.seasons.length === 0) {
       return `<p style="color: var(--text-secondary); line-height: 1.6;">${anime.desc || 'Descripción no disponible.'}</p>`;
@@ -1750,12 +1421,13 @@
   }
 
   function openDetail(id) {
-    const anime = baseAnimes.find(a => a.id == id);
+    // Obtener el anime de baseAnimes (que anime-loader.js debería tener, pero lo tomamos del catálogo global)
+    const anime = (typeof catalogoArray !== 'undefined') ? catalogoArray.find(a => a.id == id) : null;
     if (!anime) { alert('Anime no encontrado'); return; }
     document.getElementById('detailCoverImg').src = anime.img || 'assets/img/placeholder.webp';
     document.getElementById('detailCoverImg').alt = anime.title;
     document.getElementById('detailTitle').textContent = anime.title;
-    const rating = getDisplayRating(anime);
+    const rating = anime.rating || 0;
     const genres = anime.genres?.join(', ') || 'Sin género';
     document.getElementById('detailMeta').innerHTML = `<span>⭐ ${rating}</span><span>${genres}</span>`;
     const airingBadge = document.getElementById('detailAiringBadge');
@@ -1786,7 +1458,7 @@
     document.getElementById('eventCoverBack').src = eventData.img || 'assets/img/placeholder.webp';
     document.getElementById('eventCoverFront').src = eventData.img || 'assets/img/placeholder.webp';
     document.getElementById('eventTitle').textContent = eventData.title || 'Nuevo Anime';
-    document.getElementById('eventMeta').textContent = `⭐ ${getDisplayRating(eventData)} · ${eventData.genres?.slice(0,2).join(', ') || 'Anime'}`;
+    document.getElementById('eventMeta').textContent = `⭐ ${eventData.rating || 0} · ${eventData.genres?.slice(0,2).join(', ') || 'Anime'}`;
     document.getElementById('eventDesc').textContent = eventData.desc || 'Descripción no disponible.';
     document.getElementById('eventBadge').textContent = eventData.updateType || '🔥 NUEVO';
     document.getElementById('eventBtn').onclick = function() {
@@ -1816,18 +1488,20 @@
     }
   }
   function checkForNewAnimes() {
-    const newAnimes = baseAnimes.slice(0, 3);
-    newAnimes.forEach(anime => {
-      addEventToQueue(anime);
-    });
+    if (typeof catalogoArray !== 'undefined') {
+      const newAnimes = catalogoArray.slice(0, 3);
+      newAnimes.forEach(anime => {
+        addEventToQueue(anime);
+      });
+    }
   }
 
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') {
       closeAuthModal(); closeProfileModal(); closeDetailModal(); closeEventModal();
-      sidePanel.classList.remove('open');
+      document.getElementById('sidePanel')?.classList.remove('open');
       document.body.style.overflow = '';
-      hideAllSuggestions();
+      document.getElementById('searchSuggestions')?.classList.remove('active');
       cerrarStickerModalGlobal();
     }
   });
@@ -1844,44 +1518,84 @@
   window.closeProfileModal = closeProfileModal;
   window.copiarUID = copiarUID;
 
-  // ===== INICIALIZACIÓN FINAL =====
-  inicializarAnuncio();
-  loadRatings().then(() => {
-    if (typeof catalogoArray !== 'undefined') {
-      baseAnimes = shuffleArray([...catalogoArray]);
-      searchableIndex = buildSearchableIndex(baseAnimes);
-    } else {
-      baseAnimes = [];
-      searchableIndex = [];
-    }
-    cargarDatosYMostrar();
-    setTimeout(() => {
-      checkForNewAnimes();
-    }, 3000);
-  }).catch(err => {
-    console.error('Error al cargar ratings:', err);
-    if (typeof catalogoArray !== 'undefined') {
-      baseAnimes = shuffleArray([...catalogoArray]);
-      searchableIndex = buildSearchableIndex(baseAnimes);
-    } else {
-      baseAnimes = [];
-      searchableIndex = [];
-    }
-    cargarDatosYMostrar();
-    setTimeout(() => {
-      checkForNewAnimes();
-    }, 3000);
-  });
-
-  window.addEventListener('load', () => { if (window.startNotificationSequence) window.startNotificationSequence(); });
-
-  if (window.matchMedia('(max-width: 768px)').matches) {
-    const logo = document.querySelector('.nav-logo');
-    if (logo) {
-      logo.removeAttribute('target');
-      logo.addEventListener('click', function(e) { e.preventDefault(); window.location.href = this.href; });
-    }
+  // ============================================
+  // INICIALIZACIÓN FINAL
+  // ============================================
+  // Inicializar anuncios (si existe la variable)
+  if (typeof window.listaAnuncios !== 'undefined' && window.listaAnuncios.length > 0) {
+    window.anuncioActual = window.listaAnuncios[Math.floor(Math.random() * window.listaAnuncios.length)];
   }
+
+  // checkForNewAnimes se ejecutará después de cargar el catálogo
+  setTimeout(() => {
+    checkForNewAnimes();
+  }, 3000);
+
+  // ===== MUSICA DE FONDO =====
+  window.musicListGlobal = musicListGlobal || [];
+  let isMusicStarted = false, currentAudio = null;
+  function playNextTrack() {
+    if (!isMusicStarted) return;
+    if (currentAudio) { currentAudio.pause(); currentAudio.onended = null; currentAudio = null; }
+    const track = musicListGlobal[Math.floor(Math.random() * musicListGlobal.length)];
+    if (!track) { setTimeout(playNextTrack, 5000); return; }
+    currentAudio = new Audio(track);
+    currentAudio.volume = 0.25;
+    currentAudio.onended = playNextTrack;
+    currentAudio.play().catch(e => setTimeout(playNextTrack, 3000));
+  }
+  function startMusic() { if (isMusicStarted) return; isMusicStarted = true; playNextTrack(); }
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden && isMusicStarted && currentAudio?.paused) currentAudio.play().catch(()=>{});
+  });
+  window.addEventListener('load', startMusic);
+
+  // ===== LOADER (con GIF) =====
+  let loadingCompleted = false;
+  const loadingScreen = document.getElementById('loadingScreen');
+  const percentEl = document.getElementById('loadingPercentage');
+  const lineEl = document.getElementById('loaderLine');
+  const gifImg = document.getElementById('personaje-gif');
+
+  if (typeof listaDeGifs !== 'undefined' && listaDeGifs.length > 0) {
+    const gifElegido = listaDeGifs[Math.floor(Math.random() * listaDeGifs.length)];
+    gifImg.src = gifElegido;
+  } else {
+    gifImg.src = 'assets/gifs/chica_corriendo.gif';
+  }
+
+  function updateProgress(p) {
+    const v = Math.min(99, Math.max(0, Math.floor(p)));
+    percentEl.textContent = v + '%';
+    lineEl.style.width = v + '%';
+  }
+
+  function finishLoading() {
+    if (loadingCompleted) return;
+    loadingCompleted = true;
+    updateProgress(100);
+    percentEl.textContent = 'SISTEMA LISTO';
+    setTimeout(() => {
+      loadingScreen.classList.add('hidden');
+      document.body.style.overflow = '';
+    }, 700);
+  }
+
+  let prog = 0;
+  const loadInterval = setInterval(() => {
+    if (loadingCompleted) { clearInterval(loadInterval); return; }
+    if (prog < 85) { prog += Math.random() * 8; if (prog > 85) prog = 85; updateProgress(prog); }
+  }, 200);
+  
+  // Escuchar evento que dispara anime-loader.js cuando carga la primera página
+  window.addEventListener('firstAnimesLoaded', () => { 
+    clearInterval(loadInterval); 
+    updateProgress(100); 
+    finishLoading(); 
+  });
+  
+  // Fallback por si el evento no se dispara
+  setTimeout(() => { if (!loadingCompleted) finishLoading(); }, 8000);
 
   // ===== PAUSAR BANNERS =====
   (function pauseBannersWhenHidden() {
@@ -1938,8 +1652,7 @@
     resize();
   })();
 
-  console.log('🚀 Archinime cargado correctamente con optimizaciones para móviles.');
+  console.log('🚀 Archinime cargado correctamente con módulos externos.');
 </script>
-
 </body>
 </html>
