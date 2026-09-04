@@ -14,7 +14,7 @@
   <!-- VERSIÓN (forzar limpieza de caché) -->
   <script>
     (function() {
-      const APP_VERSION = "2025-04-07-v22.0-modular";
+      const APP_VERSION = "2025-04-08-v23.0-final";
       const stored = localStorage.getItem('archinime_app_version');
       if (stored !== APP_VERSION) {
         localStorage.setItem('archinime_app_version', APP_VERSION);
@@ -77,11 +77,9 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script>
 
-  <style>
-    /* ===== TODO EL CSS ORIGINAL (sin cambios) ===== */
-    /* ... (mantén exactamente el mismo CSS que tenías) ... */
-    /* Por brevedad no lo repito aquí, pero debes conservarlo intacto */
-  </style>
+  <!-- CSS EXTERNO (styles-index.css) -->
+  <link rel="stylesheet" href="css/styles-index.css">
+
 </head>
 <body>
 
@@ -423,7 +421,7 @@
 <!-- 3. Componentes reutilizables -->
 <script src="js/components/pwa-handler.js"></script>
 <script src="js/components/notification-system.js"></script>
-<script src="js/components/banner-carousel.js?v=2025-04-07-v22.0-modular"></script>
+<script src="js/components/banner-carousel.js?v=2025-04-08-v23.0-final"></script>
 
 <!-- 4. MÓDULO DE CARGA DE ANIMES (anime-loader.js) -->
 <script src="js/components/anime-loader.js"></script>
@@ -437,7 +435,7 @@
 <script src="js/utils/gifs.js"></script>
 
 <!-- 7. Datos (catálogo) -->
-<script src="data/catalogo.js?v=2025-04-07-v22.0-modular"></script>
+<script src="data/catalogo.js?v=2025-04-08-v23.0-final"></script>
 
 <!-- ========================================================== -->
 <!-- ===== LÓGICA INLINE RESTANTE (Específica de la página) ===== -->
@@ -714,16 +712,6 @@
   // ============================================
   // FUNCIONES DEL CHAT (Sobrescriben las de chat-global.js para usar IDs específicos)
   // ============================================
-  // Estas funciones mantienen la integración con el HTML de index.html
-  // mientras chat-global.js maneja la lógica de fondo.
-  
-  // NOTA: chat-global.js expone funciones, pero aquí las sobrescribimos
-  // para que usen los IDs específicos de index.html (Panel lateral).
-  // chat-global.js usa 'chatModal', 'chatMessages', etc., que NO existen aquí.
-  // Por eso, necesitamos mantener estas implementaciones locales.
-  // Si chat-global.js se actualiza para ser más flexible, podríamos eliminarlas.
-  // Por ahora, las mantenemos para no romper nada.
-
   let chatUnsubscribePanel = null;
   let stickerSeleccionadoPanel = null;
 
@@ -1421,7 +1409,6 @@
   }
 
   function openDetail(id) {
-    // Obtener el anime de baseAnimes (que anime-loader.js debería tener, pero lo tomamos del catálogo global)
     const anime = (typeof catalogoArray !== 'undefined') ? catalogoArray.find(a => a.id == id) : null;
     if (!anime) { alert('Anime no encontrado'); return; }
     document.getElementById('detailCoverImg').src = anime.img || 'assets/img/placeholder.webp';
@@ -1521,12 +1508,10 @@
   // ============================================
   // INICIALIZACIÓN FINAL
   // ============================================
-  // Inicializar anuncios (si existe la variable)
   if (typeof window.listaAnuncios !== 'undefined' && window.listaAnuncios.length > 0) {
     window.anuncioActual = window.listaAnuncios[Math.floor(Math.random() * window.listaAnuncios.length)];
   }
 
-  // checkForNewAnimes se ejecutará después de cargar el catálogo
   setTimeout(() => {
     checkForNewAnimes();
   }, 3000);
@@ -1587,14 +1572,12 @@
     if (prog < 85) { prog += Math.random() * 8; if (prog > 85) prog = 85; updateProgress(prog); }
   }, 200);
   
-  // Escuchar evento que dispara anime-loader.js cuando carga la primera página
   window.addEventListener('firstAnimesLoaded', () => { 
     clearInterval(loadInterval); 
     updateProgress(100); 
     finishLoading(); 
   });
   
-  // Fallback por si el evento no se dispara
   setTimeout(() => { if (!loadingCompleted) finishLoading(); }, 8000);
 
   // ===== PAUSAR BANNERS =====
