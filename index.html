@@ -2116,8 +2116,8 @@
       right: 20px;
       z-index: 99;
       pointer-events: auto;
-      width: 180px;  /* Reducido de 220px a 180px */
-      height: auto;
+      width: 180px;
+      height: 240px;  /* Alto fijo para que todos los recuadros tengan el mismo tamaño */
       border-radius: 16px;
       overflow: hidden;
       background: transparent;
@@ -2127,16 +2127,17 @@
     #fgContainer {
       position: relative;
       width: 100%;
-      height: auto;
+      height: 100%;
       background: transparent;
     }
 
     #fgContainer canvas,
     #fgContainer video {
       width: 100% !important;
-      height: auto !important;
+      height: 100% !important;
       display: block;
       border-radius: 0;
+      object-fit: contain;
     }
 
     .fg-left {
@@ -2171,7 +2172,8 @@
 
     @media (max-width: 768px) {
       #stageContainer {
-        width: 140px;  /* Reducido en móvil */
+        width: 140px;
+        height: 187px;  /* Mantener relación 3:4 */
         bottom: 10px;
         right: 10px;
       }
@@ -2180,7 +2182,8 @@
     }
     @media (max-width: 480px) {
       #stageContainer {
-        width: 110px;  /* Reducido en móviles pequeños */
+        width: 110px;
+        height: 147px;
         bottom: 10px;
         right: 6px;
       }
@@ -2551,7 +2554,7 @@
 <div id="stageContainer">
   <div id="fgContainer">
     <canvas id="fgCanvas"></canvas>
-    <video id="fgVideo" muted loop playsinline autoplay></video>
+    <video id="fgVideo" muted loop playsinline autoplay preload="auto"></video>
   </div>
 </div>
 
@@ -3788,7 +3791,7 @@
     });
   }
 
-  // ===== CHROMA KEY (ANIMACIONES FIJAS) =====
+  // ===== CHROMA KEY (ANIMACIONES FIJAS) - TAMAÑO FIJO Y CARGA RÁPIDA =====
   function randomizeFgPosition() {
     const container = document.getElementById('stageContainer');
     if (!container) return;
@@ -3800,21 +3803,27 @@
   const fgVideo = document.getElementById('fgVideo');
   const fgCanvas = document.getElementById('fgCanvas');
   const fgCtx = fgCanvas.getContext('2d', { willReadFrequently: true });
+
+  // Fijamos el tamaño del canvas (3:4)
+  const CANVAS_W = 180;
+  const CANVAS_H = 240;
+  fgCanvas.width = CANVAS_W;
+  fgCanvas.height = CANVAS_H;
+
+  // Cargar primer video
   let currentAnim = videoList[Math.floor(Math.random() * videoList.length)];
   let isTransitioning = false;
   fgVideo.style.display = 'none';
   fgVideo.src = currentAnim.src;
+  fgVideo.preload = 'auto';
 
-  // ===== AJUSTE DEL TAMAÑO DEL CANVAS (más pequeño) =====
-  fgVideo.addEventListener('loadedmetadata', () => {
-    const maxW = 180;  // Reducido de 300 a 180 para que el video sea más pequeño
-    const ratio = fgVideo.videoWidth / fgVideo.videoHeight;
-    fgCanvas.width = maxW;
-    fgCanvas.height = maxW / ratio;
+  // Cuando el video esté listo, lo mostramos
+  fgVideo.addEventListener('loadeddata', () => {
+    fgVideo.play().catch(() => {});
   });
 
+  // Procesar chroma (siempre en el mismo canvas)
   let frameCount = 0;
-  let chromaActive = true;
   function processChroma() {
     if (fgVideo.paused || fgVideo.ended || isTransitioning) {
       requestAnimationFrame(processChroma);
@@ -3825,17 +3834,44 @@
       requestAnimationFrame(processChroma);
       return;
     }
-    fgCtx.drawImage(fgVideo, 0, 0, fgCanvas.width, fgCanvas.height);
-    const frame = fgCtx.getImageData(0, 0, fgCanvas.width, fgCanvas.height);
-    const data = frame.data;
+    // Limpiar canvas
+    fgCtx.clearRect(0, 0, CANVAS_W, CANVAS_H);
+    
+    // Dibujar el video escalado para que quepa dentro del canvas (manteniendo relación)
+    const vw = fgVideo.videoWidth;
+    const vh = fgVideo.videoHeight;
+    if (!vw || !vh) { requestAnimationFrame(processChroma); return; }
+    
+    let drawW, drawH, offsetX = 0, offsetY = 0;
+    const ratio = vw / vh;
+    const canvasRatio = CANVAS_W / CANVAS_H;
+    if (ratio > canvasRatio) {
+      drawW = CANVAS_W;
+      drawH = CANVAS_W / ratio;
+      offsetY = (CANVAS_H - drawH) / 2;
+    } else {
+      drawH = CANVAS_H;
+      drawW = CANVAS_H * ratio;
+      offsetX = (CANVAS_W - drawW) / 2;
+    }
+    
+    // Dibujar el frame
+    fgCtx.drawImage(fgVideo, offsetX, offsetY, drawW, drawH);
+    
+    // Procesar chroma key (eliminar fondo verde/azul)
+    const imageData = fgCtx.getImageData(0, 0, CANVAS_W, CANVAS_H);
+    const data = imageData.data;
     const key = currentAnim.keyColor || 'green';
     const thresh = currentAnim.preset?.threshold ? currentAnim.preset.threshold * 255 : 30;
     for (let i = 0; i < data.length; i += 4) {
       let r = data[i], g = data[i+1], b = data[i+2];
-      if (key === 'blue') { if (b > r + thresh && b > g + thresh) data[i+3] = 0; }
-      else { if (g > r + thresh && g > b + thresh) data[i+3] = 0; }
+      if (key === 'blue') {
+        if (b > r + thresh && b > g + thresh) data[i+3] = 0;
+      } else {
+        if (g > r + thresh && g > b + thresh) data[i+3] = 0;
+      }
     }
-    fgCtx.putImageData(frame, 0, 0);
+    fgCtx.putImageData(imageData, 0, 0);
     requestAnimationFrame(processChroma);
   }
   fgVideo.addEventListener('play', () => requestAnimationFrame(processChroma));
@@ -3848,11 +3884,7 @@
 
     // Chroma
     fgVideo.muted = true;
-    fgVideo.play().catch(() => {
-      setTimeout(() => {
-        fgVideo.play().catch(() => {});
-      }, 1000);
-    });
+    fgVideo.play().catch(() => {});
     randomizeFgPosition();
   }
 
