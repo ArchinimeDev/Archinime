@@ -3937,7 +3937,7 @@
     });
   }
 
-  // ===== CHROMA KEY (ANIMACIONES CON CAMBIO ALEATORIO MEJORADO) =====
+  // ===== CHROMA KEY (ANIMACIONES FIJAS) =====
   function randomizeFgPosition() {
     const container = document.getElementById('stageContainer');
     if (!container) return;
@@ -3949,32 +3949,18 @@
   const fgVideo = document.getElementById('fgVideo');
   const fgCanvas = document.getElementById('fgCanvas');
   const fgCtx = fgCanvas.getContext('2d', { willReadFrequently: true });
-  let currentAnim = null;
+  let currentAnim = videoList[Math.floor(Math.random() * videoList.length)];
   let isTransitioning = false;
-
-  // Inicializar con el primer video de la lista
-  function initChroma() {
-    if (!window.videoList || window.videoList.length === 0) {
-      console.warn('No hay videos en videoList');
-      return;
-    }
-    currentAnim = window.videoList[Math.floor(Math.random() * window.videoList.length)];
-    fgVideo.src = currentAnim.src + '?t=' + Date.now();
-    fgVideo.load();
-    fgVideo.play().catch(() => {});
-    // Configurar canvas cuando el video se cargue
-    fgVideo.addEventListener('loadedmetadata', () => {
-      const maxW = 300;
-      const ratio = fgVideo.videoWidth / fgVideo.videoHeight;
-      fgCanvas.width = maxW;
-      fgCanvas.height = maxW / ratio;
-    });
-    // Iniciar el procesamiento chroma
-    fgVideo.addEventListener('play', () => requestAnimationFrame(processChroma));
-    randomizeFgPosition();
-  }
-
+  fgVideo.style.display = 'none';
+  fgVideo.src = currentAnim.src;
+  fgVideo.addEventListener('loadedmetadata', () => {
+    const maxW = 300;
+    const ratio = fgVideo.videoWidth / fgVideo.videoHeight;
+    fgCanvas.width = maxW;
+    fgCanvas.height = maxW / ratio;
+  });
   let frameCount = 0;
+  let chromaActive = true;
   function processChroma() {
     if (fgVideo.paused || fgVideo.ended || isTransitioning) {
       requestAnimationFrame(processChroma);
@@ -3998,7 +3984,13 @@
     fgCtx.putImageData(frame, 0, 0);
     requestAnimationFrame(processChroma);
   }
-
+  fgVideo.addEventListener('play', () => requestAnimationFrame(processChroma));
+  function startVisualMedia() {
+    document.getElementById('bg-video').play().then(() => document.getElementById('bg-video').style.opacity = '1').catch(()=>{});
+    fgVideo.muted = true;
+    fgVideo.play().catch(()=>{});
+    randomizeFgPosition();
+  }
   function createSparks(cx, cy) {
     const colors = ['#00f0ff','#b114ff','#ff1a6b','#ffd700'];
     for (let i = 0; i < 70; i++) {
@@ -4017,55 +4009,25 @@
       setTimeout(() => s.remove(), 800);
     }
   }
-
-  // Evento de clic para cambiar de animación (ALEATORIO, sin repetir la actual)
   fgContainer.addEventListener('click', (e) => {
     e.stopPropagation();
     if (isTransitioning) return;
-    if (!window.videoList || window.videoList.length < 2) {
-      // Si solo hay un video, no se puede cambiar, pero podemos recargarlo
-      fgVideo.pause();
-      fgVideo.currentTime = 0;
-      fgVideo.play().catch(() => {});
-      return;
-    }
     createSparks(e.clientX, e.clientY);
     isTransitioning = true;
     fgContainer.classList.add('poof');
-
     setTimeout(() => {
-      // Obtener lista de videos excluyendo el actual
-      let available = window.videoList.filter(v => v.id !== currentAnim.id);
-      if (available.length === 0) available = window.videoList; // fallback
-      const newAnim = available[Math.floor(Math.random() * available.length)];
+      let newAnim;
+      do { newAnim = videoList[Math.floor(Math.random() * videoList.length)]; } while (newAnim.id === currentAnim.id && videoList.length > 1);
       currentAnim = newAnim;
-
-      // Detener y limpiar
-      fgVideo.pause();
-      fgVideo.currentTime = 0;
-      // Cambiar src con timestamp para evitar caché
-      fgVideo.src = currentAnim.src + '?t=' + Date.now();
-      fgVideo.load();
+      fgVideo.src = currentAnim.src;
       fgVideo.play().then(() => {
         isTransitioning = false;
         fgContainer.classList.remove('poof');
         randomizeFgPosition();
-      }).catch(err => {
-        console.warn('Error al reproducir video:', err);
-        isTransitioning = false;
-        fgContainer.classList.remove('poof');
-      });
+      }).catch(() => { isTransitioning = false; });
     }, 600);
   });
-
-  // Iniciar chroma cuando el DOM esté listo
-  window.addEventListener('DOMContentLoaded', () => {
-    // Reproducir video de fondo
-    document.getElementById('bg-video').play().then(() => {
-      document.getElementById('bg-video').style.opacity = '1';
-    }).catch(() => {});
-    initChroma();
-  });
+  window.addEventListener('DOMContentLoaded', startVisualMedia);
 
   // ===== FUNCIONES DE DETALLE Y EVENTOS =====
   function buildContentDetails(anime) {
