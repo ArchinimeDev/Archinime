@@ -14,7 +14,7 @@
   <!-- VERSIÓN (forzar limpieza de caché) -->
   <script>
     (function() {
-      const APP_VERSION = "2025-04-08-v23.0-final";
+      const APP_VERSION = "2025-04-07-v21.0-chat-fixes";
       const stored = localStorage.getItem('archinime_app_version');
       if (stored !== APP_VERSION) {
         localStorage.setItem('archinime_app_version', APP_VERSION);
@@ -2266,7 +2266,7 @@
   <div class="loader-ring-outer">
     <div class="loader-ring-inner">
       <div class="gif-wrapper">
-        <img id="personaje-gif" src="https://cdn.jsdelivr.net/gh/ArchinimeDev/Archinime@main/assets/gifs/chica_corriendo.gif" alt="Cargando sistema">
+        <img id="personaje-gif" src="" alt="Cargando sistema">
       </div>
     </div>
   </div>
@@ -2573,7 +2573,7 @@
   const providerGoogle = new firebase.auth.GoogleAuthProvider();
 </script>
 
-<!-- Scripts cargados desde CDN -->
+<!-- Cargar scripts desde CDN -->
 <script src="https://cdn.jsdelivr.net/gh/ArchinimeDev/Archinime@main/data/catalogo.js"></script>
 <script src="https://cdn.jsdelivr.net/gh/ArchinimeDev/Archinime@main/js/utils/animaciones.js"></script>
 <script src="https://cdn.jsdelivr.net/gh/ArchinimeDev/Archinime@main/js/utils/musica_fondo.js"></script>
@@ -3270,10 +3270,11 @@
   const lineEl = document.getElementById('loaderLine');
   const gifImg = document.getElementById('personaje-gif');
 
-  // Ya tenemos el GIF desde CDN, pero si existe listaDeGifs, usamos uno aleatorio
   if (typeof listaDeGifs !== 'undefined' && listaDeGifs.length > 0) {
     const gifElegido = listaDeGifs[Math.floor(Math.random() * listaDeGifs.length)];
     gifImg.src = gifElegido;
+  } else {
+    gifImg.src = 'https://cdn.jsdelivr.net/gh/ArchinimeDev/Archinime@main/assets/gifs/chica_corriendo.gif';
   }
 
   function updateProgress(p) {
@@ -3298,18 +3299,8 @@
     if (loadingCompleted) { clearInterval(loadInterval); return; }
     if (prog < 85) { prog += Math.random() * 8; if (prog > 85) prog = 85; updateProgress(prog); }
   }, 200);
-  
-  // Escuchar evento de carga de animes
-  window.addEventListener('firstAnimesLoaded', () => { 
-    clearInterval(loadInterval); 
-    updateProgress(100); 
-    finishLoading(); 
-  });
-  
-  // Fallback: si después de 8 segundos no se cargaron los animes, forzar fin del loader
-  setTimeout(() => { 
-    if (!loadingCompleted) finishLoading(); 
-  }, 8000);
+  window.addEventListener('firstAnimesLoaded', () => { clearInterval(loadInterval); updateProgress(100); finishLoading(); });
+  setTimeout(() => { if (!loadingCompleted) finishLoading(); }, 8000);
 
   // ===== RESTO DEL CÓDIGO (catálogo, filtros, etc.) =====
   function shuffleArray(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
@@ -3712,7 +3703,7 @@
         dName.style.color = color; dName.style.textShadow = `0 0 10px ${color}`;
       });
     } else {
-      avatar.src = 'https://cdn.jsdelivr.net/gh/ArchinimeDev/Archinime@main/assets/img/invitado.avif'; 
+      avatar.src = 'https://cdn.jsdelivr.net/gh/ArchinimeDev/Archinime@main/assets/img/invitado.avif';
       dAvatar.src = 'https://cdn.jsdelivr.net/gh/ArchinimeDev/Archinime@main/assets/img/invitado.avif';
       dName.textContent = 'Invitado';
       loginItem.innerHTML = '<i class="fas fa-sign-in-alt"></i> Iniciar sesión'; loginItem.onclick = showAuthModal;
@@ -3720,7 +3711,6 @@
       dAvatar.style.borderColor = 'var(--neon-blue)'; dAvatar.style.boxShadow = 'none';
       dName.style.color = 'var(--neon-blue)'; dName.style.textShadow = 'none';
     }
-    // Actualizar también el panel de chat si está abierto
     if (sidePanel.classList.contains('open')) {
       actualizarEstadoChatPanel();
     }
