@@ -2116,7 +2116,7 @@
       right: 20px;
       z-index: 99;
       pointer-events: auto;
-      width: 220px;
+      width: 180px;  /* Reducido de 220px a 180px */
       height: auto;
       border-radius: 16px;
       overflow: hidden;
@@ -2171,7 +2171,7 @@
 
     @media (max-width: 768px) {
       #stageContainer {
-        width: 150px;
+        width: 140px;  /* Reducido en móvil */
         bottom: 10px;
         right: 10px;
       }
@@ -2180,7 +2180,7 @@
     }
     @media (max-width: 480px) {
       #stageContainer {
-        width: 120px;
+        width: 110px;  /* Reducido en móviles pequeños */
         bottom: 10px;
         right: 6px;
       }
@@ -3804,12 +3804,15 @@
   let isTransitioning = false;
   fgVideo.style.display = 'none';
   fgVideo.src = currentAnim.src;
+
+  // ===== AJUSTE DEL TAMAÑO DEL CANVAS (más pequeño) =====
   fgVideo.addEventListener('loadedmetadata', () => {
-    const maxW = 300;
+    const maxW = 180;  // Reducido de 300 a 180 para que el video sea más pequeño
     const ratio = fgVideo.videoWidth / fgVideo.videoHeight;
     fgCanvas.width = maxW;
     fgCanvas.height = maxW / ratio;
   });
+
   let frameCount = 0;
   let chromaActive = true;
   function processChroma() {
@@ -3837,17 +3840,15 @@
   }
   fgVideo.addEventListener('play', () => requestAnimationFrame(processChroma));
 
-  // Función mejorada para iniciar la reproducción
   function startVisualMedia() {
-    // Intentar reproducir el video de fondo
+    // Video de fondo
     document.getElementById('bg-video').play().then(() => {
       document.getElementById('bg-video').style.opacity = '1';
     }).catch(() => {});
 
-    // Intentar reproducir el chroma
+    // Chroma
     fgVideo.muted = true;
     fgVideo.play().catch(() => {
-      // Si falla, reintentar después de 1 segundo
       setTimeout(() => {
         fgVideo.play().catch(() => {});
       }, 1000);
@@ -3855,7 +3856,7 @@
     randomizeFgPosition();
   }
 
-  // Listener global para ayudar al autoplay si el usuario interactúa
+  // Forzar reproducción con clic del usuario
   document.addEventListener('click', () => {
     if (fgVideo.paused) {
       fgVideo.play().catch(() => {});
