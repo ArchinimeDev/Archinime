@@ -1,6 +1,7 @@
 // anime-detail-core.js - Versión con catálogo local (catalogo.js)
 // MEJORADO: Carga más rápida, mejor manejo de errores, 12 sugerencias
 // INCLUYE: Búsqueda rápida, votaciones, historial de visualización
+// CORREGIDO: Ruta de música ahora usa ../assets/music/
 
 function escapeHtml(text) {
   if (!text) return text;
@@ -60,7 +61,8 @@ function playTrack(idx) {
   if (!playlist.length) return;
   if (currentAudio) { currentAudio.pause(); currentAudio.onended = null; }
   let track = playlist[idx];
-  const fullUrl = track.startsWith('http') ? track : `musica/${track}`;
+  // ✅ RUTA CORREGIDA: usar ../assets/music/
+  const fullUrl = track.startsWith('http') ? track : `../assets/music/${track}`;
   currentAudio = new Audio(fullUrl);
   currentAudio.volume = 0.3;
   currentAudio.loop = false;
@@ -421,7 +423,6 @@ async function renderRecommendations(currentId) {
       card.className = 'rec-card';
       card.setAttribute('onclick', `playUISound('click'); location.href='anime-detail.html?id=${a.id}'`);
       card.setAttribute('onmouseenter', `playUISound('hover')`);
-      // 🔥 IMAGEN CON LOADING EAGER Y DECODING ASYNC
       card.innerHTML = `
         <img src="${a.img}" alt="${a.title}" loading="eager" decoding="async" 
              style="background: #0a0a0c; min-height: 100%;">
@@ -449,7 +450,6 @@ async function renderMainContent() {
   const genreHtml = genres.map(g => `<span class="genre-chip">${escapeHtml(g)}</span>`).join('');
   const desc = animeData.desc || 'Sin descripción disponible.';
 
-  // 🔥 Portada con loading eager
   let html = `
     <div class="anime-cover">
       <img src="${animeData.img || ''}" alt="cover" loading="eager" decoding="async" 
