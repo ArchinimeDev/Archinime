@@ -4092,7 +4092,8 @@
     }
     document.getElementById('detailDesc').innerHTML = buildContentDetails(anime);
     document.getElementById('detailWatchBtn').onclick = function() {
-      window.location.href = `anime-detail.html?id=${anime.id}`;
+      // *** CORRECCIÓN: ruta a pages/anime-detail.html ***
+      window.location.href = `pages/anime-detail.html?id=${anime.id}`;
     };
     document.getElementById('detailModal').classList.add('show');
     disableBodyScroll();
@@ -4116,7 +4117,8 @@
     document.getElementById('eventDesc').textContent = eventData.desc || 'Descripción no disponible.';
     document.getElementById('eventBadge').textContent = eventData.updateType || '🔥 NUEVO';
     document.getElementById('eventBtn').onclick = function() {
-      window.location.href = `anime-detail.html?id=${eventData.id}`;
+      // *** CORRECCIÓN: ruta a pages/anime-detail.html ***
+      window.location.href = `pages/anime-detail.html?id=${eventData.id}`;
     };
     document.getElementById('eventModal').classList.add('show');
     disableBodyScroll();
