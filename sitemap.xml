@@ -2,44 +2,39 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <!-- Página principal -->
   <url>
-    <loc>https://archinime.github.io/Archinime/</loc>
+    <loc>https://archinime.pages.dev/</loc>
     <lastmod>2025-04-07</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
-
   <!-- Páginas dentro de /pages/ -->
   <url>
-    <loc>https://archinime.github.io/Archinime/pages/anime-detail.html</loc>
+    <loc>https://archinime.pages.dev/pages/anime-detail.html</loc>
     <lastmod>2025-04-07</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
-
   <url>
-    <loc>https://archinime.github.io/Archinime/pages/video-player.html</loc>
+    <loc>https://archinime.pages.dev/pages/video-player.html</loc>
     <lastmod>2025-04-07</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
-
   <url>
-    <loc>https://archinime.github.io/Archinime/pages/opciones.html</loc>
+    <loc>https://archinime.pages.dev/pages/opciones.html</loc>
     <lastmod>2025-04-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
-
   <url>
-    <loc>https://archinime.github.io/Archinime/pages/carga.html</loc>
+    <loc>https://archinime.pages.dev/pages/carga.html</loc>
     <lastmod>2025-04-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
   </url>
-
-  <!-- Opcional: si tienes otras páginas importantes como /manifest.json, etc., puedes agregarlas -->
+  <!-- Opcional: otros archivos -->
   <url>
-    <loc>https://archinime.github.io/Archinime/manifest.json</loc>
+    <loc>https://archinime.pages.dev/manifest.json</loc>
     <changefreq>never</changefreq>
     <priority>0.1</priority>
   </url>

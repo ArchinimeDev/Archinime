@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://archinime.github.io/Archinime/sitemap.xml
+Sitemap: https://archinime.pages.dev/sitemap.xml
