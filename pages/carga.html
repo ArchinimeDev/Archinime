@@ -1,315 +1,357 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>ARCHINIME · Cargando</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Opciones de Cuenta - Archinime</title>
   
-  <!-- Fuentes y estilos base (igual que en index.html) -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;900&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <!-- ✅ RUTA CORREGIDA: state.js -->
+  <script src="../js/core/state.js"></script>
 
   <style>
-    /* === Variables (igual que en index) */
     :root {
-      --bg-deep: #05070a;
-      --neon-blue: #00f0ff;
-      --neon-purple: #b114ff;
-      --neon-pink: #ff1a6b;
-      --neon-gold: #ffd700;
-      --text-primary: #f0f2f5;
-      --text-secondary: #8a90a0;
+      --primary-color: #00fff7;
+      --accent-color: #bc13fe;
+      --dark-bg: #050505;
+      --glass-bg: rgba(10, 12, 16, 0.85);
     }
-
     * { margin: 0; padding: 0; box-sizing: border-box; }
-
     body {
-      background: var(--bg-deep);
+      background-color: var(--dark-bg);
+      /* ✅ RUTA CORREGIDA: imagen de fondo */
+      background-image: url('../assets/img/galaxia-morado1.avif');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      font-family: 'Poppins', sans-serif;
+      color: white;
       min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      font-family: 'Poppins', sans-serif;
-      overflow: hidden;
-      margin: 0;
+      padding: 20px;
     }
-
-    /* === LOADER === */
-    #loadingScreen {
-      position: fixed;
-      inset: 0;
-      z-index: 100000;
-      background: var(--bg-deep);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
+    .options-container {
+      background: var(--glass-bg);
+      border: 1px solid var(--accent-color);
+      border-radius: 20px;
+      padding: 40px;
+      width: 100%;
+      max-width: 500px;
+      box-shadow: 0 15px 50px rgba(0,0,0,0.9), 0 0 20px rgba(188, 19, 254, 0.2);
+      backdrop-filter: blur(15px);
+    }
+    .back-btn {
+      display: inline-flex;
       align-items: center;
-      transition: opacity 0.8s ease, visibility 0.8s;
+      gap: 8px;
+      color: #aaa;
+      text-decoration: none;
+      font-weight: 600;
+      margin-bottom: 25px;
+      transition: 0.2s;
     }
-
-    #loadingScreen.hidden {
-      opacity: 0;
-      visibility: hidden;
-      pointer-events: none;
-    }
-
-    .loader-ring {
-      width: 160px;
-      height: 160px;
-      border-radius: 50%;
-      border: 3px solid transparent;
-      border-top-color: var(--neon-blue);
-      border-right-color: var(--neon-purple);
-      animation: spinLoader 1.2s cubic-bezier(0.6, 0, 0.4, 1) infinite;
-      margin-bottom: 30px;
-      position: relative;
-      box-shadow: 0 0 40px rgba(0, 240, 255, 0.2);
-      will-change: transform;
-    }
-
-    .loader-ring::after {
-      content: '';
-      position: absolute;
-      inset: 8px;
-      border-radius: 50%;
-      border: 2px solid transparent;
-      border-bottom-color: var(--neon-pink);
-      border-left-color: var(--neon-gold);
-      animation: spinLoader 0.8s linear infinite reverse;
-    }
-
-    @keyframes spinLoader {
-      to { transform: rotate(360deg); }
-    }
-
-    /* GIF dentro del círculo */
-    .gif-container {
-      position: absolute;
-      inset: 0;
-      border-radius: 50%;
-      overflow: hidden;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      pointer-events: none;
-      z-index: 2;
-    }
-
-    .gif-container img {
-      width: 70%;
-      height: 70%;
-      object-fit: contain;
-      border-radius: 50%;
-      background: var(--bg-deep);
-      transition: opacity 0.4s ease;
-      will-change: transform;
-    }
-
-    .loader-title {
-      font-size: 2.8rem;
-      font-weight: 900;
-      letter-spacing: 10px;
-      background: linear-gradient(135deg, #fff, var(--neon-blue), var(--neon-purple));
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-      text-shadow: 0 0 60px rgba(0, 240, 255, 0.3);
-      margin-bottom: 10px;
-      font-family: 'Orbitron', sans-serif;
-    }
-
-    .loader-sub {
-      font-size: 0.8rem;
-      color: var(--text-secondary);
-      letter-spacing: 4px;
-      margin-bottom: 20px;
-      font-family: 'Poppins', sans-serif;
-    }
-
-    .loader-bar {
-      width: 300px;
-      height: 3px;
-      background: rgba(255,255,255,0.05);
-      border-radius: 10px;
-      overflow: hidden;
-      border: 1px solid rgba(0, 240, 255, 0.1);
-    }
-
-    .loader-bar-fill {
-      width: 0%;
-      height: 100%;
-      background: linear-gradient(90deg, var(--neon-pink), var(--neon-purple), var(--neon-blue));
-      border-radius: 10px;
-      transition: width 0.2s linear;
-      box-shadow: 0 0 20px var(--neon-blue);
-    }
-
-    .loader-percent {
-      font-family: 'Orbitron', monospace;
-      color: var(--neon-blue);
-      font-size: 1rem;
-      margin-top: 12px;
-      text-shadow: 0 0 10px var(--neon-blue);
-    }
-
-    /* Botón de prueba (igual que antes) */
-    .close-btn {
-      margin-top: 30px;
-      background: rgba(255,255,255,0.05);
+    .back-btn:hover { color: var(--primary-color); transform: translateX(-5px); }
+    h2 { font-family: 'Orbitron', sans-serif; text-align: center; color: var(--primary-color); margin-bottom: 30px; letter-spacing: 1px;}
+    
+    .form-group { margin-bottom: 20px; }
+    .form-group label { display: block; font-size: 0.9rem; color: #ccc; margin-bottom: 8px; font-weight: 600; }
+    .form-group input[type="text"] {
+      width: 100%; padding: 14px; border-radius: 10px;
       border: 1px solid rgba(255,255,255,0.1);
-      color: #fff;
-      padding: 8px 24px;
-      border-radius: 30px;
-      cursor: pointer;
-      transition: 0.3s;
-      font-family: 'Poppins', sans-serif;
+      background: rgba(0,0,0,0.5); color: white; font-family: 'Poppins'; outline: none; transition: 0.3s;
     }
-    .close-btn:hover {
-      background: var(--neon-blue);
-      color: var(--bg-deep);
-      box-shadow: 0 0 20px var(--neon-blue);
+    .form-group input[type="text"]:focus { border-color: var(--primary-color); box-shadow: 0 0 10px rgba(0,255,247,0.2); }
+    
+    .avatar-preview {
+      display: flex; flex-direction: column;
+      align-items: center; gap: 15px; margin-bottom: 20px;
     }
+    .avatar-preview img {
+      width: 100px;
+      height: 100px; border-radius: 50%; object-fit: cover;
+      border: 2px solid var(--primary-color); box-shadow: 0 0 15px rgba(0,255,247,0.3);
+    }
+    .upload-btn {
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); padding: 8px 20px;
+      border-radius: 20px; color: white; cursor: pointer; transition: 0.2s; font-size: 0.85rem;
+    }
+    .upload-btn:hover { background: rgba(255,255,255,0.1); border-color: var(--primary-color); }
+    
+    .color-picker-wrapper { display: flex; align-items: center; gap: 15px; }
+    .color-picker {
+      -webkit-appearance: none; border: none; width: 40px; height: 40px;
+      border-radius: 50%; cursor: pointer;
+      background: none; padding: 0;
+    }
+    .color-picker::-webkit-color-swatch-wrapper { padding: 0; }
+    .color-picker::-webkit-color-swatch { border: 2px solid rgba(255,255,255,0.2); border-radius: 50%; }
 
-    @media (max-width: 480px) {
-      .loader-ring { width: 120px; height: 120px; }
-      .loader-title { font-size: 2rem; letter-spacing: 6px; }
-      .loader-sub { font-size: 0.7rem; }
-      .loader-bar { width: 200px; }
+    .save-btn {
+      width: 100%; background: var(--primary-color); color: #000; border: none;
+      padding: 16px; border-radius: 10px;
+      font-weight: 900; font-family: 'Orbitron'; letter-spacing: 1px; cursor: pointer; transition: 0.3s; margin-top: 10px;
     }
+    .save-btn:hover { background: #fff; box-shadow: 0 0 20px rgba(0,243,255,0.5); transform: translateY(-2px); }
+    .save-btn:disabled { background: #555; cursor: not-allowed; box-shadow: none; transform: none; }
+    
+    #statusMsg { text-align: center; margin-top: 15px; font-weight: bold; font-size: 0.9rem; }
   </style>
 </head>
 <body>
 
-<!-- ===== PANTALLA DE CARGA ===== -->
-<div id="loadingScreen">
-  <div class="loader-ring">
-    <div class="gif-container" id="gifContainer">
-      <img id="gifDisplay" src="" alt="GIF de carga">
+  <div class="options-container">
+    <!-- ✅ RUTA CORREGIDA: volver a index -->
+    <a href="../index.html" class="back-btn"><i class="fas fa-arrow-left"></i> Volver a inicio</a>
+    <h2>CONFIGURACIÓN</h2>
+
+    <div class="avatar-preview">
+      <!-- ✅ RUTA CORREGIDA: avatar -->
+      <img id="avatarImg" src="../assets/img/invitado.avif" alt="Avatar">
+      <label class="upload-btn" for="avatarInput">
+        <i class="fas fa-upload"></i> Subir nuevo avatar
+      </label>
+      <input type="file" id="avatarInput" accept="image/*" style="display: none;">
     </div>
+
+    <div class="form-group">
+      <label>ID Único de Cuenta</label>
+      <div style="display: flex; gap: 10px;">
+        <input type="text" id="userUid" readonly style="color: #aaa; background: rgba(0,0,0,0.6); cursor: not-allowed; border-color: rgba(255,255,255,0.1);">
+        <button class="upload-btn" onclick="copiarUID()" style="margin: 0; padding: 0 15px; font-size: 1rem; border-radius: 10px;" title="Copiar ID"><i class="fas fa-copy"></i></button>
+      </div>
+      <span style="font-size: 0.8rem; color: #888; margin-top: 5px; display: inline-block;">Este ID es único y no puede cambiarse.</span>
+    </div>
+
+    <div class="form-group">
+      <label>Nombre Público</label>
+      <input type="text" id="displayName" placeholder="Ej: CyberNinja99">
+    </div>
+
+    <div class="form-group">
+      <label>Color de Nombre (Afecta comentarios y tu Avatar)</label>
+      <div class="color-picker-wrapper">
+        <input type="color" id="nameColor" class="color-picker" value="#00fff7">
+        <span style="font-size: 0.85rem; color: #aaa;">Elige tu color neón representativo</span>
+      </div>
+    </div>
+
+    <button id="saveBtn" class="save-btn" onclick="guardarCambios()">GUARDAR CAMBIOS</button>
+    <div id="statusMsg"></div>
   </div>
 
-  <div class="loader-title">ARCHINIME</div>
-  <div class="loader-sub">INICIALIZANDO SISTEMA</div>
-  <div class="loader-bar"><div class="loader-bar-fill" id="loaderLine"></div></div>
-  <div class="loader-percent" id="loadingPercentage">0%</div>
-
-  <!-- Botón para cerrar (simular fin) -->
-  <button class="close-btn" onclick="cerrarLoader()">Cerrar (simular fin)</button>
-</div>
-
-<!-- ===== SCRIPTS ===== -->
-<!-- Incluir gifs.js externo (si existe) o definirlo aquí -->
-<script>
-  // Si existe gifs.js externo, se cargará, pero por si acaso definimos la lista aquí
-  // Para que funcione sin dependencias, definimos la lista de GIFs directamente.
-  // Si quieres usar el archivo gifs.js, puedes comentar esta parte y descomentar la siguiente.
-  
-  // Opción 1: Definir localmente (para que funcione sin gifs.js)
-  const listaDeGifs = [
-    'chica_corriendo.gif',
-    'https://cdn.jsdelivr.net/gh/Archinime/Archivos-data@main/gokuu.gif',
-    'https://cdn.jsdelivr.net/gh/Archinime/Archivos-data@main/naruto.gif'
-  ];
-
-  // Opción 2: Si tienes gifs.js, descomenta la siguiente línea y comenta la de arriba:
-  // const listaDeGifs = window.listaDeGifs || [];
-</script>
-
-<script>
-  // ============================================
-  // LÓGICA DEL LOADER (similar a la anterior pero mejor estructurada)
-  // ============================================
-  (function() {
-    const loader = document.getElementById('loadingScreen');
-    const gifImg = document.getElementById('gifDisplay');
-    const percentText = document.getElementById('loadingPercentage');
-    const barFill = document.getElementById('loaderLine');
-
-    let currentGifIndex = 0;
-    let progress = 0;
-    let isFinished = false;
-    let intervalId = null;
-    let autoInterval = null;
-
-    // Función para actualizar el progreso (0-100)
-    function actualizarProgreso(valor) {
-      if (isFinished) return;
-      const clamped = Math.min(100, Math.max(0, Math.floor(valor)));
-      progress = clamped;
-      percentText.textContent = clamped + '%';
-      barFill.style.width = clamped + '%';
-    }
-
-    // Cambiar GIF
-    function cambiarGif() {
-      if (isFinished) return;
-      if (listaDeGifs.length === 0) return;
-
-      const gifUrl = listaDeGifs[currentGifIndex];
-      gifImg.src = gifUrl;
-      gifImg.style.opacity = '0';
-      setTimeout(() => {
-        gifImg.style.opacity = '1';
-      }, 50);
-
-      currentGifIndex = (currentGifIndex + 1) % listaDeGifs.length;
-    }
-
-    // Función para finalizar el loader (se llama desde el botón o automáticamente)
-    window.cerrarLoader = function() {
-      if (isFinished) return;
-      isFinished = true;
-      clearInterval(autoInterval);
-      clearInterval(intervalId);
-
-      // Poner 100%
-      actualizarProgreso(100);
-      percentText.textContent = 'SISTEMA LISTO';
-
-      // Ocultar con transición
-      setTimeout(() => {
-        loader.classList.add('hidden');
-        document.body.style.overflow = '';
-        // Opcional: redirigir a index.html después de ocultar
-        // window.location.href = 'index.html';
-      }, 700);
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBpzYARIxaJijLbbL-2S6F9MWecbAbvK_I",
+      authDomain: "login-admin-archinime.firebaseapp.com",
+      projectId: "login-admin-archinime",
+      storageBucket: "login-admin-archinime.firebasestorage.app",
+      messagingSenderId: "938164660242",
+      appId: "1:938164660242:web:648e0dce0e0d18dd78d0cb"
     };
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
 
-    // Iniciar el cambio de GIFs cada 2 segundos
-    cambiarGif(); // primero
-    intervalId = setInterval(cambiarGif, 2000);
+    const CLOUDINARY_URL = 'https://api.cloudinary.com/v1_1/dbcqcai1q/upload';
+    const CLOUDINARY_PRESET = 'stickers_archinime';
+    let currentUser = null;
+    let newAvatarUrl = null;
+    let lastProfileUpdate = 0;
 
-    // Simular progreso hasta 85%
-    autoInterval = setInterval(() => {
-      if (isFinished) {
-        clearInterval(autoInterval);
+    function getNeonColorByString(str) {
+        const neonColors = ['#00fff7', '#ff0055', '#bc13fe', '#00ff33', '#ffff00', '#ffaa00', '#ff00aa', '#00aaff'];
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
+        return neonColors[Math.abs(hash) % neonColors.length];
+    }
+
+    function syncWithGlobalState(user) {
+      if (window.ArchinimeState) {
+        ArchinimeState.set('currentUser', user);
+        if (user) {
+          db.collection('users').doc(user.uid).get().then(doc => {
+            if (doc.exists && doc.data().customColor) {
+              ArchinimeState.set('currentUserColor', doc.data().customColor);
+            }
+          }).catch(e => console.warn(e));
+        } else {
+          ArchinimeState.set('currentUserColor', null);
+        }
+      }
+    }
+
+    // Escuchar cambios de autenticación (usar state si existe, si no, directo)
+    if (window.ArchinimeState) {
+      ArchinimeState.on('currentUser', async (user) => {
+        if (user) {
+          currentUser = user;
+          cargarDatosUsuario(user);
+        } else {
+          // ✅ RUTA CORREGIDA: redirigir a index
+          window.location.href = '../index.html';
+        }
+      });
+    } else {
+      auth.onAuthStateChanged(async (user) => {
+        if (user) {
+          currentUser = user;
+          cargarDatosUsuario(user);
+        } else {
+          // ✅ RUTA CORREGIDA: redirigir a index
+          window.location.href = '../index.html';
+        }
+      });
+    }
+
+    async function cargarDatosUsuario(user) {
+      document.getElementById('userUid').value = user.uid;
+      document.getElementById('displayName').value = user.displayName || user.email.split('@')[0];
+      // ✅ RUTA CORREGIDA: avatar
+      document.getElementById('avatarImg').src = user.photoURL || '../assets/img/invitado.avif';
+      newAvatarUrl = user.photoURL;
+
+      try {
+        const doc = await db.collection('users').doc(user.uid).get();
+        if (doc.exists) {
+          if (doc.data().customColor) {
+            document.getElementById('nameColor').value = doc.data().customColor;
+          } else {
+            document.getElementById('nameColor').value = getNeonColorByString(user.uid || user.displayName || user.email);
+          }
+          if (doc.data().lastProfileUpdate) {
+            lastProfileUpdate = doc.data().lastProfileUpdate.toMillis();
+          }
+        } else {
+          document.getElementById('nameColor').value = getNeonColorByString(user.uid || user.displayName || user.email);
+        }
+      } catch(e) { console.error("Error obteniendo datos: ", e); }
+    }
+
+    function copiarUID() {
+      const uidInput = document.getElementById('userUid');
+      if (uidInput.value) {
+        navigator.clipboard.writeText(uidInput.value);
+        const statusMsg = document.getElementById('statusMsg');
+        statusMsg.style.color = '#00fff7';
+        statusMsg.innerText = '¡ID copiado al portapapeles!';
+        setTimeout(() => { if(statusMsg.innerText.includes('copiado')) statusMsg.innerText = ''; }, 3000);
+      }
+    }
+
+    document.getElementById('avatarInput').addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      if (file.size > 2 * 1024 * 1024) {
+          alert('La imagen es muy pesada. El tamaño máximo permitido es 2 MB.');
+          e.target.value = '';
+          return;
+      }
+      
+      const btnLabel = document.querySelector('.upload-btn');
+      btnLabel.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Subiendo...';
+      
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('upload_preset', CLOUDINARY_PRESET);
+        
+        const res = await fetch(CLOUDINARY_URL, { method: 'POST', body: formData });
+        const data = await res.json();
+        
+        if (data.secure_url) {
+          newAvatarUrl = data.secure_url;
+          document.getElementById('avatarImg').src = newAvatarUrl;
+        }
+      } catch (err) {
+        alert("Error subiendo la imagen.");
+      } finally {
+        btnLabel.innerHTML = '<i class="fas fa-upload"></i> Subir nuevo avatar';
+      }
+    });
+
+    async function guardarCambios() {
+      if (!currentUser) return;
+      const saveBtn = document.getElementById('saveBtn');
+      const statusMsg = document.getElementById('statusMsg');
+      const newName = document.getElementById('displayName').value.trim();
+      const newColor = document.getElementById('nameColor').value;
+      if (!newName) {
+        statusMsg.style.color = '#ff0055';
+        statusMsg.innerText = 'El nombre no puede estar vacío.';
         return;
       }
-      if (progress < 85) {
-        const inc = Math.random() * 8 + 1;
-        actualizarProgreso(progress + inc);
+
+      const isAdmin = currentUser.email === 'archinime12@gmail.com';
+      const now = Date.now();
+      const fiveDaysMs = 5 * 24 * 60 * 60 * 1000;
+      if (!isAdmin && lastProfileUpdate > 0 && (now - lastProfileUpdate < fiveDaysMs)) {
+          const msLeft = fiveDaysMs - (now - lastProfileUpdate);
+          const daysLeft = Math.ceil(msLeft / (1000 * 60 * 60 * 24));
+          statusMsg.style.color = '#ff0055';
+          statusMsg.innerText = `⏳ Has cambiado tu perfil recientemente. Vuelve a intentarlo en ${daysLeft} días.`;
+          return;
       }
-    }, 300);
 
-    // Fallback: cerrar automáticamente después de 8 segundos (para prueba)
-    setTimeout(() => {
-      if (!isFinished) {
-        window.cerrarLoader();
+      saveBtn.disabled = true;
+      saveBtn.innerText = 'GUARDANDO...';
+      statusMsg.innerText = '';
+      try {
+        await currentUser.updateProfile({
+          displayName: newName,
+          photoURL: newAvatarUrl
+        });
+        await db.collection('users').doc(currentUser.uid).set({
+          customColor: newColor,
+          lastProfileUpdate: firebase.firestore.FieldValue.serverTimestamp() 
+        }, { merge: true });
+        
+        // Actualizar comentarios históricos
+        statusMsg.style.color = '#fff';
+        statusMsg.innerText = 'Actualizando comentarios históricos...';
+        
+        const commentsRef = db.collection('comments').where('userId', '==', currentUser.uid);
+        const snapshot = await commentsRef.get();
+        const batch = db.batch();
+        let ops = 0;
+        
+        snapshot.forEach(doc => {
+          batch.update(doc.ref, {
+            userName: newName,
+            userAvatar: newAvatarUrl,
+            customColor: newColor
+          });
+          ops++;
+        });
+        if (ops > 0) {
+          await batch.commit();
+        }
+
+        // Sincronizar con estado global si existe
+        if (window.ArchinimeState) {
+          ArchinimeState.set('currentUser', currentUser); // fuerza actualización
+          ArchinimeState.set('currentUserColor', newColor);
+        }
+
+        lastProfileUpdate = Date.now();
+        statusMsg.style.color = '#00fff7';
+        statusMsg.innerText = '¡Cambios guardados exitosamente!';
+      } catch (err) {
+        console.error(err);
+        statusMsg.style.color = '#ff0055';
+        statusMsg.innerText = 'Error al guardar los cambios.';
+      } finally {
+        saveBtn.disabled = false;
+        saveBtn.innerText = 'GUARDAR CAMBIOS';
       }
-    }, 8000);
-
-    // Exponer función global para que se pueda llamar desde fuera
-    window.loaderFinish = window.cerrarLoader;
-
-    // Mostrar loader (por si acaso)
-    loader.classList.remove('hidden');
-    document.body.style.overflow = 'hidden';
-
-    console.log('🚀 Loader con GIFs iniciado.');
-  })();
-</script>
-
+    }
+  </script>
 </body>
 </html>

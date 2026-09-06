@@ -11,8 +11,8 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-  <!-- Cargar state.js (ahora en js/core/) para unificar estado -->
-  <script src="js/core/state.js"></script>
+  <!-- ✅ RUTA CORREGIDA: state.js -->
+  <script src="../js/core/state.js"></script>
 
   <style>
     :root {
@@ -24,7 +24,8 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       background-color: var(--dark-bg);
-      background-image: url('assets/img/galaxia-morado1.avif');
+      /* ✅ RUTA CORREGIDA: imagen de fondo */
+      background-image: url('../assets/img/galaxia-morado1.avif');
       background-size: cover;
       background-position: center;
       background-attachment: fixed;
@@ -106,11 +107,13 @@
 <body>
 
   <div class="options-container">
-    <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i> Volver a inicio</a>
+    <!-- ✅ RUTA CORREGIDA: volver a index -->
+    <a href="../index.html" class="back-btn"><i class="fas fa-arrow-left"></i> Volver a inicio</a>
     <h2>CONFIGURACIÓN</h2>
 
     <div class="avatar-preview">
-      <img id="avatarImg" src="assets/img/invitado.avif" alt="Avatar">
+      <!-- ✅ RUTA CORREGIDA: avatar -->
+      <img id="avatarImg" src="../assets/img/invitado.avif" alt="Avatar">
       <label class="upload-btn" for="avatarInput">
         <i class="fas fa-upload"></i> Subir nuevo avatar
       </label>
@@ -169,7 +172,6 @@
         return neonColors[Math.abs(hash) % neonColors.length];
     }
 
-    // Función para sincronizar con el estado central si existe
     function syncWithGlobalState(user) {
       if (window.ArchinimeState) {
         ArchinimeState.set('currentUser', user);
@@ -192,7 +194,8 @@
           currentUser = user;
           cargarDatosUsuario(user);
         } else {
-          window.location.href = 'index.html';
+          // ✅ RUTA CORREGIDA: redirigir a index
+          window.location.href = '../index.html';
         }
       });
     } else {
@@ -201,7 +204,8 @@
           currentUser = user;
           cargarDatosUsuario(user);
         } else {
-          window.location.href = 'index.html';
+          // ✅ RUTA CORREGIDA: redirigir a index
+          window.location.href = '../index.html';
         }
       });
     }
@@ -209,7 +213,8 @@
     async function cargarDatosUsuario(user) {
       document.getElementById('userUid').value = user.uid;
       document.getElementById('displayName').value = user.displayName || user.email.split('@')[0];
-      document.getElementById('avatarImg').src = user.photoURL || 'assets/img/invitado.avif';
+      // ✅ RUTA CORREGIDA: avatar
+      document.getElementById('avatarImg').src = user.photoURL || '../assets/img/invitado.avif';
       newAvatarUrl = user.photoURL;
 
       try {
