@@ -1,5 +1,5 @@
 // notification-system.js - Con límite de 5 popups por carga de página
-// CORREGIDO: Evita popups duplicados al cargar, cola sincronizada correctamente
+// CORREGIDO: Rutas de enlaces ahora usan pages/ (anime-detail.html y video-player.html)
 // MODIFICADO: Colores de tipo y episodio en popups ahora son celestes (--neon-blue)
 (function(global) {
   'use strict';
@@ -75,7 +75,7 @@
       this.isMenuOpen = false;
       this.isShowingPopup = false;
       this.popupsShownInThisLoad = 0;
-      this.isProcessingQueue = false; // 🔥 nuevo flag para evitar colisiones
+      this.isProcessingQueue = false;
       this.repliesUnsubscribe = null;
       this.dom = { menu: null, list: null, badge: null, modal: null };
       this.toggleMenu = this.toggleMenu.bind(this);
@@ -107,7 +107,6 @@
       this.renderNotificationList();
       this.updateBadge();
       
-      // Esperar un pequeño tick para que todo esté listo y luego mostrar popups
       setTimeout(() => {
         this.attemptResumeQueue('init');
       }, 100);
@@ -154,7 +153,6 @@
         this.rebuildQueueFromHistory();
         this.renderNotificationList();
         this.updateBadge();
-        // No llamar a attemptResumeQueue aquí para evitar duplicados, se llamará en pageshow o mediante el primer popup
       } else {
         if (this.repliesUnsubscribe) { this.repliesUnsubscribe(); this.repliesUnsubscribe = null; }
       }
@@ -166,7 +164,6 @@
       this.rebuildQueueFromHistory();
       this.updateBadge();
       this.renderNotificationList();
-      // Solo intentar reanudar si no hay un popup mostrándose y no está procesando
       if (!this.isShowingPopup && !this.isProcessingQueue) {
         this.attemptResumeQueue('pageshow');
       }
@@ -351,7 +348,6 @@
             this.rebuildQueueFromHistory();
             this.renderNotificationList();
             if (!this.isMenuOpen) this.updateBadge();
-            // Solo intentar reanudar si no hay popup mostrándose ni procesando
             if (!this.isShowingPopup && !this.isProcessingQueue) {
               this.attemptResumeQueue('reply');
             }
@@ -375,6 +371,8 @@
         } catch (e) {}
       }
       const timestampMs = data.timestamp?.toMillis() || Date.now();
+      // ✅ Ruta corregida a pages/video-player.html
+      const url = `pages/video-player.html?anime=${data.animeId}&s=${data.season}&e=${data.episode}&targetComment=${docId}`;
       return {
         notifId, type: 'RESPUESTA', animeId: data.animeId,
         title: `¡${data.userName} te respondió!`,
@@ -384,12 +382,11 @@
         epTitle: `"${cleanText.substring(0, 80)}${cleanText.length > 80 ? '...' : ''}"`,
         originalText: originalText ? `"${originalText.substring(0, 60)}${originalText.length > 60 ? '...' : ''}"` : `"Comentario original no disponible"`,
         date: timestampMs, seen: false, isFinal: false,
-        url: `video-player.html?anime=${data.animeId}&s=${data.season}&e=${data.episode}&targetComment=${docId}`
+        url: url
       };
     }
 
     attemptResumeQueue(source) {
-      // Evitar ejecuciones concurrentes
       if (this.isProcessingQueue) {
         console.log(`⏳ [${source}] Ya procesando cola, ignorando.`);
         return;
@@ -412,26 +409,22 @@
     }
 
     showNextPopup() {
-      // Si ya hay un popup mostrándose, no hacer nada
       if (this.isShowingPopup) {
         console.log('⏳ Ya hay un popup mostrándose, esperando...');
         return;
       }
       
-      // Si la cola está vacía, liberar el flag y salir
       if (this.queue.length === 0) {
         this.isProcessingQueue = false;
         return;
       }
       
-      // Verificar límite por carga de página
       if (this.popupsShownInThisLoad >= CONFIG.MAX_POPUPS_PER_PAGE_LOAD) {
         console.log(`⏸️ Límite de ${CONFIG.MAX_POPUPS_PER_PAGE_LOAD} popups por carga alcanzado. Restantes en cola: ${this.queue.length}`);
         this.isProcessingQueue = false;
         return;
       }
       
-      // Tomar la primera notificación (ya está ordenada por fecha)
       const notif = this.queue[0];
       this.popupsShownInThisLoad++;
       console.log(`🎬 Mostrando popup ${this.popupsShownInThisLoad}/${CONFIG.MAX_POPUPS_PER_PAGE_LOAD}: ${notif.title}`);
@@ -440,10 +433,8 @@
     }
 
     renderPopup(notif) {
-      // Marcar como vista inmediatamente al mostrar el popup
       if (!notif.seen) {
         this.markAsRead(notif.notifId);
-        // Eliminar de la cola (ya que se marcó como vista)
         this.queue = this.queue.filter(n => n.notifId !== notif.notifId);
         this.persistQueue();
       }
@@ -526,18 +517,16 @@
         modal.remove();
         domUtils.enableScroll();
         this.isShowingPopup = false;
-        // Mostrar el siguiente popup (si hay más y no se ha alcanzado el límite)
         this.showNextPopup();
       }, 300);
     }
 
+    // ✅ Ruta corregida a pages/anime-detail.html
     goToAnimeFromPopup(animeId, notifId) {
-      // Ya está marcada como vista, solo redirigir
       this.closePopup(); // cierra el popup y limpia
-      // Redirigir
       const targetNotif = this.history.find(n => n.notifId === notifId);
       if (targetNotif && targetNotif.url) window.location.href = targetNotif.url;
-      else window.location.href = `anime-detail.html?id=${animeId}`;
+      else window.location.href = `pages/anime-detail.html?id=${animeId}`;
     }
 
     toggleMenu() {
@@ -557,8 +546,8 @@
         this.persistHistory(); 
         this.renderNotificationList(); 
         this.updateBadge();
-        this.rebuildQueueFromHistory(); // vacía la cola porque todos están vistos
-        this.isProcessingQueue = false; // liberar flag
+        this.rebuildQueueFromHistory();
+        this.isProcessingQueue = false;
       }
     }
 
@@ -569,7 +558,6 @@
         this.persistHistory();
         this.updateBadge();
         this.renderNotificationList();
-        // Eliminar de la cola si está
         this.queue = this.queue.filter(n => n.notifId !== notifId);
         this.persistQueue();
       }
@@ -631,12 +619,13 @@
             <div class="n-meta">${infoString}</div>
           </div>`;
 
+        // ✅ Ruta corregida a pages/anime-detail.html
         div.addEventListener('click', () => {
           if (!item.seen) {
             this.markAsRead(item.notifId);
             div.querySelector('.unread-dot')?.remove();
           }
-          location.href = item.url || `anime-detail.html?id=${item.animeId}`;
+          location.href = item.url || `pages/anime-detail.html?id=${item.animeId}`;
         });
 
         fragment.appendChild(div);
