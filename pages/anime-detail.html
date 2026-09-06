@@ -63,16 +63,16 @@
   <meta property="og:type" content="video.movie">
   <meta property="og:title" content="Archinime OS">
   <meta property="og:description" content="Disfruta del mejor anime online con interfaz Cyberpunk.">
-  <meta property="og:image" content="https://cdn.jsdelivr.net/gh/ArchinimeDev/Archinime@main/assets/img/Logo_Archinime.avif">
+  <meta property="og:image" content="../assets/img/Logo_Archinime.avif">
   <meta property="og:url" content="">
   <meta property="og:site_name" content="Archinime">
 
-  <link rel="icon" href="https://cdn.jsdelivr.net/gh/ArchinimeDev/Archinime@main/assets/img/Logo_Archinime.png" type="image/png">
+  <link rel="icon" href="../assets/img/Logo_Archinime.png" type="image/png">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
-    /* ===== ESTILOS OPTIMIZADOS ===== */
+    /* ===== ESTILOS OPTIMIZADOS (sin cambios) ===== */
     * {
       margin: 0;
       padding: 0;
@@ -110,7 +110,7 @@
       height: 100%;
       object-fit: cover;
       z-index: -2;
-      background: url('https://cdn.jsdelivr.net/gh/ArchinimeDev/Archinime@main/assets/img/galaxia-morado1.avif') center/cover no-repeat;
+      background: url('../assets/img/galaxia-morado1.avif') center/cover no-repeat;
       opacity: 1;
       transition: opacity 1.2s ease;
       pointer-events: none;
@@ -681,7 +681,7 @@
   <div class="loader-content">
     <div class="gif-wrapper">
       <div class="gif-inner">
-        <img id="personaje-gif" src="https://cdn.jsdelivr.net/gh/ArchinimeDev/Archinime@main/assets/gifs/chica_corriendo.gif" alt="Cargando sistema">
+        <img id="personaje-gif" src="../assets/gifs/chica_corriendo.gif" alt="Cargando sistema">
       </div>
     </div>
     <div class="loader-title">ARCHINIME</div>
@@ -696,8 +696,8 @@
   </div>
 </div>
 
-<video id="bg-video" autoplay muted loop playsinline poster="https://cdn.jsdelivr.net/gh/ArchinimeDev/Archinime@main/assets/img/galaxia-morado1.avif">
-  <source src="https://cdn.jsdelivr.net/gh/ArchinimeDev/Archinime@main/assets/videos/galaxia.mp4" type="video/mp4">
+<video id="bg-video" autoplay muted loop playsinline poster="../assets/img/galaxia-morado1.avif">
+  <source src="../assets/videos/galaxia.mp4" type="video/mp4">
 </video>
 <div id="overlay"></div>
 <div id="scanlines"></div>
@@ -725,31 +725,13 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script>
 
-<!-- Configuración de Firebase (necesaria para ratings y autenticación) -->
-<script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyBpzYARIxaJijLbbL-2S6F9MWecbAbvK_I",
-    authDomain: "login-admin-archinime.firebaseapp.com",
-    projectId: "login-admin-archinime",
-    storageBucket: "login-admin-archinime.firebasestorage.app",
-    messagingSenderId: "938164660242",
-    appId: "1:938164660242:web:648e0dce0e0d18dd78d0cb"
-  };
-  if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  const db = firebase.firestore();
-  window.db = db;
-  window.auth = auth;
-  auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
-</script>
-
-<!-- Scripts del catálogo y lógica de la página (vía CDN) -->
-<script src="https://cdn.jsdelivr.net/gh/ArchinimeDev/Archinime@main/data/catalogo.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/ArchinimeDev/Archinime@main/js/pages/anime-detail-core.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/ArchinimeDev/Archinime@main/js/utils/gifs.js"></script>
+<!-- Scripts con rutas actualizadas para la carpeta pages/ -->
+<script src="../data/catalogo.js"></script>
+<script src="../js/pages/anime-detail-core.js?v=20250406"></script>
+<script src="../js/utils/gifs.js"></script>
 
 <script>
-  // GIF aleatorio (sobrescribe el default si existe listaDeGifs)
+  // GIF aleatorio (usa listaDeGifs desde gifs.js)
   if (typeof listaDeGifs !== 'undefined' && listaDeGifs.length > 0) {
     const gifElegido = listaDeGifs[Math.floor(Math.random() * listaDeGifs.length)];
     document.getElementById('personaje-gif').src = gifElegido;
@@ -800,5 +782,6 @@
     return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); 
   };
 </script>
+
 </body>
 </html>
