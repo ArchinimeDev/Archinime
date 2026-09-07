@@ -2,6 +2,7 @@
 // CHAT GLOBAL - ARCHINIME
 // Sistema de mensajería en tiempo real
 // Soporta texto, stickers, reacciones (like)
+// CORREGIDO: Ruta de avatar por defecto (../assets/img/invitado.avif)
 // ============================================
 
 (function() {
@@ -64,7 +65,6 @@
           }
         } else {
           // Opcional: no cancelamos la suscripción al cerrar, para mantener mensajes al reabrir
-          // pero podemos mantenerla activa.
         }
       });
       observer.observe(modal, { attributes: true, attributeFilter: ['class'] });
@@ -107,7 +107,8 @@
       docs.forEach(doc => {
         const data = doc.data();
         const userName = data.userName || 'Usuario';
-        const userAvatar = data.userAvatar || 'invitado.avif';
+        // ✅ RUTA CORREGIDA: avatar por defecto
+        const userAvatar = data.userAvatar || '../assets/img/invitado.avif';
         const texto = data.texto || '';
         const timestamp = data.timestamp?.toDate() || new Date();
         const fecha = timestamp.toLocaleString();
@@ -190,7 +191,8 @@
       inputContainer.style.display = 'flex';
       const avatarImg = document.querySelector('#chatInputContainer .chat-user-avatar');
       if (avatarImg) {
-        avatarImg.src = currentUser.photoURL || 'invitado.avif';
+        // ✅ RUTA CORREGIDA
+        avatarImg.src = currentUser.photoURL || '../assets/img/invitado.avif';
       }
     } else {
       inputContainer.style.display = 'none';
@@ -224,7 +226,8 @@
       await db.collection('globalChat').add({
         userId: currentUser.uid,
         userName: currentUser.displayName || currentUser.email.split('@')[0] || 'Usuario',
-        userAvatar: currentUser.photoURL || 'invitado.avif',
+        // ✅ RUTA CORREGIDA
+        userAvatar: currentUser.photoURL || '../assets/img/invitado.avif',
         texto: textoFinal,
         esSticker: !!sticker,
         stickerUrl: sticker || null,

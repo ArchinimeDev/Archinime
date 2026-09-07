@@ -1,6 +1,7 @@
 // ============================================
 // SISTEMA DE COMENTARIOS "PREMIUM" CYBERPUNK v11.0
 // MEJORADO: Rendimiento, accesibilidad, animaciones, scroll perfecto
+// CORREGIDO: Ruta de avatar por defecto (../assets/img/invitado.avif)
 // ============================================
 
 let comentariosDb = null;
@@ -491,7 +492,8 @@ function generarHtmlComentario(c, isReply, isNew = false, level = 0) {
     const currentUser = getCurrentUser();
     const isAdmin = currentUser?.email === 'archinime12@gmail.com';
     const isOwner = currentUser?.uid === c.userId;
-    const avatar = c.userAvatar || 'invitado.avif';
+    // ✅ RUTA CORREGIDA: avatar por defecto
+    const avatar = c.userAvatar || '../assets/img/invitado.avif';
     const userName = c.userName || 'Usuario';
     const neonColor = c.customColor || getNeonColorByString(c.userId || userName);
     const neonGlow = hexToRgbA(neonColor, 0.4);
@@ -541,7 +543,7 @@ function generarHtmlComentario(c, isReply, isNew = false, level = 0) {
             ${optionsMenu}
 
             <div class="comentario-avatar">
-                <img src="${avatar}" onerror="this.src='invitado.avif'">
+                <img src="${avatar}" onerror="this.src='../assets/img/invitado.avif'">
             </div>
             
             <div class="comentario-content">
@@ -706,7 +708,7 @@ window.prepararRespuesta = function(commentId, userName, userId) {
             <button class="reply-box-close" onclick="cancelarRespuesta()"><i class="fas fa-times"></i></button>
         </div>
         <div class="reply-box-body">
-            <img src="${currentUser.photoURL || 'invitado.avif'}" class="reply-box-avatar">
+            <img src="${currentUser.photoURL || '../assets/img/invitado.avif'}" class="reply-box-avatar">
             <div style="flex: 1;">
                 <textarea id="dynamicReplyText-${commentId}" class="reply-box-textarea" placeholder="Añade una respuesta pública..." maxlength="500"></textarea>
                 <div class="reply-box-tools">
@@ -851,7 +853,8 @@ async function enviarComentarioTexto() {
             episode: parseInt(window.comentariosEpisode),
             userId: currentUser.uid,
             userName: currentUser.displayName || currentUser.email.split('@')[0],
-            userAvatar: currentUser.photoURL || 'invitado.avif',
+            // ✅ RUTA CORREGIDA
+            userAvatar: currentUser.photoURL || '../assets/img/invitado.avif',
             texto: textoFinal,
             customColor: getCurrentUserColor() || null,
             esSticker: !!stickerUrl,
@@ -973,7 +976,8 @@ window.enviarRespuestaDinamica = async function() {
             episode: parseInt(window.comentariosEpisode),
             userId: currentUser.uid,
             userName: currentUser.displayName || currentUser.email.split('@')[0],
-            userAvatar: currentUser.photoURL || 'invitado.avif',
+            // ✅ RUTA CORREGIDA
+            userAvatar: currentUser.photoURL || '../assets/img/invitado.avif',
             texto: textoFinal,
             customColor: getCurrentUserColor() || null,
             esSticker: !!stickerUrl,
@@ -1018,7 +1022,8 @@ function updateComentariosUI() {
         const avatar = document.getElementById('comentarioUserAvatar');
         const color = getCurrentUserColor() || getNeonColorByString(currentUser.uid || currentUser.email);
         if (avatar) {
-            avatar.src = currentUser.photoURL || 'invitado.avif';
+            // ✅ RUTA CORREGIDA
+            avatar.src = currentUser.photoURL || '../assets/img/invitado.avif';
             avatar.style.borderColor = color;
             avatar.style.boxShadow = `0 0 15px ${hexToRgbA(color, 0.5)}`;
         }

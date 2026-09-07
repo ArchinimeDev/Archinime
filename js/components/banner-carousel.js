@@ -1,6 +1,7 @@
 // banner-carousel.js
 // Carrusel de banners con almacenamiento local, actualización en caliente
 // y reproducción inteligente de video (solo el visible se reproduce)
+// CORREGIDO: Nombres de videos actualizados y enlaces a pages/anime-detail.html
 
 (function() {
   const STORAGE_KEY = 'archinime_banners';
@@ -8,20 +9,26 @@
     { 
       title: "Jujutsu Kaisen", 
       desc: "", 
-      media: "https://cdn.jsdelivr.net/gh/Archinime/Banners@main/toji%20(2)%20(1).mp4", 
-      link: "https://archinime.github.io/-Archinime-/anime-detail.html?id=2" 
+      // ✅ VIDEO ACTUALIZADO: jujutsukaisen.mp4
+      media: "assets/videos/jujutsukaisen.mp4", 
+      // ✅ RUTA CORREGIDA: pages/anime-detail.html
+      link: "pages/anime-detail.html?id=2" 
     },
     { 
       title: "Demon Slayer", 
       desc: "", 
-      media: "https://cdn.jsdelivr.net/gh/Archinime/Banners@main/damonsd.mp4", 
-      link: "https://archinime.github.io/-Archinime-/anime-detail.html?id=10" 
+      // ✅ VIDEO ACTUALIZADO: demonslayer.mp4
+      media: "assets/videos/demonslayer.mp4", 
+      // ✅ RUTA CORREGIDA: pages/anime-detail.html
+      link: "pages/anime-detail.html?id=10" 
     },
     { 
       title: "Solo Leveling", 
       desc: "", 
-      media: "https://cdn.jsdelivr.net/gh/Archinime/Banners@main/jin%20(1).mp4", 
-      link: "https://archinime.github.io/-Archinime-/anime-detail.html?id=67" 
+      // ✅ VIDEO ACTUALIZADO: sololeveling.mp4
+      media: "assets/videos/sololeveling.mp4", 
+      // ✅ RUTA CORREGIDA: pages/anime-detail.html
+      link: "pages/anime-detail.html?id=67" 
     }
   ];
 
@@ -75,7 +82,6 @@
         slide.style.background = '#000';
         const videoEl = document.createElement('video');
         videoEl.src = b.media;
-        // No ponemos autoplay aquí para controlarlo manualmente
         videoEl.muted = true;
         videoEl.loop = true;
         videoEl.playsInline = true;
@@ -120,11 +126,10 @@
       `;
       slide.appendChild(info);
 
-      // --- Enlace (Click) - Ahora navega en la misma pestaña ---
+      // --- Enlace (Click) - Navega en la misma pestaña ---
       if (b.link && b.link !== '#') {
         slide.style.cursor = 'pointer';
         slide.addEventListener('click', () => {
-          // Cambio: en lugar de window.open con '_blank', usamos location.href
           window.location.href = b.link;
         });
       }
@@ -146,11 +151,9 @@
     const slides = carousel.querySelectorAll('.banner-slide');
     const dots = dotsContainer.querySelectorAll('.banner-dot');
     
-    // Cambiar clases CSS de visibilidad
     slides.forEach((s, i) => s.classList.toggle('active', i === index));
     dots.forEach((d, i) => d.classList.toggle('active', i === index));
     
-    // Controlar reproducción de videos (pausar ocultos, reproducir activo)
     controlVideoPlayback(index);
     
     currentBanner = index;
