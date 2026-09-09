@@ -1,35 +1,31 @@
 /**
- * MODO ESPECIAL - ARCHINIME (VERSIÓN FULLSCREEN)
- * - Banner ocupa 100vh (toda la pantalla)
- * - Video sin recortes (object-fit: cover en PC, contain en móviles)
- * - Reproducción automática con sonido
+ * MODO ESPECIAL - ARCHINIME (VERSIÓN FULLSCREEN SIN ESPACIOS)
+ * - Ocupa todo el espacio disponible debajo del navbar
+ * - Sin bordes negros, sin márgenes, sin scroll
  * - Probabilidad al 100% para pruebas (cambiar a 0.10 para producción)
  */
 
-// ===== CONFIGURACIÓN =====
-const SPECIAL_PROBABILITY = 1.0; // 100% para pruebas (cambia a 0.10 para producción)
-
-// Lista de videos para el modo especial (añade los que quieras)
+const SPECIAL_PROBABILITY = 1.0; // 100% para pruebas (0.10 en producción)
 const SPECIAL_VIDEOS = [
   'assets/videos/atrevete.mp4'
 ];
 
-// Variable global para saber si el modo especial está activo
 window.isSpecialMode = false;
 
-// ===== DETECCIÓN DE MÓVIL =====
-function isMobileDevice() {
-  return window.innerWidth <= 768;
+// ===== OBTENER ALTURA DEL NAVBAR =====
+function getNavHeight() {
+  const nav = document.querySelector('.cyber-nav');
+  return nav ? nav.offsetHeight : 68;
 }
 
-// ===== FUNCIÓN PRINCIPAL =====
+// ===== ACTIVAR MODO ESPECIAL =====
 function activarModoEspecial() {
   if (window.isSpecialMode) return;
   window.isSpecialMode = true;
 
-  console.log('🌟 MODO ESPECIAL ACTIVADO (FULLSCREEN)');
+  console.log('🌟 MODO ESPECIAL ACTIVADO (SIN ESPACIOS)');
 
-  // 1. Detener la música de fondo
+  // Detener música
   if (window.stopMusic && typeof window.stopMusic === 'function') {
     window.stopMusic();
   } else {
@@ -40,50 +36,56 @@ function activarModoEspecial() {
     window.isMusicStarted = false;
   }
 
-  // 2. Obtener elementos del DOM
   const carousel = document.getElementById('bannerCarousel');
   const specialBanner = document.getElementById('specialBanner');
   const videoElement = document.getElementById('specialVideo');
   const audioIndicator = document.getElementById('specialAudioIndicator');
+  const bannerContainer = document.getElementById('bannerContainer');
 
-  if (!carousel || !specialBanner || !videoElement) {
-    console.error('No se encontraron los elementos del banner especial');
+  if (!carousel || !specialBanner || !videoElement || !bannerContainer) {
+    console.error('Faltan elementos del banner especial');
     return;
   }
 
-  // 3. Ocultar carrusel y mostrar banner especial con animación
+  // 1. Ocultar carrusel y su contenedor
   carousel.style.display = 'none';
+  bannerContainer.style.display = 'none'; // ← CLAVE: elimina el espacio del contenedor
+
+  // 2. Mostrar banner especial
   specialBanner.style.display = 'block';
-  
-  // Aplicar estilos para que el banner ocupe toda la pantalla
+
+  // 3. Forzar estilos para ocupar todo el espacio disponible
+  const navHeight = getNavHeight();
+  specialBanner.style.position = 'relative';
   specialBanner.style.width = '100%';
   specialBanner.style.maxWidth = '100%';
-  specialBanner.style.height = isMobileDevice() ? '100dvh' : '100vh';
-  specialBanner.style.borderRadius = '0';
+  specialBanner.style.height = `calc(100vh - ${navHeight}px)`;
   specialBanner.style.margin = '0';
+  specialBanner.style.padding = '0';
+  specialBanner.style.borderRadius = '0';
   specialBanner.style.border = 'none';
-  specialBanner.style.boxShadow = '0 0 60px rgba(0, 240, 255, 0.5)';
-  specialBanner.style.position = 'relative';
+  specialBanner.style.boxShadow = 'none';
   specialBanner.style.overflow = 'hidden';
   specialBanner.style.backgroundColor = '#000';
-  
-  // Añadir clase para animación de entrada
-  specialBanner.classList.remove('special-exit');
-  specialBanner.classList.add('special-enter');
 
-  // 4. Elegir un video aleatorio de la lista
+  // 4. Configurar video
+  videoElement.style.width = '100%';
+  videoElement.style.height = '100%';
+  videoElement.style.objectFit = 'cover';
+  videoElement.style.display = 'block';
+
+  // Elegir video aleatorio
   const randomIndex = Math.floor(Math.random() * SPECIAL_VIDEOS.length);
-  const videoSrc = SPECIAL_VIDEOS[randomIndex];
-  videoElement.src = videoSrc;
+  videoElement.src = SPECIAL_VIDEOS[randomIndex];
   videoElement.loop = true;
   videoElement.muted = false;
   videoElement.volume = 0.9;
-  videoElement.style.width = '100%';
-  videoElement.style.height = '100%';
-  // En móviles usar 'contain' para que se vea completo, en PC 'cover'
-  videoElement.style.objectFit = isMobileDevice() ? 'contain' : 'cover';
 
-  // 5. Función para actualizar el indicador de audio
+  // Animación de entrada
+  specialBanner.classList.remove('special-exit');
+  specialBanner.classList.add('special-enter');
+
+  // Indicador de audio
   function updateAudioIndicator(hasAudio) {
     if (!audioIndicator) return;
     if (hasAudio) {
@@ -97,55 +99,39 @@ function activarModoEspecial() {
     }
   }
 
-  // 6. Intentar reproducir con sonido directamente
+  // Intentar reproducción con sonido
   const playPromise = videoElement.play();
-
   if (playPromise !== undefined) {
     playPromise.then(() => {
-      console.log('✅ Video especial con sonido activado');
+      console.log('✅ Sonido activado');
       updateAudioIndicator(true);
     }).catch(error => {
-      console.warn('⚠️ Autoplay con sonido bloqueado. Reproduciendo con mute...');
+      console.warn('⚠️ Autoplay bloqueado, mute temporal');
       videoElement.muted = true;
       videoElement.play().then(() => {
-        console.log('✅ Video especial con mute activado. Esperando interacción para sonido.');
         updateAudioIndicator(false);
-        // Escuchar el primer clic en cualquier parte para activar sonido
         const activateAudio = () => {
           videoElement.muted = false;
           videoElement.volume = 0.9;
           videoElement.play().then(() => {
-            console.log('🔊 Sonido activado tras interacción');
             updateAudioIndicator(true);
-          }).catch(() => {
-            console.warn('No se pudo activar el sonido tras clic');
-          });
+          }).catch(() => {});
           document.removeEventListener('click', activateAudio);
           document.removeEventListener('touchstart', activateAudio);
         };
         document.addEventListener('click', activateAudio, { once: true });
         document.addEventListener('touchstart', activateAudio, { once: true });
-        // También si el usuario hace clic en el banner
         specialBanner.addEventListener('click', activateAudio, { once: true });
       }).catch(err => {
-        console.error('Error al reproducir incluso con mute:', err);
+        console.error('Error al reproducir:', err);
         updateAudioIndicator(false);
       });
     });
   }
 
-  // 7. Añadir clase al body
   document.body.classList.add('special-mode');
 
-  // 8. Ajustar el contenedor del banner para que no tenga márgenes laterales
-  const bannerContainer = document.getElementById('bannerContainer');
-  if (bannerContainer) {
-    bannerContainer.style.padding = '0';
-    bannerContainer.style.margin = '0';
-    bannerContainer.style.maxWidth = '100%';
-  }
-
-  // 9. Asegurar que el navbar se vea por encima
+  // Asegurar que el navbar se vea por encima
   const nav = document.querySelector('.cyber-nav');
   if (nav) {
     nav.style.position = 'relative';
@@ -170,31 +156,35 @@ function desactivarModoEspecial() {
     setTimeout(() => {
       specialBanner.style.display = 'none';
       specialBanner.classList.remove('special-exit');
-      // Restaurar estilos originales
+      // Restaurar estilos
+      specialBanner.style.position = '';
       specialBanner.style.width = '';
       specialBanner.style.maxWidth = '';
       specialBanner.style.height = '';
-      specialBanner.style.borderRadius = '';
       specialBanner.style.margin = '';
+      specialBanner.style.padding = '';
+      specialBanner.style.borderRadius = '';
       specialBanner.style.border = '';
       specialBanner.style.boxShadow = '';
-      specialBanner.style.position = '';
       specialBanner.style.overflow = '';
       specialBanner.style.backgroundColor = '';
       if (video) {
         video.style.width = '';
         video.style.height = '';
         video.style.objectFit = '';
+        video.style.display = '';
+        video.pause();
+        video.src = '';
       }
     }, 600);
   }
+
+  // Restaurar carrusel y contenedor
   if (carousel) carousel.style.display = 'block';
-  if (video) { video.pause(); video.src = ''; }
   if (bannerContainer) {
-    bannerContainer.style.padding = '';
-    bannerContainer.style.margin = '';
-    bannerContainer.style.maxWidth = '';
+    bannerContainer.style.display = ''; // volver a su estado original
   }
+
   if (nav) {
     nav.style.position = '';
     nav.style.zIndex = '';
@@ -202,49 +192,46 @@ function desactivarModoEspecial() {
 
   document.body.classList.remove('special-mode');
 
-  // Reactivar la música
   if (window.startMusic && typeof window.startMusic === 'function') {
     window.startMusic();
   }
-  console.log('🔇 Modo especial desactivado, música reanudada');
+  console.log('🔇 Modo especial desactivado');
 }
 
-// ===== AUTO-EJECUCIÓN AL CARGAR =====
+// ===== INICIALIZACIÓN =====
 function initSpecialMode() {
   if (window.isSpecialMode) return;
-
   const shouldActivate = Math.random() < SPECIAL_PROBABILITY;
   if (shouldActivate) {
     activarModoEspecial();
   } else {
-    console.log('🎵 Modo normal (sin modo especial)');
+    console.log('🎵 Modo normal');
     const carousel = document.getElementById('bannerCarousel');
     if (carousel) carousel.style.display = 'block';
     const specialBanner = document.getElementById('specialBanner');
     if (specialBanner) specialBanner.style.display = 'none';
+    const bannerContainer = document.getElementById('bannerContainer');
+    if (bannerContainer) bannerContainer.style.display = '';
   }
 }
 
-// Ejecutar cuando el DOM esté listo
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', initSpecialMode);
 } else {
   initSpecialMode();
 }
 
-// ===== REAJUSTE AL CAMBIAR DE ORIENTACIÓN =====
+// Reajuste al redimensionar (para cambiar altura del navbar)
 window.addEventListener('resize', () => {
   if (window.isSpecialMode) {
-    const video = document.getElementById('specialVideo');
     const banner = document.getElementById('specialBanner');
-    if (video && banner) {
-      const mobile = isMobileDevice();
-      video.style.objectFit = mobile ? 'contain' : 'cover';
-      banner.style.height = mobile ? '100dvh' : '100vh';
+    if (banner) {
+      const navHeight = getNavHeight();
+      banner.style.height = `calc(100vh - ${navHeight}px)`;
     }
   }
 });
 
-// Exponer funciones globalmente
+// Exponer funciones
 window.activarModoEspecial = activarModoEspecial;
 window.desactivarModoEspecial = desactivarModoEspecial;
