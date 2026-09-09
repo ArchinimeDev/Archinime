@@ -691,33 +691,36 @@ body {
   .banner-slide .banner-info p { font-size: 0.75rem; }
 }
 
-/* ===== MODO ESPECIAL (se controla desde JavaScript) ===== */
+/* ===== MODO ESPECIAL (ACTUALIZADO SIN ESPACIOS) ===== */
 .banner-special {
+  display: none;
   position: relative;
   width: 100%;
   max-width: 100%;
-  margin: 0;
-  border-radius: 0;
+  margin: 0 !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  border: none !important;
   overflow: hidden;
   background: #000;
-  display: none;
+  box-shadow: none !important;
 }
 
 .banner-special video {
   width: 100%;
   height: 100%;
   display: block;
+  object-fit: cover;
 }
 
 .banner-special .overlay-text {
   display: none !important;
 }
 
-/* Animaciones de entrada/salida */
+/* Animaciones */
 .banner-special.special-enter {
   animation: specialZoomIn 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
-
 .banner-special.special-exit {
   animation: specialZoomOut 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
@@ -726,13 +729,12 @@ body {
   0% { transform: scale(0.95); opacity: 0; }
   100% { transform: scale(1); opacity: 1; }
 }
-
 @keyframes specialZoomOut {
   0% { transform: scale(1); opacity: 1; }
   100% { transform: scale(0.95); opacity: 0; }
 }
 
-/* ===== INDICADOR DE AUDIO ===== */
+/* Indicador de audio */
 .banner-special .audio-indicator {
   position: absolute;
   bottom: 24px;
@@ -753,34 +755,29 @@ body {
   transition: all 0.3s;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
 }
-
 .banner-special .audio-indicator i {
   font-size: 1.2rem;
   transition: 0.3s;
 }
-
 .banner-special .audio-indicator.active i {
   color: var(--neon-blue);
   animation: pulseIcon 1.5s infinite alternate;
 }
-
 .banner-special .audio-indicator.muted i {
   color: var(--neon-pink);
   animation: pulseIcon 1s infinite alternate;
 }
-
 .banner-special .audio-indicator .indicator-text {
   font-size: 0.7rem;
   letter-spacing: 1px;
   opacity: 0.8;
 }
-
 @keyframes pulseIcon {
   0% { transform: scale(1); opacity: 0.6; text-shadow: 0 0 0 transparent; }
   100% { transform: scale(1.2); opacity: 1; text-shadow: 0 0 20px currentColor; }
 }
 
-/* Ajustes para móviles */
+/* Ajustes para móviles del indicador */
 @media (max-width: 768px) {
   .banner-special .audio-indicator {
     bottom: 16px;
@@ -795,7 +792,6 @@ body {
     display: none;
   }
 }
-
 @media (max-width: 480px) {
   .banner-special .audio-indicator {
     bottom: 12px;
