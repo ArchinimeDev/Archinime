@@ -1,7 +1,8 @@
 /**
- * MODO ESPECIAL - ARCHINIME (VERSIÓN ADAPTATIVA)
+ * MODO ESPECIAL - ARCHINIME (VERSIÓN ADAPTATIVA CON REINTENTO)
  * - En PC: Ocupa toda la pantalla (fullscreen) con object-fit: cover
  * - En móviles: Se muestra como un banner normal, con object-fit: contain
+ * - Si un video falla al cargar, intenta con el siguiente
  * - Probabilidad al 100% para pruebas (cambiar a 0.10 para producción)
  */
 
@@ -21,6 +22,49 @@ function isMobileDevice() {
 function getNavHeight() {
   const nav = document.querySelector('.cyber-nav');
   return nav ? nav.offsetHeight : 68;
+}
+
+// ===== FUNCIÓN PARA INTENTAR REPRODUCIR UN VIDEO, CON REINTENTO =====
+function intentarReproducirVideo(videoElement, videoList, index) {
+  // Si ya no hay más videos, salir
+  if (index >= videoList.length) {
+    console.error('❌ Todos los videos fallaron. Usando el primero como fallback.');
+    // Forzar el primer video (puede que tampoco funcione, pero al menos lo intenta)
+    videoElement.src = videoList[0];
+    videoElement.load();
+    videoElement.play().catch(() => {});
+    return;
+  }
+
+  const src = videoList[index];
+  console.log(`🎬 Intentando cargar: ${src}`);
+
+  // Remover listeners anteriores para evitar acumulación
+  videoElement.removeEventListener('error', onVideoError);
+  videoElement.removeEventListener('loadeddata', onVideoLoaded);
+
+  // Definir manejadores
+  function onVideoError(e) {
+    console.warn(`⚠️ Error al cargar ${src}, pasando al siguiente...`);
+    // Intentar con el siguiente
+    intentarReproducirVideo(videoElement, videoList, index + 1);
+  }
+
+  function onVideoLoaded() {
+    console.log(`✅ Video cargado correctamente: ${src}`);
+    // Reproducir
+    videoElement.play().catch(() => {});
+  }
+
+  videoElement.addEventListener('error', onVideoError);
+  videoElement.addEventListener('loadeddata', onVideoLoaded);
+
+  // Asignar src y cargar
+  videoElement.src = src;
+  videoElement.load();
+  // Si el video ya está en caché y se carga rápido, puede que no dispare 'loadeddata'
+  // así que intentamos reproducir directamente
+  videoElement.play().catch(() => {});
 }
 
 function activarModoEspecial() {
@@ -53,7 +97,6 @@ function activarModoEspecial() {
 
   // Ocultar carrusel
   carousel.style.display = 'none';
-  // El contenedor lo dejamos visible pero sin padding/margin
   bannerContainer.style.padding = '0';
   bannerContainer.style.margin = '0';
   bannerContainer.style.maxWidth = '100%';
@@ -77,15 +120,13 @@ function activarModoEspecial() {
 
   // Configuración según dispositivo
   if (isMobile) {
-    // MÓVIL: banner normal, altura automática, video con contain
-    specialBanner.style.height = 'auto'; // altura automática según el video
+    specialBanner.style.height = 'auto';
     videoElement.style.width = '100%';
     videoElement.style.height = 'auto';
-    videoElement.style.objectFit = 'contain'; // video completo sin recortes
+    videoElement.style.objectFit = 'contain';
     videoElement.style.display = 'block';
     videoElement.style.margin = '0 auto';
   } else {
-    // PC: fullscreen, altura completa, cover
     const navHeight = getNavHeight();
     specialBanner.style.height = `calc(100vh - ${navHeight}px)`;
     videoElement.style.width = '100%';
@@ -94,9 +135,11 @@ function activarModoEspecial() {
     videoElement.style.display = 'block';
   }
 
-  // Elegir video aleatorio
+  // Elegir un índice aleatorio para empezar
   const randomIndex = Math.floor(Math.random() * SPECIAL_VIDEOS.length);
-  videoElement.src = SPECIAL_VIDEOS[randomIndex];
+  // Empezar la reproducción con reintento
+  intentarReproducirVideo(videoElement, SPECIAL_VIDEOS, randomIndex);
+
   videoElement.loop = true;
   videoElement.muted = false;
   videoElement.volume = 0.9;
@@ -119,7 +162,7 @@ function activarModoEspecial() {
     }
   }
 
-  // Reproducción
+  // Reproducción con sonido (el reintento ya maneja la carga, pero el play puede fallar por autoplay)
   const playPromise = videoElement.play();
   if (playPromise !== undefined) {
     playPromise.then(() => {
@@ -151,7 +194,6 @@ function activarModoEspecial() {
 
   document.body.classList.add('special-mode');
 
-  // Asegurar navbar visible
   const nav = document.querySelector('.cyber-nav');
   if (nav) {
     nav.style.position = 'relative';
@@ -195,6 +237,9 @@ function desactivarModoEspecial() {
         video.style.margin = '';
         video.pause();
         video.src = '';
+        // Eliminar listeners para evitar fugas
+        video.removeEventListener('error', null);
+        video.removeEventListener('loadeddata', null);
       }
     }, 600);
   }
