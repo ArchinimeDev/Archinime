@@ -7,7 +7,9 @@
 
 const SPECIAL_PROBABILITY = 1.0; // 100% para pruebas (0.10 en producción)
 const SPECIAL_VIDEOS = [
-  'assets/videos/atrevete.mp4'
+  'assets/videos/atrevete.mp4',
+  'assets/videos/baki.mp4',
+  'assets/videos/efecto.mp4'
 ];
 
 window.isSpecialMode = false;
