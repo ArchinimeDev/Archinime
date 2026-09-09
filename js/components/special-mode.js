@@ -1,7 +1,7 @@
 /**
- * MODO ESPECIAL - ARCHINIME (VERSIÓN FULLSCREEN)
- * - Banner ocupa 100vh (toda la pantalla)
- * - Video sin recortes (object-fit: cover)
+ * MODO ESPECIAL - ARCHINIME (FULLSCREEN + ADAPTADO A MÓVILES)
+ * - En PC: 100vh, object-fit: cover (cubre toda la pantalla)
+ * - En móviles: 100dvh, object-fit: contain (video completo sin recortes)
  * - Reproducción automática con sonido
  * - Probabilidad al 100% para pruebas (cambiar a 0.10 para producción)
  */
@@ -11,19 +11,34 @@ const SPECIAL_PROBABILITY = 1.0; // 100% para pruebas (cambia a 0.10 para produc
 
 // Lista de videos para el modo especial (añade los que quieras)
 const SPECIAL_VIDEOS = [
-
+  'assets/videos/gojo.mp4',
+  'assets/videos/levi.mp4',
+  'assets/videos/rem.mp4',
+  'assets/videos/reze.mp4',
+  'assets/videos/rimuru.mp4',
+  'assets/videos/sololeveling.mp4',
+  'assets/videos/jujutsukaisen.mp4',
+  'assets/videos/demonsalayer.mp4',
+  'assets/videos/shinobu.mp4',
   'assets/videos/atrevete.mp4'
 ];
 
 // Variable global para saber si el modo especial está activo
 window.isSpecialMode = false;
 
+// Detectar si es dispositivo móvil
+function isMobile() {
+  return window.matchMedia('(max-width: 768px)').matches || 
+         ('ontouchstart' in window) || 
+         (navigator.maxTouchPoints > 0);
+}
+
 // ===== FUNCIÓN PRINCIPAL =====
 function activarModoEspecial() {
   if (window.isSpecialMode) return;
   window.isSpecialMode = true;
 
-  console.log('🌟 MODO ESPECIAL ACTIVADO (FULLSCREEN)');
+  console.log('🌟 MODO ESPECIAL ACTIVADO (FULLSCREEN) - Adaptado para móviles');
 
   // 1. Detener la música de fondo
   if (window.stopMusic && typeof window.stopMusic === 'function') {
@@ -51,17 +66,27 @@ function activarModoEspecial() {
   carousel.style.display = 'none';
   specialBanner.style.display = 'block';
   
-  // Aplicar estilos para que el banner ocupe toda la pantalla
+  // Detectar si es móvil para aplicar estilos específicos
+  const mobile = isMobile();
+  
+  // Aplicar estilos base
   specialBanner.style.width = '100%';
   specialBanner.style.maxWidth = '100%';
-  specialBanner.style.height = '100vh'; // Altura completa de la ventana
   specialBanner.style.borderRadius = '0';
   specialBanner.style.margin = '0';
   specialBanner.style.border = 'none';
-  specialBanner.style.boxShadow = '0 0 60px rgba(0, 240, 255, 0.5)';
   specialBanner.style.position = 'relative';
   specialBanner.style.overflow = 'hidden';
   specialBanner.style.backgroundColor = '#000';
+  specialBanner.style.display = 'flex';
+  specialBanner.style.alignItems = 'center';
+  specialBanner.style.justifyContent = 'center';
+  
+  // Altura: en móvil usar 100dvh, en PC 100vh
+  specialBanner.style.height = mobile ? '100dvh' : '100vh';
+  
+  // Sombras y animaciones
+  specialBanner.style.boxShadow = '0 0 60px rgba(0, 240, 255, 0.5)';
   
   // Añadir clase para animación de entrada
   specialBanner.classList.remove('special-exit');
@@ -76,7 +101,9 @@ function activarModoEspecial() {
   videoElement.volume = 0.9;
   videoElement.style.width = '100%';
   videoElement.style.height = '100%';
-  videoElement.style.objectFit = 'cover'; // Cubre toda la pantalla sin distorsión
+  // En móvil usar contain para que se vea completo sin recortes, en PC cover
+  videoElement.style.objectFit = mobile ? 'contain' : 'cover';
+  videoElement.style.display = 'block';
 
   // 5. Función para actualizar el indicador de audio
   function updateAudioIndicator(hasAudio) {
@@ -132,7 +159,7 @@ function activarModoEspecial() {
   // 7. Añadir clase al body
   document.body.classList.add('special-mode');
 
-  // 8. Ajustar el contenedor del banner para que no tenga márgenes laterales
+  // 8. Ajustar el contenedor del banner
   const bannerContainer = document.getElementById('bannerContainer');
   if (bannerContainer) {
     bannerContainer.style.padding = '0';
@@ -146,6 +173,16 @@ function activarModoEspecial() {
     nav.style.position = 'relative';
     nav.style.zIndex = '1000';
   }
+
+  // 10. Escuchar cambios de orientación o redimension para reajustar
+  const resizeHandler = () => {
+    const isMobileNow = isMobile();
+    specialBanner.style.height = isMobileNow ? '100dvh' : '100vh';
+    videoElement.style.objectFit = isMobileNow ? 'contain' : 'cover';
+  };
+  window.addEventListener('resize', resizeHandler);
+  // Guardar el handler para limpiar al desactivar
+  window._specialResizeHandler = resizeHandler;
 }
 
 // ===== DESACTIVAR MODO ESPECIAL =====
@@ -158,6 +195,12 @@ function desactivarModoEspecial() {
   const video = document.getElementById('specialVideo');
   const bannerContainer = document.getElementById('bannerContainer');
   const nav = document.querySelector('.cyber-nav');
+
+  // Remover listener de resize
+  if (window._specialResizeHandler) {
+    window.removeEventListener('resize', window._specialResizeHandler);
+    window._specialResizeHandler = null;
+  }
 
   if (specialBanner) {
     specialBanner.classList.remove('special-enter');
@@ -176,10 +219,14 @@ function desactivarModoEspecial() {
       specialBanner.style.position = '';
       specialBanner.style.overflow = '';
       specialBanner.style.backgroundColor = '';
+      specialBanner.style.display = '';
+      specialBanner.style.alignItems = '';
+      specialBanner.style.justifyContent = '';
       if (video) {
         video.style.width = '';
         video.style.height = '';
         video.style.objectFit = '';
+        video.style.display = '';
       }
     }, 600);
   }
