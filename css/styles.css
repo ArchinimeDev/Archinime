@@ -706,7 +706,6 @@ body {
 .banner-special video {
   width: 100%;
   height: 100%;
-  object-fit: cover;
   display: block;
 }
 
@@ -794,6 +793,18 @@ body {
   }
   .banner-special .audio-indicator .indicator-text {
     display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .banner-special .audio-indicator {
+    bottom: 12px;
+    right: 12px;
+    padding: 4px 10px;
+    font-size: 0.6rem;
+  }
+  .banner-special .audio-indicator i {
+    font-size: 0.9rem;
   }
 }
 
