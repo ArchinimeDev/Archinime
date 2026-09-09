@@ -1,7 +1,7 @@
 /**
- * MODO ESPECIAL - ARCHINIME (FULLSCREEN CON FONDO DESENFOCADO EN MÓVIL)
- * - En PC: video con object-fit: cover (rellena sin bordes)
- * - En móvil: video con object-fit: contain (se ve completo) + fondo desenfocado del mismo video
+ * MODO ESPECIAL - ARCHINIME (VERSIÓN ADAPTATIVA)
+ * - En PC: Ocupa toda la pantalla (fullscreen) con object-fit: cover
+ * - En móviles: Se muestra como un banner normal, con object-fit: contain
  * - Probabilidad al 100% para pruebas (cambiar a 0.10 para producción)
  */
 
@@ -49,21 +49,22 @@ function activarModoEspecial() {
     return;
   }
 
-  // Ocultar carrusel y su contenedor
+  // Ocultar carrusel
   carousel.style.display = 'none';
-  bannerContainer.style.display = 'none';
+  // El contenedor lo dejamos visible pero sin padding/margin
+  bannerContainer.style.padding = '0';
+  bannerContainer.style.margin = '0';
+  bannerContainer.style.maxWidth = '100%';
 
   // Mostrar banner especial
   specialBanner.style.display = 'block';
 
-  const navHeight = getNavHeight();
   const isMobile = isMobileDevice();
 
-  // Configurar banner
+  // Estilos generales
   specialBanner.style.position = 'relative';
   specialBanner.style.width = '100%';
   specialBanner.style.maxWidth = '100%';
-  specialBanner.style.height = `calc(100vh - ${navHeight}px)`;
   specialBanner.style.margin = '0';
   specialBanner.style.padding = '0';
   specialBanner.style.borderRadius = '0';
@@ -72,54 +73,28 @@ function activarModoEspecial() {
   specialBanner.style.overflow = 'hidden';
   specialBanner.style.backgroundColor = '#000';
 
-  // Limpiar cualquier fondo previo
-  const existingBg = specialBanner.querySelector('.special-bg-blur');
-  if (existingBg) existingBg.remove();
-
-  // En móvil: añadir fondo desenfocado detrás del video
+  // Configuración según dispositivo
   if (isMobile) {
-    const bgBlur = document.createElement('div');
-    bgBlur.className = 'special-bg-blur';
-    bgBlur.style.position = 'absolute';
-    bgBlur.style.top = '0';
-    bgBlur.style.left = '0';
-    bgBlur.style.width = '100%';
-    bgBlur.style.height = '100%';
-    bgBlur.style.overflow = 'hidden';
-    bgBlur.style.zIndex = '0';
-    bgBlur.style.background = '#000';
-
-    const bgVideo = document.createElement('video');
-    bgVideo.src = SPECIAL_VIDEOS[Math.floor(Math.random() * SPECIAL_VIDEOS.length)];
-    bgVideo.muted = true;
-    bgVideo.loop = true;
-    bgVideo.playsInline = true;
-    bgVideo.style.width = '100%';
-    bgVideo.style.height = '100%';
-    bgVideo.style.objectFit = 'cover';
-    bgVideo.style.filter = 'blur(20px) brightness(0.6)';
-    bgVideo.style.transform = 'scale(1.1)';
-    bgVideo.style.display = 'block';
-    bgVideo.autoplay = true;
-    bgVideo.play().catch(() => {});
-
-    bgBlur.appendChild(bgVideo);
-    specialBanner.appendChild(bgBlur);
+    // MÓVIL: banner normal, altura automática, video con contain
+    specialBanner.style.height = 'auto'; // altura automática según el video
+    videoElement.style.width = '100%';
+    videoElement.style.height = 'auto';
+    videoElement.style.objectFit = 'contain'; // video completo sin recortes
+    videoElement.style.display = 'block';
+    videoElement.style.margin = '0 auto';
+  } else {
+    // PC: fullscreen, altura completa, cover
+    const navHeight = getNavHeight();
+    specialBanner.style.height = `calc(100vh - ${navHeight}px)`;
+    videoElement.style.width = '100%';
+    videoElement.style.height = '100%';
+    videoElement.style.objectFit = 'cover';
+    videoElement.style.display = 'block';
   }
-
-  // Configurar video principal
-  videoElement.style.position = 'relative';
-  videoElement.style.zIndex = '1';
-  videoElement.style.width = '100%';
-  videoElement.style.height = '100%';
-  // En móvil: contain para que se vea completo, en PC: cover para rellenar
-  videoElement.style.objectFit = isMobile ? 'contain' : 'cover';
-  videoElement.style.display = 'block';
 
   // Elegir video aleatorio
   const randomIndex = Math.floor(Math.random() * SPECIAL_VIDEOS.length);
-  const videoSrc = SPECIAL_VIDEOS[randomIndex];
-  videoElement.src = videoSrc;
+  videoElement.src = SPECIAL_VIDEOS[randomIndex];
   videoElement.loop = true;
   videoElement.muted = false;
   videoElement.volume = 0.9;
@@ -142,7 +117,7 @@ function activarModoEspecial() {
     }
   }
 
-  // Intentar reproducción con sonido
+  // Reproducción
   const playPromise = videoElement.play();
   if (playPromise !== undefined) {
     playPromise.then(() => {
@@ -174,6 +149,7 @@ function activarModoEspecial() {
 
   document.body.classList.add('special-mode');
 
+  // Asegurar navbar visible
   const nav = document.querySelector('.cyber-nav');
   if (nav) {
     nav.style.position = 'relative';
@@ -210,24 +186,23 @@ function desactivarModoEspecial() {
       specialBanner.style.overflow = '';
       specialBanner.style.backgroundColor = '';
       if (video) {
-        video.style.position = '';
-        video.style.zIndex = '';
         video.style.width = '';
         video.style.height = '';
         video.style.objectFit = '';
         video.style.display = '';
+        video.style.margin = '';
         video.pause();
         video.src = '';
       }
-      // Eliminar fondo desenfocado
-      const bg = specialBanner.querySelector('.special-bg-blur');
-      if (bg) bg.remove();
     }, 600);
   }
 
   if (carousel) carousel.style.display = 'block';
-  if (bannerContainer) bannerContainer.style.display = '';
-
+  if (bannerContainer) {
+    bannerContainer.style.padding = '';
+    bannerContainer.style.margin = '';
+    bannerContainer.style.maxWidth = '';
+  }
   if (nav) {
     nav.style.position = '';
     nav.style.zIndex = '';
@@ -252,8 +227,6 @@ function initSpecialMode() {
     if (carousel) carousel.style.display = 'block';
     const specialBanner = document.getElementById('specialBanner');
     if (specialBanner) specialBanner.style.display = 'none';
-    const bannerContainer = document.getElementById('bannerContainer');
-    if (bannerContainer) bannerContainer.style.display = '';
   }
 }
 
@@ -263,46 +236,22 @@ if (document.readyState === 'loading') {
   initSpecialMode();
 }
 
+// Reajuste al redimensionar
 window.addEventListener('resize', () => {
   if (window.isSpecialMode) {
     const banner = document.getElementById('specialBanner');
     const video = document.getElementById('specialVideo');
     if (banner && video) {
-      const navHeight = getNavHeight();
-      banner.style.height = `calc(100vh - ${navHeight}px)`;
       const isMobile = isMobileDevice();
-      video.style.objectFit = isMobile ? 'contain' : 'cover';
-      // Actualizar fondo desenfocado si existe
-      const bg = banner.querySelector('.special-bg-blur');
-      if (bg && !isMobile) {
-        bg.remove();
-      } else if (!bg && isMobile) {
-        // Recrear fondo si es necesario
-        const newBg = document.createElement('div');
-        newBg.className = 'special-bg-blur';
-        newBg.style.position = 'absolute';
-        newBg.style.top = '0';
-        newBg.style.left = '0';
-        newBg.style.width = '100%';
-        newBg.style.height = '100%';
-        newBg.style.overflow = 'hidden';
-        newBg.style.zIndex = '0';
-        newBg.style.background = '#000';
-        const bgVideo = document.createElement('video');
-        bgVideo.src = video.src;
-        bgVideo.muted = true;
-        bgVideo.loop = true;
-        bgVideo.playsInline = true;
-        bgVideo.style.width = '100%';
-        bgVideo.style.height = '100%';
-        bgVideo.style.objectFit = 'cover';
-        bgVideo.style.filter = 'blur(20px) brightness(0.6)';
-        bgVideo.style.transform = 'scale(1.1)';
-        bgVideo.style.display = 'block';
-        bgVideo.autoplay = true;
-        bgVideo.play().catch(() => {});
-        newBg.appendChild(bgVideo);
-        banner.prepend(newBg);
+      if (isMobile) {
+        banner.style.height = 'auto';
+        video.style.height = 'auto';
+        video.style.objectFit = 'contain';
+      } else {
+        const navHeight = getNavHeight();
+        banner.style.height = `calc(100vh - ${navHeight}px)`;
+        video.style.height = '100%';
+        video.style.objectFit = 'cover';
       }
     }
   }
