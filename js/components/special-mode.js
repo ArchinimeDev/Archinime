@@ -1,7 +1,7 @@
 /**
- * MODO ESPECIAL - ARCHINIME (VERSIÓN FULLSCREEN SIN ESPACIOS)
- * - Ocupa todo el espacio disponible debajo del navbar
- * - Sin bordes negros, sin márgenes, sin scroll
+ * MODO ESPECIAL - ARCHINIME (FULLSCREEN CON FONDO DESENFOCADO EN MÓVIL)
+ * - En PC: video con object-fit: cover (rellena sin bordes)
+ * - En móvil: video con object-fit: contain (se ve completo) + fondo desenfocado del mismo video
  * - Probabilidad al 100% para pruebas (cambiar a 0.10 para producción)
  */
 
@@ -12,18 +12,20 @@ const SPECIAL_VIDEOS = [
 
 window.isSpecialMode = false;
 
-// ===== OBTENER ALTURA DEL NAVBAR =====
+function isMobileDevice() {
+  return window.innerWidth <= 768;
+}
+
 function getNavHeight() {
   const nav = document.querySelector('.cyber-nav');
   return nav ? nav.offsetHeight : 68;
 }
 
-// ===== ACTIVAR MODO ESPECIAL =====
 function activarModoEspecial() {
   if (window.isSpecialMode) return;
   window.isSpecialMode = true;
 
-  console.log('🌟 MODO ESPECIAL ACTIVADO (SIN ESPACIOS)');
+  console.log('🌟 MODO ESPECIAL ACTIVADO');
 
   // Detener música
   if (window.stopMusic && typeof window.stopMusic === 'function') {
@@ -47,15 +49,17 @@ function activarModoEspecial() {
     return;
   }
 
-  // 1. Ocultar carrusel y su contenedor
+  // Ocultar carrusel y su contenedor
   carousel.style.display = 'none';
-  bannerContainer.style.display = 'none'; // ← CLAVE: elimina el espacio del contenedor
+  bannerContainer.style.display = 'none';
 
-  // 2. Mostrar banner especial
+  // Mostrar banner especial
   specialBanner.style.display = 'block';
 
-  // 3. Forzar estilos para ocupar todo el espacio disponible
   const navHeight = getNavHeight();
+  const isMobile = isMobileDevice();
+
+  // Configurar banner
   specialBanner.style.position = 'relative';
   specialBanner.style.width = '100%';
   specialBanner.style.maxWidth = '100%';
@@ -68,15 +72,54 @@ function activarModoEspecial() {
   specialBanner.style.overflow = 'hidden';
   specialBanner.style.backgroundColor = '#000';
 
-  // 4. Configurar video
+  // Limpiar cualquier fondo previo
+  const existingBg = specialBanner.querySelector('.special-bg-blur');
+  if (existingBg) existingBg.remove();
+
+  // En móvil: añadir fondo desenfocado detrás del video
+  if (isMobile) {
+    const bgBlur = document.createElement('div');
+    bgBlur.className = 'special-bg-blur';
+    bgBlur.style.position = 'absolute';
+    bgBlur.style.top = '0';
+    bgBlur.style.left = '0';
+    bgBlur.style.width = '100%';
+    bgBlur.style.height = '100%';
+    bgBlur.style.overflow = 'hidden';
+    bgBlur.style.zIndex = '0';
+    bgBlur.style.background = '#000';
+
+    const bgVideo = document.createElement('video');
+    bgVideo.src = SPECIAL_VIDEOS[Math.floor(Math.random() * SPECIAL_VIDEOS.length)];
+    bgVideo.muted = true;
+    bgVideo.loop = true;
+    bgVideo.playsInline = true;
+    bgVideo.style.width = '100%';
+    bgVideo.style.height = '100%';
+    bgVideo.style.objectFit = 'cover';
+    bgVideo.style.filter = 'blur(20px) brightness(0.6)';
+    bgVideo.style.transform = 'scale(1.1)';
+    bgVideo.style.display = 'block';
+    bgVideo.autoplay = true;
+    bgVideo.play().catch(() => {});
+
+    bgBlur.appendChild(bgVideo);
+    specialBanner.appendChild(bgBlur);
+  }
+
+  // Configurar video principal
+  videoElement.style.position = 'relative';
+  videoElement.style.zIndex = '1';
   videoElement.style.width = '100%';
   videoElement.style.height = '100%';
-  videoElement.style.objectFit = 'cover';
+  // En móvil: contain para que se vea completo, en PC: cover para rellenar
+  videoElement.style.objectFit = isMobile ? 'contain' : 'cover';
   videoElement.style.display = 'block';
 
   // Elegir video aleatorio
   const randomIndex = Math.floor(Math.random() * SPECIAL_VIDEOS.length);
-  videoElement.src = SPECIAL_VIDEOS[randomIndex];
+  const videoSrc = SPECIAL_VIDEOS[randomIndex];
+  videoElement.src = videoSrc;
   videoElement.loop = true;
   videoElement.muted = false;
   videoElement.volume = 0.9;
@@ -131,7 +174,6 @@ function activarModoEspecial() {
 
   document.body.classList.add('special-mode');
 
-  // Asegurar que el navbar se vea por encima
   const nav = document.querySelector('.cyber-nav');
   if (nav) {
     nav.style.position = 'relative';
@@ -139,7 +181,6 @@ function activarModoEspecial() {
   }
 }
 
-// ===== DESACTIVAR MODO ESPECIAL =====
 function desactivarModoEspecial() {
   if (!window.isSpecialMode) return;
   window.isSpecialMode = false;
@@ -169,6 +210,8 @@ function desactivarModoEspecial() {
       specialBanner.style.overflow = '';
       specialBanner.style.backgroundColor = '';
       if (video) {
+        video.style.position = '';
+        video.style.zIndex = '';
         video.style.width = '';
         video.style.height = '';
         video.style.objectFit = '';
@@ -176,14 +219,14 @@ function desactivarModoEspecial() {
         video.pause();
         video.src = '';
       }
+      // Eliminar fondo desenfocado
+      const bg = specialBanner.querySelector('.special-bg-blur');
+      if (bg) bg.remove();
     }, 600);
   }
 
-  // Restaurar carrusel y contenedor
   if (carousel) carousel.style.display = 'block';
-  if (bannerContainer) {
-    bannerContainer.style.display = ''; // volver a su estado original
-  }
+  if (bannerContainer) bannerContainer.style.display = '';
 
   if (nav) {
     nav.style.position = '';
@@ -198,7 +241,6 @@ function desactivarModoEspecial() {
   console.log('🔇 Modo especial desactivado');
 }
 
-// ===== INICIALIZACIÓN =====
 function initSpecialMode() {
   if (window.isSpecialMode) return;
   const shouldActivate = Math.random() < SPECIAL_PROBABILITY;
@@ -221,17 +263,50 @@ if (document.readyState === 'loading') {
   initSpecialMode();
 }
 
-// Reajuste al redimensionar (para cambiar altura del navbar)
 window.addEventListener('resize', () => {
   if (window.isSpecialMode) {
     const banner = document.getElementById('specialBanner');
-    if (banner) {
+    const video = document.getElementById('specialVideo');
+    if (banner && video) {
       const navHeight = getNavHeight();
       banner.style.height = `calc(100vh - ${navHeight}px)`;
+      const isMobile = isMobileDevice();
+      video.style.objectFit = isMobile ? 'contain' : 'cover';
+      // Actualizar fondo desenfocado si existe
+      const bg = banner.querySelector('.special-bg-blur');
+      if (bg && !isMobile) {
+        bg.remove();
+      } else if (!bg && isMobile) {
+        // Recrear fondo si es necesario
+        const newBg = document.createElement('div');
+        newBg.className = 'special-bg-blur';
+        newBg.style.position = 'absolute';
+        newBg.style.top = '0';
+        newBg.style.left = '0';
+        newBg.style.width = '100%';
+        newBg.style.height = '100%';
+        newBg.style.overflow = 'hidden';
+        newBg.style.zIndex = '0';
+        newBg.style.background = '#000';
+        const bgVideo = document.createElement('video');
+        bgVideo.src = video.src;
+        bgVideo.muted = true;
+        bgVideo.loop = true;
+        bgVideo.playsInline = true;
+        bgVideo.style.width = '100%';
+        bgVideo.style.height = '100%';
+        bgVideo.style.objectFit = 'cover';
+        bgVideo.style.filter = 'blur(20px) brightness(0.6)';
+        bgVideo.style.transform = 'scale(1.1)';
+        bgVideo.style.display = 'block';
+        bgVideo.autoplay = true;
+        bgVideo.play().catch(() => {});
+        newBg.appendChild(bgVideo);
+        banner.prepend(newBg);
+      }
     }
   }
 });
 
-// Exponer funciones
 window.activarModoEspecial = activarModoEspecial;
 window.desactivarModoEspecial = desactivarModoEspecial;
