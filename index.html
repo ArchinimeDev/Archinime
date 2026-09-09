@@ -77,7 +77,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script>
 
-  <!-- CSS EXTERNO (ahora apunta a la carpeta css/) -->
+  <!-- CSS EXTERNO -->
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
@@ -157,10 +157,6 @@
   <video id="specialVideo" muted loop playsinline>
     <source src="assets/videos/atrevete.mp4" type="video/mp4">
   </video>
-  <div class="overlay-text">
-    <h2>🌟 MODO ESPECIAL</h2>
-    <p>Disfruta de este tráiler exclusivo</p>
-  </div>
   <div class="audio-indicator" id="specialAudioIndicator">
     <i class="fas fa-volume-mute"></i> <span>Haz clic para activar sonido</span>
   </div>
@@ -413,66 +409,13 @@
 <script src="data/catalogo.js?v=2025-04-07-v21.0-chat-fixes"></script>
 <script src="js/utils/animaciones.js"></script>
 <script src="js/utils/musica_fondo.js"></script>
+<script src="js/components/special-mode.js"></script>
 <script src="js/components/notification-system.js"></script>
 <script src="js/utils/gifs.js"></script>
 <script src="js/components/banner-carousel.js?v=2025-04-07-v21.0-chat-fixes"></script>
 
-<!-- El resto del JavaScript (el mismo que antes) va aquí -->
-<!-- Para no repetir 800 líneas, asumo que mantienes el mismo bloque JS que ya tenías.
-     Si necesitas el bloque completo, dímelo y lo incluyo, pero con la referencia al CSS ya debería cargar correctamente. -->
-
+<!-- ===== SCRIPT PRINCIPAL (con toda la lógica de la app) ===== -->
 <script>
-  // ============================================
-  // MODO ESPECIAL - ACTIVACIÓN CON PROBABILIDAD
-  // ============================================
-  (function() {
-    const PROBABILITY = 0.10; // 10%
-    const isSpecial = Math.random() < PROBABILITY;
-
-    if (isSpecial) {
-      console.log('🎬 Modo Especial activado (banner con video)');
-
-      const carousel = document.getElementById('bannerCarousel');
-      const specialBanner = document.getElementById('specialBanner');
-      const specialVideo = document.getElementById('specialVideo');
-      const audioIndicator = document.getElementById('specialAudioIndicator');
-
-      carousel.style.display = 'none';
-      specialBanner.style.display = 'block';
-
-      specialVideo.muted = true;
-      specialVideo.play()
-        .then(() => {
-          audioIndicator.innerHTML = '<i class="fas fa-volume-up"></i> <span>Sonido activado</span>';
-        })
-        .catch(() => {
-          audioIndicator.innerHTML = '<i class="fas fa-volume-mute"></i> <span>Haz clic para activar sonido</span>';
-          specialVideo.muted = true;
-          specialVideo.play().catch(() => {});
-        });
-
-      specialBanner.addEventListener('click', function() {
-        specialVideo.muted = false;
-        specialVideo.volume = 0.8;
-        specialVideo.play()
-          .then(() => {
-            audioIndicator.innerHTML = '<i class="fas fa-volume-up"></i> <span>Sonido activado</span>';
-          })
-          .catch(() => {
-            audioIndicator.innerHTML = '<i class="fas fa-exclamation-triangle"></i> <span>Error al activar audio</span>';
-          });
-      });
-
-      specialVideo.addEventListener('ended', function() {
-        specialVideo.play().catch(() => {});
-      });
-
-      document.body.classList.add('special-mode');
-    } else {
-      console.log('Modo normal.');
-    }
-  })();
-
   // ============================================
   // SISTEMA DE STICKERS (CORREGIDO)
   // ============================================
@@ -1130,23 +1073,6 @@
   });
   window.matchMedia('(display-mode: standalone)').addEventListener('change', updateButtons);
   window.addEventListener('DOMContentLoaded', updateButtons);
-
-  let isMusicStarted = false, currentAudio = null;
-  function playNextTrack() {
-    if (!isMusicStarted) return;
-    if (currentAudio) { currentAudio.pause(); currentAudio.onended = null; currentAudio = null; }
-    const track = musicListGlobal[Math.floor(Math.random() * musicListGlobal.length)];
-    if (!track) { setTimeout(playNextTrack, 5000); return; }
-    currentAudio = new Audio(track);
-    currentAudio.volume = 0.25;
-    currentAudio.onended = playNextTrack;
-    currentAudio.play().catch(e => setTimeout(playNextTrack, 3000));
-  }
-  function startMusic() { if (isMusicStarted) return; isMusicStarted = true; playNextTrack(); }
-  document.addEventListener('visibilitychange', () => {
-    if (!document.hidden && isMusicStarted && currentAudio?.paused) currentAudio.play().catch(()=>{});
-  });
-  window.addEventListener('load', startMusic);
 
   // ===== LOADER (con GIF) =====
   let loadingCompleted = false;
