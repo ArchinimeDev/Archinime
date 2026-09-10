@@ -87,7 +87,6 @@ function activarModoEspecial() {
   const carousel = document.getElementById('bannerCarousel');
   const specialBanner = document.getElementById('specialBanner');
   const videoElement = document.getElementById('specialVideo');
-  const audioIndicator = document.getElementById('specialAudioIndicator');
   const bannerContainer = document.getElementById('bannerContainer');
 
   if (!carousel || !specialBanner || !videoElement || !bannerContainer) {
@@ -148,36 +147,21 @@ function activarModoEspecial() {
   specialBanner.classList.remove('special-exit');
   specialBanner.classList.add('special-enter');
 
-  // Indicador de audio
-  function updateAudioIndicator(hasAudio) {
-    if (!audioIndicator) return;
-    if (hasAudio) {
-      audioIndicator.innerHTML = '<i class="fas fa-volume-up"></i><span class="indicator-text">Sonido activo</span>';
-      audioIndicator.classList.remove('muted');
-      audioIndicator.classList.add('active');
-    } else {
-      audioIndicator.innerHTML = '<i class="fas fa-volume-mute"></i><span class="indicator-text">Sin sonido</span>';
-      audioIndicator.classList.remove('active');
-      audioIndicator.classList.add('muted');
-    }
-  }
-
   // Reproducción con sonido (el reintento ya maneja la carga, pero el play puede fallar por autoplay)
   const playPromise = videoElement.play();
   if (playPromise !== undefined) {
     playPromise.then(() => {
       console.log('✅ Sonido activado');
-      updateAudioIndicator(true);
     }).catch(error => {
       console.warn('⚠️ Autoplay bloqueado, mute temporal');
       videoElement.muted = true;
       videoElement.play().then(() => {
-        updateAudioIndicator(false);
+        // El usuario puede hacer clic en cualquier parte para activar el sonido
         const activateAudio = () => {
           videoElement.muted = false;
           videoElement.volume = 0.9;
           videoElement.play().then(() => {
-            updateAudioIndicator(true);
+            console.log('🔊 Sonido activado tras interacción');
           }).catch(() => {});
           document.removeEventListener('click', activateAudio);
           document.removeEventListener('touchstart', activateAudio);
@@ -187,7 +171,6 @@ function activarModoEspecial() {
         specialBanner.addEventListener('click', activateAudio, { once: true });
       }).catch(err => {
         console.error('Error al reproducir:', err);
-        updateAudioIndicator(false);
       });
     });
   }
