@@ -101,7 +101,7 @@
       box-shadow: 0 0 22px rgba(0, 255, 247, 0.08);
     }
 
-    /* Círculo perfecto — usamos aspect-ratio + border-radius 50% */
+    /* Círculo sólido — SIN icono dentro, solo el color puro */
     .color-circle {
       position: relative;
       width: 62px;
@@ -109,16 +109,14 @@
       aspect-ratio: 1 / 1;
       flex-shrink: 0;
       border-radius: 50%;
-      background: var(--current-color, #00fff7);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: box-shadow 0.3s, transform 0.2s;
+      background: #00fff7;
+      cursor: default;
+      pointer-events: none;
+      transition: box-shadow 0.3s;
       box-shadow:
         0 0 0 3px rgba(255,255,255,0.08),
-        0 0 18px var(--current-color, #00fff7),
-        0 0 32px var(--current-color, #00fff7);
+        0 0 18px #00fff7,
+        0 0 32px #00fff7;
       overflow: hidden;
     }
     .color-circle::before {
@@ -127,34 +125,6 @@
       inset: 0;
       border-radius: 50%;
       background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.35), transparent 55%);
-      pointer-events: none;
-    }
-    .color-circle:hover {
-      transform: scale(1.05);
-    }
-    .color-circle:active {
-      transform: scale(0.97);
-    }
-    /* El input color nativo está oculto detrás, cubriendo el círculo completo */
-    .color-circle input[type="color"] {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      opacity: 0;
-      cursor: pointer;
-      border: none;
-      padding: 0;
-      background: transparent;
-      -webkit-appearance: none;
-      appearance: none;
-    }
-    .color-circle i {
-      position: relative;
-      z-index: 2;
-      color: #fff;
-      font-size: 1.15rem;
-      text-shadow: 0 0 8px rgba(0,0,0,0.85), 0 0 3px rgba(0,0,0,0.9);
       pointer-events: none;
     }
 
@@ -243,6 +213,55 @@
       transition: 0.3s;
     }
 
+    /* Paleta nativa visible */
+    .native-picker-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 10px;
+      padding: 10px 14px;
+      border-radius: 12px;
+      background: rgba(0,0,0,0.35);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .native-picker-row label {
+      font-size: 0.75rem;
+      color: var(--primary-color);
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      font-family: 'Orbitron', sans-serif;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .native-picker-row input[type="color"].native-picker {
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      width: 46px;
+      height: 34px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      background: none;
+      padding: 0;
+      overflow: hidden;
+    }
+    .native-picker-row input[type="color"].native-picker::-webkit-color-swatch-wrapper { padding: 0; border-radius: 8px; }
+    .native-picker-row input[type="color"].native-picker::-webkit-color-swatch {
+      border: 2px solid rgba(255,255,255,0.15);
+      border-radius: 8px;
+    }
+    .native-picker-row input[type="color"].native-picker::-moz-color-swatch {
+      border: 2px solid rgba(255,255,255,0.15);
+      border-radius: 8px;
+    }
+    .native-picker-hint {
+      font-size: 0.72rem;
+      color: #888;
+      margin-left: auto;
+    }
+
     .save-btn {
       width: 100%; background: var(--primary-color); color: #000; border: none;
       padding: 16px; border-radius: 10px;
@@ -275,6 +294,7 @@
       .color-title { font-size: 0.68rem; }
       .color-subtitle { font-size: 0.7rem; }
       .preset-dot { width: 16px; height: 16px; }
+      .native-picker-hint { display: none; }
     }
   </style>
 </head>
@@ -309,10 +329,7 @@
     <div class="form-group">
       <label>Color de Nombre</label>
       <div class="color-picker-wrapper">
-        <label class="color-circle" id="colorCircle" for="nameColor" title="Clic para elegir color">
-          <input type="color" id="nameColor" value="#00fff7">
-          <i class="fas fa-palette"></i>
-        </label>
+        <div class="color-circle" id="colorCircle" title="Color actual"></div>
         <div class="color-info">
           <span class="color-title"><i class="fas fa-bolt"></i> Tu Neón</span>
           <span class="color-subtitle">Afecta tu nombre en comentarios y tu avatar</span>
@@ -324,6 +341,11 @@
             </span>
           </div>
         </div>
+      </div>
+      <div class="native-picker-row">
+        <label for="nameColor"><i class="fas fa-palette"></i> Paleta:</label>
+        <input type="color" id="nameColor" value="#00fff7" class="native-picker">
+        <span class="native-picker-hint">Clic para elegir cualquier color</span>
       </div>
     </div>
 
@@ -380,7 +402,7 @@
         btn.type = 'button';
         btn.className = 'preset-dot' + (color.toLowerCase() === (activeColor || '').toLowerCase() ? ' active' : '');
         btn.style.background = color;
-        btn.style.color = color; // para el box-shadow: currentColor
+        btn.style.color = color;
         btn.dataset.color = color;
         btn.title = color.toUpperCase();
         btn.addEventListener('click', (e) => {
@@ -394,10 +416,11 @@
 
     // ========== Actualizar vista previa del color ==========
     function updateColorPreview(color) {
-      // Círculo principal
+      // Círculo principal — sólido
       const circle = document.getElementById('colorCircle');
       if (circle) {
-        circle.style.setProperty('--current-color', color);
+        circle.style.background = color;
+        circle.style.boxShadow = `0 0 0 3px rgba(255,255,255,0.08), 0 0 18px ${color}, 0 0 32px ${color}`;
       }
       // Dot del chip
       const dot = document.getElementById('colorDot');
