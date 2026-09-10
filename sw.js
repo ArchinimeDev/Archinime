@@ -6,12 +6,12 @@
    v103 - Fix: bump versión para forzar actualización
    ============================================================ */
 
-const CACHE_STATIC = 'archinime-static-v103';
-const CACHE_DYNAMIC = 'archinime-dynamic-v103';
-const CACHE_IMAGES = 'archinime-images-v103';
-const CACHE_FONTS = 'archinime-fonts-v103';
+const CACHE_STATIC = 'archinime-static-v104';
+const CACHE_DYNAMIC = 'archinime-dynamic-v104';
+const CACHE_IMAGES = 'archinime-images-v104';
+const CACHE_FONTS = 'archinime-fonts-v104';
 
-// OJO: opciones.html y anime-detail NO van en precache para que siempre se sirvan frescos
+
 const STATIC_ASSETS = [
   '/',
   '/index.html',
