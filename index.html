@@ -14,7 +14,7 @@
   <!-- VERSIÓN (forzar limpieza de caché) -->
   <script>
     (function() {
-      const APP_VERSION = "2025-04-10-v24.1-fix-saveBtn";
+      const APP_VERSION = "2025-04-10-v24.2-redirect-opciones";
       const stored = localStorage.getItem('archinime_app_version');
       if (stored !== APP_VERSION) {
         localStorage.setItem('archinime_app_version', APP_VERSION);
@@ -303,6 +303,7 @@
   </div>
 </div>
 
+<!-- ===== MODAL DE PERFIL (legacy - se mantiene por compatibilidad, ya no se usa desde el dropdown) ===== -->
 <div id="profileModal" class="profile-modal">
   <div class="profile-card">
     <div class="profile-close" onclick="closeProfileModal()"><i class="fas fa-times"></i></div>
@@ -387,7 +388,7 @@
 
 <!-- ===== SCRIPTS ===== -->
 <!-- app-core.js PRIMERO: contiene Firebase, auth, perfil, etc. -->
-<script src="js/core/app-core.js?v=2025-04-10-v24.1-fix-saveBtn"></script>
+<script src="js/core/app-core.js?v=2025-04-10-v24.2-redirect-opciones"></script>
 <script src="data/catalogo.js?v=2025-04-10-v24.0-modular"></script>
 <script src="js/utils/animaciones.js"></script>
 <script src="js/utils/musica_fondo.js"></script>
