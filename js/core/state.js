@@ -1,10 +1,9 @@
 // state.js - Central de estado y eventos
-// Mejorado: persistencia en localStorage para algunas claves, más eventos
+// CORREGIDO: Espera a que Firebase esté inicializado antes de usarlo
 
 window.ArchinimeState = (function() {
   const STORAGE_KEY = 'archinime_state';
 
-  // Cargar estado desde localStorage (solo para algunas claves)
   let savedState = {};
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
@@ -34,6 +33,10 @@ window.ArchinimeState = (function() {
   function on(event, callback) {
     if (!listeners[event]) listeners[event] = [];
     listeners[event].push(callback);
+    // 🔥 CLAVE: Si ya hay un valor para este evento, dispara el callback inmediatamente
+    if (state[event] !== undefined && state[event] !== null) {
+      try { callback(state[event]); } catch(e) { console.warn(e); }
+    }
   }
 
   function off(event, callback) {
@@ -46,7 +49,6 @@ window.ArchinimeState = (function() {
     if (state[key] !== value) {
       state[key] = value;
       emit(key, value);
-      // Persistir algunas claves en localStorage
       if (['theme'].includes(key)) {
         try {
           const toStore = { theme: state.theme };
@@ -60,26 +62,33 @@ window.ArchinimeState = (function() {
     return state[key];
   }
 
-  // Escuchar cambios de autenticación si Firebase está disponible
-  if (typeof firebase !== 'undefined' && firebase.auth) {
-    firebase.auth().onAuthStateChanged(async (user) => {
-      set('currentUser', user);
-      if (user) {
-        try {
-          const userDoc = await firebase.firestore().collection('users').doc(user.uid).get();
-          const color = userDoc.exists && userDoc.data().customColor ? userDoc.data().customColor : null;
-          set('currentUserColor', color);
-        } catch(e) { console.warn('Error al obtener color:', e); }
-      } else {
-        set('currentUserColor', null);
-      }
-    });
+  // 🔥 CLAVE: Esperar a que Firebase esté inicializado
+  function setupFirebaseListener() {
+    if (typeof firebase === 'undefined' || !firebase.apps || !firebase.apps.length) {
+      // Firebase aún no está listo, reintentar en un momento
+      setTimeout(setupFirebaseListener, 50);
+      return;
+    }
+
+    try {
+      firebase.auth().onAuthStateChanged(async (user) => {
+        set('currentUser', user);
+        if (user) {
+          try {
+            const userDoc = await firebase.firestore().collection('users').doc(user.uid).get();
+            const color = userDoc.exists && userDoc.data().customColor ? userDoc.data().customColor : null;
+            set('currentUserColor', color);
+          } catch(e) { console.warn('Error al obtener color:', e); }
+        } else {
+          set('currentUserColor', null);
+        }
+      });
+    } catch (e) {
+      console.warn('No se pudo registrar onAuthStateChanged en state.js:', e);
+    }
   }
 
-  return {
-    set,
-    get,
-    on,
-    off
-  };
+  setupFirebaseListener();
+
+  return { set, get, on, off };
 })();
