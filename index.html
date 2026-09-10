@@ -14,7 +14,7 @@
   <!-- VERSIÓN (forzar limpieza de caché) -->
   <script>
     (function() {
-      const APP_VERSION = "2025-04-08-v22.0-performance";
+      const APP_VERSION = "2025-04-09-v23.0-catalog-fix";
       const stored = localStorage.getItem('archinime_app_version');
       if (stored !== APP_VERSION) {
         localStorage.setItem('archinime_app_version', APP_VERSION);
@@ -103,7 +103,7 @@
 <!-- ===== PARTÍCULAS ===== -->
 <canvas id="particlesCanvas"></canvas>
 
-<!-- ===== FONDO VIDEO (preload metadata para carga rápida) ===== -->
+<!-- ===== FONDO VIDEO ===== -->
 <video id="bg-video" poster="assets/img/galaxia-morado1.avif" autoplay muted loop playsinline preload="metadata" style="position:fixed; inset:0; width:100%; height:100%; object-fit:cover; z-index:-2; opacity:0; transition:opacity 1.2s; filter:brightness(0.5) contrast(1.1);">
   <source src="assets/videos/galaxia.mp4" type="video/mp4">
 </video>
@@ -166,7 +166,7 @@
 <!-- ===== FILTROS ===== -->
 <div class="controls-container">
   <select id="genre-select" aria-label="Género">
-      <option value="">🎭 Todos los géneros</option>
+      <option value="">Género</option>
       <option>Acción</option><option>Animación</option><option>Antihéroe</option><option>Artes Marciales</option><option>Aventura</option>
       <option>Cambio de género</option><option>Ciencia ficción</option><option>Cocina</option><option>Comedia</option><option>Comedia oscura</option>
       <option>Coming-of-age</option><option>Cosplay</option><option>Crimen</option><option>Cyberpunk</option>
@@ -186,11 +186,11 @@
       <option>Yaoi</option><option>Yuri</option>
   </select>
   <select id="demographic-select" aria-label="Demografía">
-    <option value="">👥 Todas</option>
+    <option value="">Demografía</option>
     <option>Josei</option><option>Kodomo</option><option>Seijin</option><option>Seinen</option><option>Shōjo</option><option>Shōnen</option>
   </select>
   <select id="rating-select" aria-label="Ranking">
-    <option value="">⭐ RANKING</option>
+    <option value="">Ranking</option>
     <option value="excellent">🏆 S-TIER</option>
     <option value="good">🔥 A-TIER</option>
     <option value="regular">📀 B-TIER</option>
@@ -403,18 +403,18 @@
   const providerGoogle = new firebase.auth.GoogleAuthProvider();
 </script>
 
-<script src="data/catalogo.js?v=2025-04-08-v22.0-performance"></script>
+<script src="data/catalogo.js?v=2025-04-09-v23.0-catalog-fix"></script>
 <script src="js/utils/animaciones.js"></script>
 <script src="js/utils/musica_fondo.js"></script>
 <script src="js/components/special-mode.js"></script>
 <script src="js/components/notification-system.js"></script>
 <script src="js/utils/gifs.js"></script>
-<script src="js/components/banner-carousel.js?v=2025-04-08-v22.0-performance"></script>
+<script src="js/components/banner-carousel.js?v=2025-04-09-v23.0-catalog-fix"></script>
 
-<!-- ===== SCRIPT PRINCIPAL (OPTIMIZADO) ===== -->
+<!-- ===== SCRIPT PRINCIPAL ===== -->
 <script>
   // ============================================
-  // CONFIGURACIÓN DE DEBUG (cambiar a false en producción)
+  // CONFIGURACIÓN DE DEBUG
   // ============================================
   const DEBUG = false;
   const log = (...args) => { if (DEBUG) console.log(...args); };
@@ -765,17 +765,12 @@
     return div.innerHTML;
   }
 
-  // ===== getNeonColor (única definición) =====
   function getNeonColor(str) {
     const colors = ['#00f0ff','#ff1a6b','#b114ff','#ffd700','#00ff33','#ffaa00'];
     let h = 0;
     for (let i=0; i<str.length; i++) h = str.charCodeAt(i) + ((h<<5)-h);
     return colors[Math.abs(h)%colors.length];
   }
-  window.getCurrentUserColor = function() {
-    if (!auth.currentUser) return null;
-    return null; // se resuelve desde db.users
-  };
 
   window.enviarMensajeChatPanel = async function() {
     const user = auth.currentUser;
@@ -969,14 +964,13 @@
   window.matchMedia('(display-mode: standalone)').addEventListener('change', updateButtons);
   window.addEventListener('DOMContentLoaded', updateButtons);
 
-  // ===== LOADER OPTIMIZADO (sessionStorage + 3s timeout) =====
+  // ===== LOADER =====
   let loadingCompleted = false;
   const loadingScreen = document.getElementById('loadingScreen');
   const percentEl = document.getElementById('loadingPercentage');
   const lineEl = document.getElementById('loaderLine');
   const gifImg = document.getElementById('personaje-gif');
 
-  // Si ya se mostró el loader en esta sesión, ocultarlo al instante
   if (sessionStorage.getItem('archinime_loader_shown') === '1') {
     loadingScreen.classList.add('hidden');
     loadingCompleted = true;
@@ -1014,7 +1008,6 @@
   }, 150);
 
   window.addEventListener('firstAnimesLoaded', () => { clearInterval(loadInterval); updateProgress(100); finishLoading(); });
-  // Reducido de 8000ms a 3000ms
   setTimeout(() => { if (!loadingCompleted) finishLoading(); }, 3000);
 
   // ===== UTILIDADES =====
@@ -1026,34 +1019,31 @@
   const RATINGS_CACHE_TTL = 2 * 60 * 60 * 1000; // 2 horas
 
   async function loadRatings() {
-    // Intentar cargar desde caché
     try {
       const cached = localStorage.getItem(RATINGS_CACHE_KEY);
       if (cached) {
         const parsed = JSON.parse(cached);
         if (parsed.timestamp && (Date.now() - parsed.timestamp < RATINGS_CACHE_TTL)) {
           parsed.data.forEach(([id, val]) => firestoreRatings.set(parseInt(id), val));
-          log('✅ Ratings cargadas desde caché:', firestoreRatings.size);
+          log('✅ Ratings desde caché:', firestoreRatings.size);
           return;
         }
       }
-    } catch (e) { warn('Error leyendo caché de ratings:', e); }
+    } catch (e) { warn('Error leyendo caché:', e); }
 
-    // Cargar desde Firestore
     try {
       const snap = await db.collection('animeRatings').get();
       snap.forEach(doc => {
         const d = doc.data();
         if (typeof d.avg === 'number') firestoreRatings.set(parseInt(doc.id), { avg: d.avg, count: d.count || 0 });
       });
-      // Guardar en caché
       try {
         localStorage.setItem(RATINGS_CACHE_KEY, JSON.stringify({
           data: Array.from(firestoreRatings.entries()),
           timestamp: Date.now()
         }));
       } catch (e) { warn('No se pudo guardar caché:', e); }
-      log('✅ Ratings cargadas desde Firestore:', firestoreRatings.size);
+      log('✅ Ratings desde Firestore:', firestoreRatings.size);
     } catch (e) { console.error('Error ratings:', e); }
   }
 
@@ -1241,7 +1231,6 @@
       const ratingVal = getNumericRating(anime);
       const roundedRating = Math.round(ratingVal * 10) / 10;
       const badge = (roundedRating >= 4.9 && roundedRating <= 5.0) ? '<div class="badge">🔥 TOP</div>' : '';
-      // Lazy loading para las tarjetas después de las 6 primeras
       const loadingAttr = i < 6 ? 'eager' : 'lazy';
       card.innerHTML = `
         <img src="${img}" alt="${anime.title}" loading="${loadingAttr}" decoding="async" style="background:#0b0e14;">
@@ -1520,7 +1509,7 @@
     });
   }
 
-  // ===== CHROMA KEY (OPTIMIZADO) =====
+  // ===== CHROMA KEY =====
   function randomizeFgPosition() {
     const container = document.getElementById('stageContainer');
     if (!container) return;
@@ -1537,7 +1526,6 @@
   fgVideo.style.display = 'none';
   fgVideo.src = currentAnim.src;
   fgVideo.addEventListener('loadedmetadata', () => {
-    // Reducido de 300 a 200 para mejor rendimiento
     const maxW = 200;
     const ratio = fgVideo.videoWidth / fgVideo.videoHeight;
     fgCanvas.width = maxW;
@@ -1551,7 +1539,6 @@
       return;
     }
     frameCount++;
-    // Procesar cada 12 frames (antes 6) para aliviar la CPU
     if (frameCount % 12 !== 0) {
       requestAnimationFrame(processChroma);
       return;
@@ -1746,29 +1733,37 @@
   window.closeProfileModal = closeProfileModal;
   window.copiarUID = copiarUID;
 
-  // ===== INICIALIZACIÓN FINAL OPTIMIZADA =====
-  inicializarAnuncio();
+  // ===== INICIALIZACIÓN FINAL (cargar ratings primero, luego mostrar) =====
+  async function initCatalog() {
+    inicializarAnuncio();
 
-  // 1. Mostrar el catálogo INMEDIATAMENTE (sin esperar ratings)
-  if (typeof catalogoArray !== 'undefined') {
-    baseAnimes = shuffleArray([...catalogoArray]);
-    searchableIndex = buildSearchableIndex(baseAnimes);
-  } else {
-    baseAnimes = [];
-    searchableIndex = [];
-  }
-  cargarDatosYMostrar();
+    // Cargar ratings con timeout máximo de 1.2s (para no bloquear si Firestore va lento)
+    try {
+      await Promise.race([
+        loadRatings(),
+        new Promise(resolve => setTimeout(resolve, 1200))
+      ]);
+    } catch (e) { console.error('Error cargando ratings:', e); }
 
-  // 2. Cargar ratings en paralelo (con caché)
-  loadRatings().then(() => {
-    // Refrescar la vista si el usuario sigue en la primera página sin filtros
-    if (currentPage === 1 && !currentFilters.search && !currentFilters.genre && !currentFilters.demographic && !currentFilters.rating) {
-      cargarDatosYMostrar();
+    // Cargar catálogo completo
+    if (typeof catalogoArray !== 'undefined' && Array.isArray(catalogoArray)) {
+      baseAnimes = shuffleArray([...catalogoArray]);
+      searchableIndex = buildSearchableIndex(baseAnimes);
+      log('📚 Catálogo cargado:', baseAnimes.length, 'animes |', Math.ceil(baseAnimes.length / itemsPerPage), 'páginas');
+    } else {
+      console.error('❌ catalogoArray no encontrado o no es un array');
+      baseAnimes = [];
+      searchableIndex = [];
     }
-  }).catch(err => console.error('Error al cargar ratings:', err));
 
-  // 3. Notificaciones de nuevos animes después de un momento
-  setTimeout(() => { checkForNewAnimes(); }, 3000);
+    // Renderizar una sola vez
+    cargarDatosYMostrar();
+
+    // Notificaciones después de un momento
+    setTimeout(() => { checkForNewAnimes(); }, 3000);
+  }
+
+  initCatalog();
 
   window.addEventListener('load', () => { if (window.startNotificationSequence) window.startNotificationSequence(); });
 
@@ -1830,7 +1825,7 @@
     resize();
   })();
 
-  log('🚀 Archinime cargado correctamente con optimizaciones de rendimiento.');
+  log('🚀 Archinime cargado correctamente.');
 </script>
 
 </body>
