@@ -81,15 +81,121 @@
       border-radius: 20px; color: white; cursor: pointer; transition: 0.2s; font-size: 0.85rem;
     }
     .upload-btn:hover { background: rgba(255,255,255,0.1); border-color: var(--primary-color); }
-    
-    .color-picker-wrapper { display: flex; align-items: center; gap: 15px; }
-    .color-picker {
-      -webkit-appearance: none; border: none; width: 40px; height: 40px;
-      border-radius: 50%; cursor: pointer;
-      background: none; padding: 0;
+
+    /* ============ SELECTOR DE COLOR REDISEÑADO ============ */
+    .color-picker-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 16px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(0,255,247,0.05), rgba(188,19,254,0.05));
+      border: 1px solid rgba(188, 19, 254, 0.25);
+      transition: 0.3s;
     }
-    .color-picker::-webkit-color-swatch-wrapper { padding: 0; }
-    .color-picker::-webkit-color-swatch { border: 2px solid rgba(255,255,255,0.2); border-radius: 50%; }
+    .color-picker-wrapper:hover {
+      border-color: rgba(0, 255, 247, 0.5);
+      box-shadow: 0 0 20px rgba(0, 255, 247, 0.1);
+    }
+
+    /* Contenedor circular para el input color */
+    .color-picker-frame {
+      position: relative;
+      width: 52px;
+      height: 52px;
+      flex-shrink: 0;
+      border-radius: 50%;
+      background: conic-gradient(from 0deg, #ff0055, #ffaa00, #ffff00, #00ff33, #00fff7, #00aaff, #bc13fe, #ff00aa, #ff0055);
+      padding: 3px;
+      box-shadow: 0 0 15px rgba(0, 255, 247, 0.35), inset 0 0 8px rgba(0,0,0,0.6);
+      animation: colorSpin 8s linear infinite;
+    }
+    @keyframes colorSpin {
+      to { transform: rotate(360deg); }
+    }
+    .color-picker-frame::after {
+      content: '';
+      position: absolute;
+      inset: 3px;
+      border-radius: 50%;
+      background: rgba(5, 5, 5, 0.85);
+      z-index: 1;
+    }
+
+    /* El input color nativo, formateado como círculo perfecto */
+    .color-picker {
+      position: relative;
+      z-index: 2;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 100%;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      background: none;
+      padding: 0;
+      overflow: hidden;
+    }
+    .color-picker::-webkit-color-swatch-wrapper { padding: 0; border-radius: 50%; }
+    .color-picker::-webkit-color-swatch {
+      border: 2px solid rgba(255,255,255,0.35);
+      border-radius: 50%;
+      box-shadow: inset 0 0 12px rgba(0,0,0,0.5);
+    }
+    .color-picker::-moz-color-swatch {
+      border: 2px solid rgba(255,255,255,0.35);
+      border-radius: 50%;
+    }
+
+    /* Información de color a la derecha */
+    .color-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      flex: 1;
+      min-width: 0;
+    }
+    .color-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.72rem;
+      letter-spacing: 1.5px;
+      font-weight: 700;
+      color: var(--primary-color);
+      text-shadow: 0 0 8px rgba(0, 255, 247, 0.6);
+      text-transform: uppercase;
+    }
+    .color-subtitle {
+      font-size: 0.78rem;
+      color: #b8b8c8;
+      line-height: 1.3;
+    }
+    .color-hex {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 4px;
+      font-family: 'Orbitron', monospace;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #fff;
+      background: rgba(0,0,0,0.5);
+      padding: 4px 10px;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.15);
+      width: fit-content;
+      letter-spacing: 1px;
+      transition: 0.3s;
+    }
+    .color-hex .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--primary-color);
+      box-shadow: 0 0 8px var(--primary-color);
+      transition: 0.3s;
+    }
 
     .save-btn {
       width: 100%; background: var(--primary-color); color: #000; border: none;
@@ -114,6 +220,15 @@
       background: rgba(0,0,0,0.6);
       border: 1px solid currentColor;
       box-shadow: 0 0 15px currentColor;
+    }
+
+    /* Responsive del selector */
+    @media (max-width: 420px) {
+      .options-container { padding: 26px 20px; }
+      .color-picker-frame { width: 46px; height: 46px; }
+      .color-picker-wrapper { gap: 12px; padding: 12px; }
+      .color-title { font-size: 0.65rem; }
+      .color-subtitle { font-size: 0.72rem; }
     }
   </style>
 </head>
@@ -146,10 +261,19 @@
     </div>
 
     <div class="form-group">
-      <label>Color de Nombre (Afecta comentarios y tu Avatar)</label>
+      <label>Color de Nombre</label>
       <div class="color-picker-wrapper">
-        <input type="color" id="nameColor" class="color-picker" value="#00fff7">
-        <span style="font-size: 0.85rem; color: #aaa;">Elige tu color neón representativo</span>
+        <div class="color-picker-frame">
+          <input type="color" id="nameColor" class="color-picker" value="#00fff7">
+        </div>
+        <div class="color-info">
+          <span class="color-title"><i class="fas fa-palette"></i> Tu Neón</span>
+          <span class="color-subtitle">Afecta tu nombre en comentarios y tu avatar</span>
+          <span class="color-hex">
+            <span class="dot" id="colorDot"></span>
+            <span id="colorHexText">#00FFF7</span>
+          </span>
+        </div>
       </div>
     </div>
 
@@ -193,6 +317,29 @@
       console.log('[opciones] status:', msg);
     }
 
+    // ========== Actualizar vista previa del color (dot + hex) ==========
+    function updateColorPreview(color) {
+      const dot = document.getElementById('colorDot');
+      const hexText = document.getElementById('colorHexText');
+      if (dot) {
+        dot.style.background = color;
+        dot.style.boxShadow = `0 0 10px ${color}, 0 0 20px ${color}80`;
+      }
+      if (hexText) {
+        hexText.textContent = (color || '#00FFF7').toUpperCase();
+      }
+      const avatarImg = document.getElementById('avatarImg');
+      if (avatarImg) {
+        avatarImg.style.borderColor = color;
+        avatarImg.style.boxShadow = `0 0 20px ${color}80, 0 0 35px ${color}40`;
+      }
+    }
+
+    // Listener del color picker (para actualizar en vivo)
+    document.getElementById('nameColor').addEventListener('input', (e) => {
+      updateColorPreview(e.target.value);
+    });
+
     // ========== Sincronización con estado global (opcional) ==========
     function syncWithGlobalState(user) {
       if (window.ArchinimeState) {
@@ -232,12 +379,13 @@
         newAvatarUrl = user.photoURL || null;
 
         const doc = await db.collection('users').doc(user.uid).get();
+        let color;
         if (doc.exists) {
           const data = doc.data();
           if (data.customColor) {
-            document.getElementById('nameColor').value = data.customColor;
+            color = data.customColor;
           } else {
-            document.getElementById('nameColor').value = getNeonColorByString(user.uid || user.displayName || user.email || 'user');
+            color = getNeonColorByString(user.uid || user.displayName || user.email || 'user');
           }
           if (data.lastProfileUpdate) {
             lastProfileUpdate = data.lastProfileUpdate.toMillis
@@ -246,8 +394,11 @@
           }
           console.log('📅 lastProfileUpdate cargado:', new Date(lastProfileUpdate));
         } else {
-          document.getElementById('nameColor').value = getNeonColorByString(user.uid || user.displayName || user.email || 'user');
+          color = getNeonColorByString(user.uid || user.displayName || user.email || 'user');
         }
+
+        document.getElementById('nameColor').value = color;
+        updateColorPreview(color);
       } catch(e) { 
         console.error("Error obteniendo datos: ", e); 
       }
