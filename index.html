@@ -14,7 +14,7 @@
   <!-- VERSIÓN (forzar limpieza de caché) -->
   <script>
     (function() {
-      const APP_VERSION = "2025-04-10-v24.0-modular";
+      const APP_VERSION = "2025-04-10-v24.1-fix-saveBtn";
       const stored = localStorage.getItem('archinime_app_version');
       if (stored !== APP_VERSION) {
         localStorage.setItem('archinime_app_version', APP_VERSION);
@@ -330,8 +330,8 @@
         <span style="font-size:0.75rem; color:var(--text-secondary);">Elige tu neón</span>
       </div>
     </div>
-    <button class="profile-save-btn" onclick="guardarCambiosPerfil()">GUARDAR CAMBIOS</button>
-    <div id="profileStatusMsg" class="profile-status"></div>
+    <button id="profileSaveBtn" class="profile-save-btn" onclick="guardarCambiosPerfil()">GUARDAR CAMBIOS</button>
+    <div id="profileStatusMsg" class="profile-status" style="min-height:22px; margin-top:12px; text-align:center; font-weight:700; font-size:0.9rem; padding:8px 10px; border-radius:8px; transition:0.3s; word-break:break-word;"></div>
   </div>
 </div>
 
@@ -386,7 +386,8 @@
 </div>
 
 <!-- ===== SCRIPTS ===== -->
-<script src="js/core/app-core.js?v=2025-04-10-v24.0-modular"></script>
+<!-- app-core.js PRIMERO: contiene Firebase, auth, perfil, etc. -->
+<script src="js/core/app-core.js?v=2025-04-10-v24.1-fix-saveBtn"></script>
 <script src="data/catalogo.js?v=2025-04-10-v24.0-modular"></script>
 <script src="js/utils/animaciones.js"></script>
 <script src="js/utils/musica_fondo.js"></script>
@@ -567,6 +568,7 @@
     }
   };
 
+  // Listener específico para cargar stickers del usuario
   auth.onAuthStateChanged(user => {
     if (user) loadUserStickers();
     else { userStickersCollection = []; renderUserStickers(); }
@@ -642,6 +644,7 @@
     }
   };
 
+  // Expuesto para que app-core.js lo pueda llamar desde updateUserUI
   window.actualizarEstadoChatPanel = function() {
     const user = auth.currentUser;
     const inputArea = document.getElementById('chatInputArea');
@@ -1518,49 +1521,56 @@
   window.openDetail = openDetail;
   window.closeDetailModal = closeDetailModal;
 
-  // ===== EVENTOS (MODAL) - VERSIÓN DEFENSIVA =====
+  // ===== EVENTOS (MODAL) - VERSIÓN DEFENSIVA con reintentos =====
   let eventQueue = [];
   let isEventModalShowing = false;
 
   function showNextEvent() {
     if (eventQueue.length === 0 || isEventModalShowing) return;
 
-    // Cachear y validar TODOS los elementos
-    const els = {
-      modal:      document.getElementById('eventModal'),
-      bg:         document.getElementById('eventBg'),
-      coverBack:  document.getElementById('eventCoverBack'),
-      coverFront: document.getElementById('eventCoverFront'),
-      title:      document.getElementById('eventTitle'),
-      meta:       document.getElementById('eventMeta'),
-      desc:       document.getElementById('eventDesc'),
-      badge:      document.getElementById('eventBadge'),
-      btn:        document.getElementById('eventBtn')
+    const ids = ['eventModal','eventBg','eventCoverBack','eventCoverFront',
+                 'eventTitle','eventMeta','eventDesc','eventBadge','eventBtn'];
+    const getEls = () => {
+      const o = {};
+      ids.forEach(id => o[id] = document.getElementById(id));
+      return o;
     };
 
-    const missing = Object.entries(els).filter(([, el]) => !el).map(([k]) => k);
+    let els = getEls();
+    let missing = ids.filter(id => !els[id]);
+
+    // Si faltan elementos, reintentar hasta 5 veces (por si el DOM se está re-renderizando)
     if (missing.length) {
-      console.warn('⚠️ showNextEvent: faltan elementos →', missing);
-      isEventModalShowing = false;
+      if (!showNextEvent._retries) showNextEvent._retries = 0;
+      showNextEvent._retries++;
+      if (showNextEvent._retries <= 5) {
+        console.warn(`⏳ showNextEvent: faltan [${missing.join(', ')}], reintento ${showNextEvent._retries}/5`);
+        setTimeout(showNextEvent, 300);
+        return;
+      }
+      console.error('❌ showNextEvent: los elementos del modal NO aparecen. Causa probable: Service Worker sirviendo HTML antiguo. Desregístralo desde DevTools → Application → Service Workers.');
       eventQueue = [];
+      isEventModalShowing = false;
+      showNextEvent._retries = 0;
       return;
     }
+    showNextEvent._retries = 0;
 
     isEventModalShowing = true;
     const eventData = eventQueue.shift();
 
     try {
-      els.bg.style.backgroundImage = `url(${eventData.img || 'assets/img/placeholder.webp'})`;
-      els.coverBack.src  = eventData.img || 'assets/img/placeholder.webp';
-      els.coverFront.src = eventData.img || 'assets/img/placeholder.webp';
-      els.title.textContent = eventData.title || 'Nuevo Anime';
-      els.meta.textContent  = `⭐ ${getDisplayRating(eventData)} · ${eventData.genres?.slice(0,2).join(', ') || 'Anime'}`;
-      els.desc.textContent  = eventData.desc || 'Descripción no disponible.';
-      els.badge.textContent = eventData.updateType || '🔥 NUEVO';
-      els.btn.onclick = function() {
+      els.eventBg.style.backgroundImage = `url(${eventData.img || 'assets/img/placeholder.webp'})`;
+      els.eventCoverBack.src  = eventData.img || 'assets/img/placeholder.webp';
+      els.eventCoverFront.src = eventData.img || 'assets/img/placeholder.webp';
+      els.eventTitle.textContent = eventData.title || 'Nuevo Anime';
+      els.eventMeta.textContent  = `⭐ ${getDisplayRating(eventData)} · ${eventData.genres?.slice(0,2).join(', ') || 'Anime'}`;
+      els.eventDesc.textContent  = eventData.desc || 'Descripción no disponible.';
+      els.eventBadge.textContent = eventData.updateType || '🔥 NUEVO';
+      els.eventBtn.onclick = function() {
         window.location.href = `pages/anime-detail.html?id=${eventData.id}`;
       };
-      els.modal.classList.add('show');
+      els.eventModal.classList.add('show');
       disableBodyScroll();
 
       if (window.eventTimeout) clearTimeout(window.eventTimeout);
