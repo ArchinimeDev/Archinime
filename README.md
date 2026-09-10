@@ -150,7 +150,7 @@ Todo está construido con **JavaScript puro + Firebase**, sin frameworks pesados
 
 <div align="center">
 
-<img src="https://cdn.jsdelivr.net/gh/Archinime/Banners@main/banners.gif" alt="Archinime Preview" width="100%" />
+<img src="https://raw.githubusercontent.com/Archinime/Banners/main/banners.gif" alt="Archinime Preview" width="100%" />
 
 <br>
 
@@ -182,24 +182,39 @@ Todo está construido con **JavaScript puro + Firebase**, sin frameworks pesados
 
 ---
 
+### 📺 Reproductor de Video
+
+<div align="center">
+  <img src="https://cdn.jsdelivr.net/gh/Archinime/Banners@main/video.png" alt="Reproductor de video" width="100%" />
+</div>
+
+> El **reproductor multipropósito** con:
+> - Selector de **múltiples servidores** (Drive, Dropbox, PixelDrain, etc.)
+> - **Bloqueador de logo** para evitar redirecciones
+> - **Navegación entre episodios** (anterior / siguiente)
+> - Sección completa de **comentarios con reacciones** y **stickers**
+> - Botón de **descarga** con barra de progreso
+
+---
+
 ### ⚡ Módulos Interactivos
 
 <div align="center">
 
 <table>
 <tr>
-<td width="50%" align="center">
+<td width="33%" align="center">
 
-**🔔 Sistema de Notificaciones**
+**🔔 Notificaciones**
 
 <a href="https://cdn.jsdelivr.net/gh/Archinime/Banners@main/notificaciones.png" target="_blank">
   <img src="https://cdn.jsdelivr.net/gh/Archinime/Banners@main/notificaciones.png" alt="Sistema de notificaciones" width="100%" />
 </a>
 
-<sub>Cola de popups, badge dinámico, historial persistente y sincronización con Firestore.</sub>
+<sub>Cola de popups, badge dinámico e historial persistente.</sub>
 
 </td>
-<td width="50%" align="center">
+<td width="33%" align="center">
 
 **💬 Chat Global**
 
@@ -207,12 +222,10 @@ Todo está construido con **JavaScript puro + Firebase**, sin frameworks pesados
   <img src="https://cdn.jsdelivr.net/gh/Archinime/Banners@main/chat.png" alt="Chat global" width="100%" />
 </a>
 
-<sub>Mensajes en tiempo real, stickers personalizables y colores neón por usuario.</sub>
+<sub>Mensajes en tiempo real, stickers y colores neón.</sub>
 
 </td>
-</tr>
-<tr>
-<td width="50%" align="center">
+<td width="33%" align="center">
 
 **🎥 Detalle del Anime**
 
@@ -220,18 +233,7 @@ Todo está construido con **JavaScript puro + Firebase**, sin frameworks pesados
   <img src="https://cdn.jsdelivr.net/gh/Archinime/Banners@main/detalle.png" alt="Detalle del anime" width="100%" />
 </a>
 
-<sub>Votación por estrellas, temporadas, OVAs, películas y recomendaciones.</sub>
-
-</td>
-<td width="50%" align="center">
-
-**📺 Reproductor de Video**
-
-<a href="https://cdn.jsdelivr.net/gh/Archinime/Banners@main/video.png" target="_blank">
-  <img src="https://cdn.jsdelivr.net/gh/Archinime/Banners@main/video.png" alt="Reproductor de video" width="100%" />
-</a>
-
-<sub>Multi-servidor, comentarios, reacciones y descarga con barra de progreso.</sub>
+<sub>Votos, temporadas, OVAs, películas y recomendaciones.</sub>
 
 </td>
 </tr>
