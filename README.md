@@ -754,20 +754,24 @@ El proyecto usa reglas **granulares** con validación de tipos, tamaños y propi
 
 <div align="center">
 
-<img src="https://github-readme-stats.vercel.app/api?username=ArchinimeDev&show_icons=true&theme=radical&hide_border=true&bg_color=0D1117&title_color=00F0FF&icon_color=b114ff&text_color=FFFFFF&border_radius=15" alt="Estadísticas de ArchinimeDev" width="100%" style="max-width: 500px;" />
+<!-- Estadísticas principales (usando github-stats-extended, más estable) -->
+<img src="https://github-stats-extended.vercel.app/api?username=ArchinimeDev&show_icons=true&theme=radical&hide_border=true&bg_color=0D1117&title_color=00F0FF&icon_color=b114ff&text_color=FFFFFF" alt="Estadísticas de ArchinimeDev" width="100%" style="max-width: 500px;" />
 
 <br><br>
 
+<!-- GIFs de estadísticas y lenguajes, igualados al 48% cada uno -->
 <img src="https://cdn.jsdelivr.net/gh/Archinime/Banners@main/estadisticas.gif" alt="Estadísticas" width="48%" />
 <img src="https://cdn.jsdelivr.net/gh/Archinime/Banners@main/lenguaje.gif" alt="Lenguajes" width="48%" />
 
 <br><br>
 
-<img src="https://github-readme-streak-stats.herokuapp.com/?user=ArchinimeDev&theme=radical&hide_border=true&background=0D1117&stroke=00F0FF&ring=b114ff&fire=ff1a6b&border_radius=15" alt="Racha de ArchinimeDev" width="100%" style="max-width: 800px;" />
+<!-- Racha de contribuciones, usando el servicio con vercel.app (más estable que herokuapp) -->
+<img src="https://github-readme-streak-stats.vercel.app/?user=ArchinimeDev&theme=radical&hide_border=true&background=0D1117&stroke=00F0FF&ring=b114ff&fire=ff1a6b" alt="Racha de ArchinimeDev" width="100%" style="max-width: 800px;" />
 
 <br><br>
 
-<img src="https://github-profile-trophy.vercel.app/?username=ArchinimeDev&theme=radical&no-frame=true&no-bg=true&column=7&margin-w=10" alt="Trofeos" width="100%" />
+<!-- Trofeos usando un fork activo y mantenido (HarshKuro) -->
+<img src="https://github-profile-trophy-fork-two.vercel.app/?username=ArchinimeDev&theme=radical&no-frame=true&no-bg=true&column=7&margin-w=10" alt="Trofeos" width="100%" />
 
 </div>
 
@@ -899,9 +903,10 @@ Consulta el archivo [LICENSE](LICENSE) para más detalles.
 
 <div align="center">
 
-<img src="https://cdn.jsdelivr.net/gh/Archinime/Banners@main/Logo_Archinime.png" alt="Avatar" width="130" style="border-radius: 50%;" />
+<!-- Avatar con tamaño reducido y sin espacios extra -->
+<img src="https://cdn.jsdelivr.net/gh/Archinime/Banners@main/Logo_Archinime.png" alt="Avatar" width="100" height="100" style="border-radius: 50%;" />
 
-<br><br>
+<br>
 
 ### **ArchinimeDev**
 
