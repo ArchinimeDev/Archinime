@@ -1,16 +1,12 @@
 /* ============================================================
    sw.js - Archinime OS Service Worker
-   Estrategia híbrida con control absoluto sobre catalogo.js
-   MEJORADO: Caché más inteligente, actualizaciones en caliente
-   ACTUALIZADO: Rutas a la nueva estructura de carpetas
-   v103 - Fix: bump versión para forzar actualización
+   v104 - Fix: bump versión + no-store en HTML + sin precache de opciones.html
    ============================================================ */
 
-const CACHE_STATIC = 'archinime-static-v104';
-const CACHE_DYNAMIC = 'archinime-dynamic-v104';
-const CACHE_IMAGES = 'archinime-images-v104';
-const CACHE_FONTS = 'archinime-fonts-v104';
-
+const CACHE_STATIC = 'archinime-static-v105';
+const CACHE_DYNAMIC = 'archinime-dynamic-v105';
+const CACHE_IMAGES = 'archinime-images-v105';
+const CACHE_FONTS = 'archinime-fonts-v105';
 
 const STATIC_ASSETS = [
   '/',
@@ -25,9 +21,8 @@ const STATIC_ASSETS = [
   '/assets/gifs/naruto.gif'
 ];
 
-// Instalación
 self.addEventListener('install', event => {
-  console.log('[SW] Instalando v103...');
+  console.log('[SW] Instalando v104...');
   self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_STATIC).then(cache => {
@@ -37,9 +32,8 @@ self.addEventListener('install', event => {
   );
 });
 
-// Activación
 self.addEventListener('activate', event => {
-  console.log('[SW] Activando v103...');
+  console.log('[SW] Activando v104...');
   const currentCaches = [CACHE_STATIC, CACHE_DYNAMIC, CACHE_IMAGES, CACHE_FONTS];
   event.waitUntil(
     caches.keys().then(cacheNames => {
@@ -55,13 +49,12 @@ self.addEventListener('activate', event => {
   );
 });
 
-// Fetch
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
   const request = event.request;
   if (request.method !== 'GET') return;
 
-  // Catálogo siempre fresco (nueva ruta)
+  // Catálogo siempre fresco
   if (url.pathname.endsWith('/data/catalogo.js')) {
     event.respondWith(
       fetch(request, { cache: 'no-cache' })
@@ -75,13 +68,11 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // ===== HTML CRÍTICO: SIEMPRE RED PRIMERO, SIN CACHÉ =====
-  // Esto incluye opciones.html, anime-detail.html, etc.
+  // HTML -> SIEMPRE RED, sin caché
   if (request.destination === 'document' || url.pathname.endsWith('.html') || url.pathname === '/') {
     event.respondWith(
       fetch(request, { cache: 'no-store' })
         .then(response => {
-          // Guardamos copia fresca por si se cae la red
           const clone = response.clone();
           caches.open(CACHE_DYNAMIC).then(cache => cache.put(request, clone));
           return response;
@@ -109,7 +100,6 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // Resto -> network-first
   event.respondWith(networkFirst(request));
 });
 
@@ -150,7 +140,6 @@ function getCacheNameForRequest(request) {
   return CACHE_DYNAMIC;
 }
 
-// Push
 self.addEventListener('push', event => {
   let data = { title: 'Archinime', body: 'Nueva actualización', icon: '/assets/img/Logo_Archinime.png' };
   if (event.data) {
