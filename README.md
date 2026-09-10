@@ -785,7 +785,7 @@ El proyecto usa reglas **granulares** con validación de tipos, tamaños y propi
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/ArchinimeDev/Archinime/output/github-snake-dark.svg" />
     <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/ArchinimeDev/Archinime/output/github-snake.svg" />
-    <img alt="Snake animation" src="https://raw.githubusercontent.com/ArchinimeDev/Archinime/output/github-snake.svg" width="100%" />
+    <img alt="Snake animation" src="https://raw.githubusercontent.com/platane/snk/output/github-contribution-grid-snake.svg" width="100%" />
   </picture>
 </div>
 
