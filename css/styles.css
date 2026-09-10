@@ -211,8 +211,8 @@ body {
   top: 0;
   z-index: 1000;
   background: rgba(5, 7, 10, 0.85);
-  backdrop-filter: blur(20px) saturate(1.5);
-  -webkit-backdrop-filter: blur(20px) saturate(1.5);
+  backdrop-filter: blur(8px) saturate(1.4);
+  -webkit-backdrop-filter: blur(8px) saturate(1.4);
   padding: 0 3%;
   height: 68px;
   display: grid;
@@ -326,7 +326,7 @@ body {
   left: 0;
   width: 100%;
   background: rgba(11, 14, 20, 0.98);
-  backdrop-filter: blur(20px);
+  backdrop-filter: blur(8px);
   border: 1px solid rgba(0, 240, 255, 0.15);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-heavy);
@@ -451,8 +451,8 @@ body {
   top: 52px;
   right: 0;
   background: rgba(11, 14, 20, 0.98);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   border: 1px solid rgba(255,255,255,0.05);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-heavy);
@@ -629,7 +629,7 @@ body {
 .banner-slide.active { opacity: 1; }
 .banner-slide .banner-info {
   background: rgba(5, 7, 10, 0.7);
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(6px);
   padding: 16px 24px;
   border-radius: var(--radius-md);
   border-left: 4px solid var(--neon-blue);
@@ -723,7 +723,7 @@ body {
   flex-wrap: wrap;
   justify-content: center;
   background: rgba(5, 7, 10, 0.4);
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(6px);
   border-bottom: 1px solid rgba(255,255,255,0.03);
   margin-bottom: 4px;
 }
@@ -765,7 +765,7 @@ body {
 .custom-select-dropdown {
   position: absolute;
   background: rgba(11, 14, 20, 0.98);
-  backdrop-filter: blur(20px);
+  backdrop-filter: blur(8px);
   border: 1px solid rgba(255,255,255,0.05);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-heavy);
@@ -793,7 +793,7 @@ body {
   position: fixed;
   inset: 0;
   background: rgba(5, 7, 10, 0.85);
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(6px);
   z-index: 10001;
   display: flex;
   align-items: center;
@@ -1022,7 +1022,7 @@ body {
   background: rgba(11, 14, 20, 0.6);
   border: 1px solid rgba(255,255,255,0.04);
   border-radius: var(--radius-xl);
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(6px);
   text-align: center;
 }
 .cyber-no-results i { font-size: 3rem; color: var(--neon-blue); margin-bottom: 16px; }
@@ -1087,7 +1087,7 @@ body {
   position: fixed;
   inset: 0;
   background: rgba(5, 7, 10, 0.9);
-  backdrop-filter: blur(24px);
+  backdrop-filter: blur(10px);
   z-index: 10001;
   display: flex;
   justify-content: center;
@@ -1440,8 +1440,8 @@ body {
   width: 100%;
   height: 100%;
   background: rgba(0,0,0,0.92);
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   z-index: 99999;
   display: flex;
   justify-content: center;
@@ -1611,7 +1611,7 @@ body {
   max-width: 90vw;
   height: 100%;
   background: rgba(11, 14, 20, 0.98);
-  backdrop-filter: blur(30px);
+  backdrop-filter: blur(12px);
   border-left: 1px solid rgba(0, 240, 255, 0.05);
   box-shadow: -10px 0 40px rgba(0,0,0,0.6);
   z-index: 9999;
