@@ -1,6 +1,7 @@
 // app-core.js
 // Inicialización central de Firebase y estado del usuario
 // ACTUALIZADO: Single source of truth para Firebase + Auth + Profile
+// v24.2 - Fix: botón "Opciones" redirige a opciones.html en vez de abrir modal interno
 // v24.1 - Fix: null checks, cooldown robusto, photoURL opcional, statusMsg visible
 
 // ========== CONFIGURACIÓN DE FIREBASE ==========
@@ -80,6 +81,16 @@ function setProfileStatus(msg, color) {
     el.style.border = 'none';
     el.style.boxShadow = 'none';
   }
+}
+
+// ========== NAVEGACIÓN A OPCIONES ==========
+// Detecta si estamos en la raíz o dentro de /pages/ y redirige correctamente
+function irAOpciones() {
+  const path = window.location.pathname;
+  const inPages = path.includes('/pages/');
+  const target = inPages ? './opciones.html' : 'pages/opciones.html';
+  console.log('🧭 Navegando a:', target);
+  window.location.href = target;
 }
 
 // ========== UI DEL USUARIO ==========
@@ -205,7 +216,9 @@ function closeAuthModal() {
   if (errEl) errEl.textContent = '';
 }
 
-// ========== MODAL DE PERFIL ==========
+// ========== MODAL DE PERFIL (legacy - se mantiene por compatibilidad) ==========
+// Ya no se usa desde el botón "Opciones" del dropdown, pero se conserva
+// por si algún otro lugar del código lo invoca.
 function showProfileModal() {
   if (!currentUser) {
     showAuthModal();
@@ -401,7 +414,7 @@ function setupAuthUI() {
     });
   });
 
-  // Avatar en el modal de perfil
+  // Avatar en el modal de perfil (legacy)
   const avatarInput = document.getElementById('profileAvatarInput');
   if (avatarInput) {
     avatarInput.addEventListener('change', async (e) => {
@@ -433,12 +446,28 @@ function setupAuthUI() {
     });
   }
 
-  // Click en el header del dropdown para abrir perfil
+  // ============ FIX PRINCIPAL v24.2 ============
+  // Click en el header del dropdown "Opciones" → NAVEGA a opciones.html
+  // (antes abría el modal feo interno de index.html)
   const profileDropdownBtn = document.getElementById('profileDropdownBtn');
   if (profileDropdownBtn) {
     profileDropdownBtn.addEventListener('click', (e) => {
       e.stopPropagation();
-      showProfileModal();
+
+      // Si no hay sesión, mostrar login en vez de navegar
+      if (!auth.currentUser) {
+        showAuthModal();
+        const errEl = document.getElementById('authError');
+        if (errEl) errEl.textContent = "⚠️ Inicia sesión para configurar tu cuenta.";
+        return;
+      }
+
+      // Cerrar el dropdown por si acaso
+      const dropdown = document.getElementById('userDropdown');
+      if (dropdown) dropdown.classList.remove('active');
+
+      // Navegar a opciones.html
+      irAOpciones();
     });
   }
 
@@ -481,5 +510,6 @@ window.guardarCambiosPerfil = guardarCambiosPerfil;
 window.getNeonColor = getNeonColor;
 window.disableBodyScroll = disableBodyScroll;
 window.enableBodyScroll = enableBodyScroll;
+window.irAOpciones = irAOpciones;
 
-console.log('✅ app-core.js cargado correctamente (v24.1)');
+console.log('✅ app-core.js cargado correctamente (v24.2)');
