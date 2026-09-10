@@ -34,16 +34,20 @@
       justify-content: center;
       align-items: center;
       padding: 20px;
+      overflow-x: hidden;
     }
     .options-container {
       background: var(--glass-bg);
       border: 1px solid var(--accent-color);
       border-radius: 20px;
       padding: 40px;
-      width: 100%;
-      max-width: 500px;
+      /* ANCHO FIJO — no depende del contenido */
+      width: 500px;
+      max-width: 100%;
       box-shadow: 0 15px 50px rgba(0,0,0,0.9), 0 0 20px rgba(188, 19, 254, 0.2);
       backdrop-filter: blur(15px);
+      /* evita que el contenido lo estire */
+      overflow: hidden;
     }
     .back-btn {
       display: inline-flex;
@@ -94,20 +98,23 @@
       border-radius: 16px;
       background: linear-gradient(135deg, rgba(0,255,247,0.04), rgba(188,19,254,0.06));
       border: 1px solid rgba(188, 19, 254, 0.25);
-      transition: 0.3s;
+      transition: border-color 0.3s, box-shadow 0.3s;
+      /* Evita que el contenido estire el wrapper */
+      overflow: hidden;
     }
     .color-picker-wrapper:hover {
       border-color: rgba(0, 255, 247, 0.45);
       box-shadow: 0 0 22px rgba(0, 255, 247, 0.08);
     }
 
-    /* Círculo sólido — SIN icono dentro, solo el color puro */
+    /* Círculo sólido — tamaño fijo, no crece */
     .color-circle {
       position: relative;
       width: 62px;
       height: 62px;
-      aspect-ratio: 1 / 1;
+      min-width: 62px;
       flex-shrink: 0;
+      aspect-ratio: 1 / 1;
       border-radius: 50%;
       background: #00fff7;
       cursor: default;
@@ -132,8 +139,10 @@
       display: flex;
       flex-direction: column;
       gap: 6px;
-      flex: 1;
+      flex: 1 1 0;
+      /* CLAVE: evita que el contenido empuje el layout */
       min-width: 0;
+      overflow: hidden;
     }
     .color-title {
       font-family: 'Orbitron', sans-serif;
@@ -146,6 +155,7 @@
       display: flex;
       align-items: center;
       gap: 6px;
+      white-space: nowrap;
     }
     .color-subtitle {
       font-size: 0.75rem;
@@ -153,23 +163,26 @@
       line-height: 1.35;
     }
 
-    /* Fila de presets + chip HEX */
+    /* Fila de presets + chip HEX — layout fijo */
     .color-bottom-row {
       display: flex;
       align-items: center;
       gap: 10px;
-      flex-wrap: wrap;
       margin-top: 2px;
+      /* No permitas que el contenido cambie el ancho */
+      overflow: hidden;
     }
 
     /* Chips de colores preestablecidos */
     .color-presets {
       display: flex;
       gap: 6px;
+      flex-shrink: 0;
     }
     .preset-dot {
       width: 18px;
       height: 18px;
+      min-width: 18px;
       border-radius: 50%;
       cursor: pointer;
       border: 2px solid rgba(255,255,255,0.15);
@@ -187,10 +200,11 @@
       box-shadow: 0 0 12px currentColor, 0 0 0 2px rgba(255,255,255,0.3);
     }
 
-    /* Chip HEX */
+    /* Chip HEX — ANCHO FIJO para que no cambie con el contenido */
     .color-hex {
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       gap: 6px;
       font-family: 'Orbitron', monospace;
       font-size: 0.7rem;
@@ -202,15 +216,29 @@
       border: 1px solid rgba(255,255,255,0.12);
       letter-spacing: 1px;
       transition: 0.3s;
+      /* ANCHO FIJO — esto soluciona el problema */
+      width: 96px;
+      min-width: 96px;
+      flex-shrink: 0;
       margin-left: auto;
+      font-variant-numeric: tabular-nums;
+      font-feature-settings: "tnum";
     }
     .color-hex .dot {
       width: 6px;
       height: 6px;
+      min-width: 6px;
       border-radius: 50%;
       background: var(--primary-color);
       box-shadow: 0 0 8px var(--primary-color);
       transition: 0.3s;
+    }
+    #colorHexText {
+      /* Ancho fijo para el texto del código */
+      display: inline-block;
+      width: 60px;
+      text-align: center;
+      white-space: nowrap;
     }
 
     /* Paleta nativa visible */
@@ -223,6 +251,7 @@
       border-radius: 12px;
       background: rgba(0,0,0,0.35);
       border: 1px solid rgba(255,255,255,0.08);
+      overflow: hidden;
     }
     .native-picker-row label {
       font-size: 0.75rem;
@@ -233,12 +262,15 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
     .native-picker-row input[type="color"].native-picker {
       -webkit-appearance: none;
       -moz-appearance: none;
       appearance: none;
       width: 46px;
+      min-width: 46px;
       height: 34px;
       border: none;
       border-radius: 8px;
@@ -246,6 +278,7 @@
       background: none;
       padding: 0;
       overflow: hidden;
+      flex-shrink: 0;
     }
     .native-picker-row input[type="color"].native-picker::-webkit-color-swatch-wrapper { padding: 0; border-radius: 8px; }
     .native-picker-row input[type="color"].native-picker::-webkit-color-swatch {
@@ -260,6 +293,7 @@
       font-size: 0.72rem;
       color: #888;
       margin-left: auto;
+      white-space: nowrap;
     }
 
     .save-btn {
@@ -289,11 +323,13 @@
 
     @media (max-width: 420px) {
       .options-container { padding: 26px 20px; }
-      .color-circle { width: 54px; height: 54px; }
+      .color-circle { width: 54px; height: 54px; min-width: 54px; }
       .color-picker-wrapper { gap: 14px; padding: 14px; }
       .color-title { font-size: 0.68rem; }
       .color-subtitle { font-size: 0.7rem; }
-      .preset-dot { width: 16px; height: 16px; }
+      .preset-dot { width: 16px; height: 16px; min-width: 16px; }
+      .color-hex { width: 88px; min-width: 88px; }
+      #colorHexText { width: 54px; }
       .native-picker-hint { display: none; }
     }
   </style>
@@ -374,7 +410,6 @@
     let lastProfileUpdate = 0;
     let userReady = false;
 
-    // Paleta de presets neón
     const PRESET_COLORS = ['#00fff7', '#bc13fe', '#ff0055', '#00ff33', '#ffaa00', '#00aaff'];
 
     function getNeonColorByString(str) {
@@ -384,7 +419,6 @@
       return neonColors[Math.abs(hash) % neonColors.length];
     }
 
-    // ========== Helper para mensajes de estado ==========
     function setStatus(msg, color) {
       const statusMsg = document.getElementById('statusMsg');
       statusMsg.style.color = color || '#fff';
@@ -392,7 +426,6 @@
       console.log('[opciones] status:', msg);
     }
 
-    // ========== Crear los preset dots ==========
     function renderPresets(activeColor) {
       const container = document.getElementById('colorPresets');
       if (!container) return;
@@ -414,32 +447,26 @@
       });
     }
 
-    // ========== Actualizar vista previa del color ==========
     function updateColorPreview(color) {
-      // Círculo principal — sólido
       const circle = document.getElementById('colorCircle');
       if (circle) {
         circle.style.background = color;
         circle.style.boxShadow = `0 0 0 3px rgba(255,255,255,0.08), 0 0 18px ${color}, 0 0 32px ${color}`;
       }
-      // Dot del chip
       const dot = document.getElementById('colorDot');
       if (dot) {
         dot.style.background = color;
         dot.style.boxShadow = `0 0 10px ${color}, 0 0 18px ${color}80`;
       }
-      // Texto HEX
       const hexText = document.getElementById('colorHexText');
       if (hexText) {
         hexText.textContent = (color || '#00FFF7').toUpperCase();
       }
-      // Avatar preview
       const avatarImg = document.getElementById('avatarImg');
       if (avatarImg) {
         avatarImg.style.borderColor = color;
         avatarImg.style.boxShadow = `0 0 20px ${color}80, 0 0 35px ${color}40`;
       }
-      // Marcar preset activo
       document.querySelectorAll('.preset-dot').forEach(el => {
         if (el.dataset.color.toLowerCase() === (color || '').toLowerCase()) {
           el.classList.add('active');
@@ -449,7 +476,6 @@
       });
     }
 
-    // Listener del color picker nativo
     document.getElementById('nameColor').addEventListener('input', (e) => {
       updateColorPreview(e.target.value);
     });
@@ -457,10 +483,8 @@
       updateColorPreview(e.target.value);
     });
 
-    // Inicializar presets con el color por defecto
     renderPresets('#00fff7');
 
-    // ========== Sincronización con estado global ==========
     function syncWithGlobalState(user) {
       if (window.ArchinimeState) {
         ArchinimeState.set('currentUser', user);
@@ -476,7 +500,6 @@
       }
     }
 
-    // ========== FUENTE DE VERDAD: auth.onAuthStateChanged ==========
     auth.onAuthStateChanged(async (user) => {
       if (user) {
         currentUser = user;
