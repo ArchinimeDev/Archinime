@@ -150,20 +150,97 @@ Todo está construido con **JavaScript puro + Firebase**, sin frameworks pesados
 
 <div align="center">
 
-### 🖥️ Vista Principal
-<img src="https://cdn.jsdelivr.net/gh/Archinime/Banners@main/4.gif" alt="Vista principal" width="90%" />
-
-<br><br>
-
-### 🏠 Habitación 3D Interactiva (Lunari OS)
-<a href="https://archinime.pages.dev/pages/room.html" target="_blank">
-  <img src="https://img.shields.io/badge/🌐_EXPLORAR-HABITACIÓN_3D-00F0FF?style=for-the-badge&logo=three.js&logoColor=white" />
-</a>
-
-> Entorno 3D inmersivo construido con **Three.js** y modelos de **Blender**.  
-> Incluye controles de TV, PC, sistema de clima sincronizado en tiempo real según tu ubicación, e inventario interactivo.
+> 📸 Un recorrido visual por la interfaz de **Archinime** — desde la portada hasta el reproductor.
 
 </div>
+
+### 🏠 Pantalla de Inicio
+
+<div align="center">
+  <a href="https://archinime.pages.dev/" target="_blank">
+    <img src="https://cdn.jsdelivr.net/gh/Archinime/Banners@main/inicio.png" alt="Pantalla de inicio de Archinime" width="90%" />
+  </a>
+</div>
+
+> La pantalla principal con el **banner carrusel**, la **barra de búsqueda con sugerencias en vivo**, el **grid de animes** y todos los **filtros de género, demografía y ranking** en la parte superior.
+
+<br>
+
+### 📚 Catálogo de Animes
+
+<div align="center">
+  <img src="https://cdn.jsdelivr.net/gh/Archinime/Banners@main/anime.png" alt="Catálogo de animes" width="90%" />
+</div>
+
+> El **grid completo** con +160 animes. Cada tarjeta muestra la portada, el título y la calificación actual en estrellas. Se incluye **paginación** con navegación fluida y **efectos 3D** al pasar el cursor en escritorio.
+
+<br>
+
+### 🔔 Sistema de Notificaciones
+
+<div align="center">
+  <img src="https://cdn.jsdelivr.net/gh/Archinime/Banners@main/notificaciones.png" alt="Sistema de notificaciones" width="90%" />
+</div>
+
+> Panel de **notificaciones inteligentes** con cola de popups, badge dinámico, historial persistente y sincronización con Firestore. Incluye alertas de **nuevos episodios**, **estrenos** y **respuestas a comentarios**.
+
+<br>
+
+### 💬 Chat Global
+
+<div align="center">
+  <img src="https://cdn.jsdelivr.net/gh/Archinime/Banners@main/chat.png" alt="Chat global" width="90%" />
+</div>
+
+> **Chat global en tiempo real** con panel lateral deslizante. Soporta mensajes de texto, **stickers personalizables** (imágenes y videos), colores neón por usuario y eliminación de mensajes propios.
+
+<br>
+
+### 🎥 Detalle del Anime
+
+<div align="center">
+  <img src="https://cdn.jsdelivr.net/gh/Archinime/Banners@main/detalle.png" alt="Detalle del anime" width="90%" />
+</div>
+
+> Vista de **detalle del anime** con portada, sinopsis, géneros, sistema de **votación por estrellas**, lista de **temporadas / OVAs / películas** con episodios marcables como vistos, y sección de **recomendaciones** basadas en el catálogo.
+
+<br>
+
+### 📺 Reproductor de Video
+
+<div align="center">
+  <img src="https://cdn.jsdelivr.net/gh/Archinime/Banners@main/video.png" alt="Reproductor de video" width="90%" />
+</div>
+
+> El **reproductor multipropósito** con:
+> - Selector de **múltiples servidores** (Drive, Dropbox, PixelDrain, etc.)
+> - **Bloqueador de logo** para evitar redirecciones
+> - **Navegación entre episodios** (anterior / siguiente)
+> - Sección completa de **comentarios con reacciones** y **stickers**
+> - Botón de **descarga** con barra de progreso
+
+<br>
+
+### ⚡ Animaciones y Efectos Visuales
+
+<div align="center">
+  <img src="https://cdn.jsdelivr.net/gh/Archinime/Banners@main/animacion.png" alt="Animaciones y efectos" width="90%" />
+</div>
+
+> Los **efectos visuales únicos** de Archinime: partículas interactivas, **chroma key en vivo** con canvas, cursor personalizado con glow, animaciones fluidas de entrada y todos los detalles cyberpunk que hacen única la experiencia.
+
+<br>
+
+### 🏠 Habitación 3D Interactiva (Lunari OS)
+
+<div align="center">
+  <a href="https://archinime.pages.dev/pages/room.html" target="_blank">
+    <img src="https://img.shields.io/badge/🌐_EXPLORAR-HABITACIÓN_3D-00F0FF?style=for-the-badge&logo=three.js&logoColor=white" />
+  </a>
+</div>
+
+> Entorno **3D inmersivo** construido con **Three.js** y modelos de **Blender**.  
+> Incluye controles interactivos de TV y PC, **sistema de clima sincronizado en tiempo real** según tu ubicación, e **inventario interactivo**.
 
 ---
 
