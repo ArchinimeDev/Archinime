@@ -3,7 +3,7 @@
 <!-- ═══════════════════════════════════════════════════════
      BANNER PRINCIPAL
 ═══════════════════════════════════════════════════════ -->
-<img src="https://cdn.jsdelivr.net/gh/Archinime/Banners@main/3.gif" alt="Archinime Banner" width="100%" />
+<img src="https://cdn.jsdelivr.net/gh/Archinime/Banners@main/5.gif" alt="Archinime Banner" width="100%" />
 
 <!-- ═══════════════════════════════════════════════════════
      TÍTULO ANIMADO
@@ -151,7 +151,7 @@ Todo está construido con **JavaScript puro + Firebase**, sin frameworks pesados
 <div align="center">
 
 ### 🖥️ Vista Principal
-<img src="https://cdn.jsdelivr.net/gh/Archinime/Banners@main/3.gif" alt="Vista principal" width="90%" />
+<img src="https://cdn.jsdelivr.net/gh/Archinime/Banners@main/4.gif" alt="Vista principal" width="90%" />
 
 <br><br>
 
@@ -558,7 +558,7 @@ Consulta el archivo [LICENSE](LICENSE) para más detalles.
 
 <br><br>
 
-<img src="https://cdn.jsdelivr.net/gh/Archinime/Banners@main/1.gif" alt="Archinime Footer" width="180" />
+<img src="https://cdn.jsdelivr.net/gh/Archinime/Banners@main/4.gif" alt="Archinime Footer" width="180" />
 
 <br><br>
 
