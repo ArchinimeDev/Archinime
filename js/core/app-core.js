@@ -1,6 +1,7 @@
 // app-core.js
 // Inicialización central de Firebase y estado del usuario
 // ACTUALIZADO: Single source of truth para Firebase + Auth + Profile
+// v24.1 - Fix: null checks, cooldown robusto, photoURL opcional, statusMsg visible
 
 // ========== CONFIGURACIÓN DE FIREBASE ==========
 const firebaseConfig = {
@@ -37,7 +38,7 @@ const CLOUDINARY_PRESET = 'stickers_archinime';
 function getNeonColor(str) {
   const colors = ['#00f0ff','#ff1a6b','#b114ff','#ffd700','#00ff33','#ffaa00'];
   let h = 0;
-  for (let i = 0; i < str.length; i++) h = str.charCodeAt(i) + ((h << 5) - h);
+  for (let i = 0; i < (str || '').length; i++) h = str.charCodeAt(i) + ((h << 5) - h);
   return colors[Math.abs(h) % colors.length];
 }
 
@@ -50,6 +51,35 @@ function disableBodyScroll() {
 function enableBodyScroll() {
   document.body.style.paddingRight = '';
   document.body.classList.remove('modal-open');
+}
+
+// Helper: convierte cualquier formato de timestamp Firestore a ms
+function firestoreTimestampToMs(ts) {
+  if (!ts) return 0;
+  if (typeof ts.toMillis === 'function') return ts.toMillis();
+  if (typeof ts.seconds === 'number') return ts.seconds * 1000;
+  if (typeof ts === 'number') return ts;
+  return 0;
+}
+
+// Helper: muestra el estado en el modal de perfil (con estilo)
+function setProfileStatus(msg, color) {
+  const el = document.getElementById('profileStatusMsg');
+  if (!el) {
+    console.log('[profileStatus]', msg);
+    return;
+  }
+  el.style.color = color || 'var(--neon-blue)';
+  el.textContent = msg;
+  if (msg) {
+    el.style.background = 'rgba(0,0,0,0.5)';
+    el.style.border = `1px solid ${color || 'var(--neon-blue)'}`;
+    el.style.boxShadow = `0 0 15px ${color || 'var(--neon-blue)'}`;
+  } else {
+    el.style.background = 'transparent';
+    el.style.border = 'none';
+    el.style.boxShadow = 'none';
+  }
 }
 
 // ========== UI DEL USUARIO ==========
@@ -66,7 +96,7 @@ function updateUserUI(user) {
     const photo = user.photoURL || 'assets/img/invitado.avif';
     if (avatar) avatar.src = photo;
     if (dAvatar) dAvatar.src = photo;
-    if (dName) dName.textContent = user.displayName || user.email.split('@')[0];
+    if (dName) dName.textContent = user.displayName || (user.email ? user.email.split('@')[0] : 'Usuario');
     if (loginItem) {
       loginItem.innerHTML = '<i class="fas fa-sign-out-alt"></i> Cerrar sesión';
       loginItem.onclick = logoutUser;
@@ -110,8 +140,11 @@ auth.onAuthStateChanged(updateUserUI);
 
 // ========== FUNCIONES DE AUTENTICACIÓN ==========
 async function loginWithEmail() {
-  const email = document.getElementById('loginEmail').value;
-  const pass = document.getElementById('loginPassword').value;
+  const emailEl = document.getElementById('loginEmail');
+  const passEl = document.getElementById('loginPassword');
+  if (!emailEl || !passEl) return;
+  const email = emailEl.value;
+  const pass = passEl.value;
   try {
     await auth.signInWithEmailAndPassword(email, pass);
     closeAuthModal();
@@ -122,18 +155,24 @@ async function loginWithEmail() {
 }
 
 async function registerWithEmail() {
-  const email = document.getElementById('registerEmail').value;
-  const pass = document.getElementById('registerPassword').value;
-  const conf = document.getElementById('registerConfirm').value;
+  const emailEl = document.getElementById('registerEmail');
+  const passEl = document.getElementById('registerPassword');
+  const confEl = document.getElementById('registerConfirm');
+  if (!emailEl || !passEl || !confEl) return;
+  const email = emailEl.value;
+  const pass = passEl.value;
+  const conf = confEl.value;
   if (pass !== conf) {
-    document.getElementById('authError').textContent = 'Las contraseñas no coinciden';
+    const errEl = document.getElementById('authError');
+    if (errEl) errEl.textContent = 'Las contraseñas no coinciden';
     return;
   }
   try {
     await auth.createUserWithEmailAndPassword(email, pass);
     closeAuthModal();
   } catch (e) {
-    document.getElementById('authError').textContent = e.message;
+    const errEl = document.getElementById('authError');
+    if (errEl) errEl.textContent = e.message;
   }
 }
 
@@ -142,7 +181,8 @@ async function loginWithGoogle() {
     await auth.signInWithPopup(providerGoogle);
     closeAuthModal();
   } catch (e) {
-    document.getElementById('authError').textContent = e.message;
+    const errEl = document.getElementById('authError');
+    if (errEl) errEl.textContent = e.message;
   }
 }
 
@@ -175,19 +215,24 @@ function showProfileModal() {
   }
   const avatar = document.getElementById('profileAvatar');
   if (avatar) avatar.src = currentUser.photoURL || 'assets/img/invitado.avif';
-  newAvatarUrl = currentUser.photoURL;
+  newAvatarUrl = currentUser.photoURL || null;
   const uidInput = document.getElementById('profileUid');
   if (uidInput) uidInput.value = currentUser.uid;
   const nameInput = document.getElementById('profileDisplayName');
-  if (nameInput) nameInput.value = currentUser.displayName || currentUser.email.split('@')[0];
-  
+  if (nameInput) nameInput.value = currentUser.displayName || (currentUser.email ? currentUser.email.split('@')[0] : 'Usuario');
+
   db.collection('users').doc(currentUser.uid).get().then(doc => {
     const color = doc.exists && doc.data().customColor ? doc.data().customColor : getNeonColor(currentUser.uid);
     const colorInput = document.getElementById('profileNameColor');
     if (colorInput) colorInput.value = color;
-    if (doc.exists && doc.data().lastProfileUpdate) lastProfileUpdate = doc.data().lastProfileUpdate.toMillis();
+    if (doc.exists && doc.data().lastProfileUpdate) {
+      lastProfileUpdate = firestoreTimestampToMs(doc.data().lastProfileUpdate);
+      console.log('📅 lastProfileUpdate:', new Date(lastProfileUpdate));
+    } else {
+      lastProfileUpdate = 0;
+    }
   }).catch(console.error);
-  
+
   const modal = document.getElementById('profileModal');
   if (modal) modal.classList.add('show');
   disableBodyScroll();
@@ -197,64 +242,109 @@ function closeProfileModal() {
   const modal = document.getElementById('profileModal');
   if (modal) modal.classList.remove('show');
   enableBodyScroll();
+  setProfileStatus('');
 }
 
 function copiarUID() {
-  const uid = document.getElementById('profileUid').value;
+  const uidEl = document.getElementById('profileUid');
+  if (!uidEl) return;
+  const uid = uidEl.value;
   if (!uid) return;
-  navigator.clipboard.writeText(uid);
-  const msg = document.getElementById('profileStatusMsg');
-  if (!msg) return;
-  msg.style.color = 'var(--neon-blue)';
-  msg.textContent = '¡ID copiado!';
-  setTimeout(() => {
-    if (msg.textContent.includes('copiado')) msg.textContent = '';
-  }, 3000);
+  navigator.clipboard.writeText(uid).then(() => {
+    setProfileStatus('¡ID copiado!', 'var(--neon-blue)');
+    setTimeout(() => {
+      const msg = document.getElementById('profileStatusMsg');
+      if (msg && msg.textContent.includes('copiado')) setProfileStatus('');
+    }, 3000);
+  }).catch(() => {
+    setProfileStatus('No se pudo copiar el ID.', 'var(--neon-pink)');
+  });
 }
 
 async function guardarCambiosPerfil() {
-  if (!currentUser) return;
-  const btn = document.getElementById('profileSaveBtn');
-  const msg = document.getElementById('profileStatusMsg');
-  const name = document.getElementById('profileDisplayName').value.trim();
-  const color = document.getElementById('profileNameColor').value;
-  
-  if (!name) {
-    msg.style.color = 'var(--neon-pink)';
-    msg.textContent = 'El nombre no puede estar vacío.';
+  console.log('🟡 guardarCambiosPerfil invocado');
+
+  // ===== 1. Validaciones con null checks =====
+  if (!currentUser) {
+    console.warn('guardarCambiosPerfil: currentUser es null');
+    setProfileStatus('⚠️ No hay sesión activa.', 'var(--neon-pink)');
     return;
   }
 
+  const btn = document.getElementById('profileSaveBtn');
+  const nameInput = document.getElementById('profileDisplayName');
+  const colorInput = document.getElementById('profileNameColor');
+
+  if (!nameInput || !colorInput) {
+    console.error('❌ Faltan inputs del perfil (profileDisplayName / profileNameColor)');
+    setProfileStatus('Error: campos del formulario no encontrados.', 'var(--neon-pink)');
+    return;
+  }
+
+  const name = nameInput.value.trim();
+  const color = colorInput.value;
+
+  if (!name) {
+    setProfileStatus('El nombre no puede estar vacío.', 'var(--neon-pink)');
+    return;
+  }
+
+  // ===== 2. Cooldown de 5 días =====
   const isAdmin = currentUser.email === 'archinime12@gmail.com';
   const now = Date.now();
   const fiveDays = 5 * 24 * 60 * 60 * 1000;
   if (!isAdmin && lastProfileUpdate > 0 && (now - lastProfileUpdate < fiveDays)) {
     const days = Math.ceil((fiveDays - (now - lastProfileUpdate)) / (1000 * 60 * 60 * 24));
-    msg.style.color = 'var(--neon-pink)';
-    msg.textContent = `⏳ Espera ${days} días para cambiar de nuevo.`;
+    setProfileStatus(`⏳ Espera ${days} día(s) para cambiar de nuevo.`, 'var(--neon-pink)');
+    console.warn('⏳ Cooldown activo. Última actualización:', new Date(lastProfileUpdate));
     return;
   }
 
-  btn.disabled = true;
-  btn.textContent = 'GUARDANDO...';
-  msg.textContent = '';
+  // ===== 3. Bloquear botón (con null check) =====
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = 'GUARDANDO...';
+  }
+  setProfileStatus('Guardando cambios...', 'var(--neon-blue)');
 
   try {
-    await currentUser.updateProfile({ displayName: name, photoURL: newAvatarUrl });
+    // ===== 4. Actualizar Firebase Auth (photoURL solo si es válido) =====
+    const profileUpdates = { displayName: name };
+    if (newAvatarUrl && typeof newAvatarUrl === 'string' && newAvatarUrl.startsWith('http')) {
+      profileUpdates.photoURL = newAvatarUrl;
+    }
+    console.log('📝 profileUpdates:', profileUpdates);
+    await currentUser.updateProfile(profileUpdates);
+    console.log('✅ updateProfile OK');
+
+    // ===== 5. Guardar en Firestore =====
     await db.collection('users').doc(currentUser.uid).set({
       customColor: color,
       lastProfileUpdate: firebase.firestore.FieldValue.serverTimestamp()
     }, { merge: true });
+    console.log('✅ Firestore set OK');
 
-    const commentsRef = db.collection('comments').where('userId', '==', currentUser.uid);
-    const snap = await commentsRef.get();
-    const batch = db.batch();
-    snap.forEach(d => batch.update(d.ref, { userName: name, userAvatar: newAvatarUrl, customColor: color }));
-    if (snap.size > 0) await batch.commit();
+    // ===== 6. Actualizar comentarios históricos (opcional, no aborta) =====
+    try {
+      setProfileStatus('Actualizando comentarios...', 'var(--neon-blue)');
+      const commentsRef = db.collection('comments').where('userId', '==', currentUser.uid);
+      const snap = await commentsRef.get();
+      const batch = db.batch();
+      snap.forEach(d => batch.update(d.ref, {
+        userName: name,
+        userAvatar: newAvatarUrl || currentUser.photoURL || 'assets/img/invitado.avif',
+        customColor: color
+      }));
+      if (snap.size > 0) await batch.commit();
+      console.log('✅ Comentarios actualizados:', snap.size);
+    } catch (commentsErr) {
+      console.warn('⚠️ No se pudieron actualizar comentarios históricos:', commentsErr);
+      // No abortamos: el guardado principal ya funcionó
+    }
 
+    // ===== 7. Feedback y UI local =====
     lastProfileUpdate = Date.now();
-    msg.style.color = 'var(--neon-blue)';
-    msg.textContent = '¡Cambios guardados!';
+    setProfileStatus('✅ ¡Cambios guardados exitosamente!', 'var(--neon-blue)');
 
     const userAvatarBtn = document.getElementById('userAvatarBtn');
     const dropdownAvatar = document.getElementById('dropdownAvatar');
@@ -274,13 +364,25 @@ async function guardarCambiosPerfil() {
       dropdownName.style.color = color;
       dropdownName.style.textShadow = `0 0 10px ${color}`;
     }
+
+    // Actualizar currentUser local
+    currentUser.displayName = name;
+    if (profileUpdates.photoURL) currentUser.photoURL = profileUpdates.photoURL;
+
+    // Sincronizar con estado global si existe
+    if (window.ArchinimeState) {
+      window.ArchinimeState.set('currentUser', currentUser);
+      window.ArchinimeState.set('currentUserColor', color);
+    }
+
   } catch (err) {
-    msg.style.color = 'var(--neon-pink)';
-    msg.textContent = 'Error al guardar.';
-    console.error(err);
+    console.error('❌ Error al guardar perfil:', err);
+    setProfileStatus('Error al guardar: ' + (err.message || 'desconocido'), 'var(--neon-pink)');
   } finally {
-    btn.disabled = false;
-    btn.textContent = 'GUARDAR CAMBIOS';
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = 'GUARDAR CAMBIOS';
+    }
   }
 }
 
@@ -321,6 +423,7 @@ function setupAuthUI() {
           newAvatarUrl = data.secure_url;
           const profAvatar = document.getElementById('profileAvatar');
           if (profAvatar) profAvatar.src = newAvatarUrl;
+          setProfileStatus('Avatar subido. Pulsa GUARDAR para aplicar.', 'var(--neon-blue)');
         }
       } catch (err) {
         alert('Error al subir');
@@ -379,4 +482,4 @@ window.getNeonColor = getNeonColor;
 window.disableBodyScroll = disableBodyScroll;
 window.enableBodyScroll = enableBodyScroll;
 
-console.log('✅ app-core.js cargado correctamente');
+console.log('✅ app-core.js cargado correctamente (v24.1)');
