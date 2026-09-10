@@ -225,34 +225,19 @@ Todo está construido con **JavaScript puro + Firebase**, sin frameworks pesados
 </td>
 <td width="50%" align="center">
 
-**⚡ Animaciones y Efectos**
+**📺 Reproductor de Video**
 
-<a href="https://cdn.jsdelivr.net/gh/Archinime/Banners@main/animacion.png" target="_blank">
-  <img src="https://cdn.jsdelivr.net/gh/Archinime/Banners@main/animacion.png" alt="Animaciones y efectos" width="100%" />
+<a href="https://cdn.jsdelivr.net/gh/Archinime/Banners@main/video.png" target="_blank">
+  <img src="https://cdn.jsdelivr.net/gh/Archinime/Banners@main/video.png" alt="Reproductor de video" width="100%" />
 </a>
 
-<sub>Partículas, chroma key en vivo, cursor con glow y transiciones fluidas.</sub>
+<sub>Multi-servidor, comentarios, reacciones y descarga con barra de progreso.</sub>
 
 </td>
 </tr>
 </table>
 
 </div>
-
----
-
-### 📺 Reproductor de Video
-
-<div align="center">
-  <img src="https://cdn.jsdelivr.net/gh/Archinime/Banners@main/video.png" alt="Reproductor de video" width="100%" />
-</div>
-
-> El **reproductor multipropósito** con:
-> - Selector de **múltiples servidores** (Drive, Dropbox, PixelDrain, etc.)
-> - **Bloqueador de logo** para evitar redirecciones
-> - **Navegación entre episodios** (anterior / siguiente)
-> - Sección completa de **comentarios con reacciones** y **stickers**
-> - Botón de **descarga** con barra de progreso
 
 ---
 
