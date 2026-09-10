@@ -11,7 +11,6 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-  <!-- ✅ RUTA CORREGIDA: state.js -->
   <script src="../js/core/state.js"></script>
 
   <style>
@@ -24,7 +23,6 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       background-color: var(--dark-bg);
-      /* ✅ RUTA CORREGIDA: imagen de fondo */
       background-image: url('../assets/img/galaxia-morado1.avif');
       background-size: cover;
       background-position: center;
@@ -107,12 +105,10 @@
 <body>
 
   <div class="options-container">
-    <!-- ✅ RUTA CORREGIDA: volver a index -->
     <a href="../index.html" class="back-btn"><i class="fas fa-arrow-left"></i> Volver a inicio</a>
     <h2>CONFIGURACIÓN</h2>
 
     <div class="avatar-preview">
-      <!-- ✅ RUTA CORREGIDA: avatar -->
       <img id="avatarImg" src="../assets/img/invitado.avif" alt="Avatar">
       <label class="upload-btn" for="avatarInput">
         <i class="fas fa-upload"></i> Subir nuevo avatar
@@ -147,6 +143,7 @@
   </div>
 
   <script>
+    // ========== CONFIG FIREBASE ==========
     const firebaseConfig = {
       apiKey: "AIzaSyBpzYARIxaJijLbbL-2S6F9MWecbAbvK_I",
       authDomain: "login-admin-archinime.firebaseapp.com",
@@ -164,14 +161,16 @@
     let currentUser = null;
     let newAvatarUrl = null;
     let lastProfileUpdate = 0;
+    let userReady = false;
 
     function getNeonColorByString(str) {
-        const neonColors = ['#00fff7', '#ff0055', '#bc13fe', '#00ff33', '#ffff00', '#ffaa00', '#ff00aa', '#00aaff'];
-        let hash = 0;
-        for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
-        return neonColors[Math.abs(hash) % neonColors.length];
+      const neonColors = ['#00fff7', '#ff0055', '#bc13fe', '#00ff33', '#ffff00', '#ffaa00', '#ff00aa', '#00aaff'];
+      let hash = 0;
+      for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
+      return neonColors[Math.abs(hash) % neonColors.length];
     }
 
+    // ========== Sincronización con estado global (opcional) ==========
     function syncWithGlobalState(user) {
       if (window.ArchinimeState) {
         ArchinimeState.set('currentUser', user);
@@ -187,51 +186,45 @@
       }
     }
 
-    // Escuchar cambios de autenticación (usar state si existe, si no, directo)
-    if (window.ArchinimeState) {
-      ArchinimeState.on('currentUser', async (user) => {
-        if (user) {
-          currentUser = user;
-          cargarDatosUsuario(user);
-        } else {
-          // ✅ RUTA CORREGIDA: redirigir a index
-          window.location.href = '../index.html';
-        }
-      });
-    } else {
-      auth.onAuthStateChanged(async (user) => {
-        if (user) {
-          currentUser = user;
-          cargarDatosUsuario(user);
-        } else {
-          // ✅ RUTA CORREGIDA: redirigir a index
-          window.location.href = '../index.html';
-        }
-      });
-    }
+    // ========== FUENTE DE VERDAD: auth.onAuthStateChanged ==========
+    // Esto garantiza que currentUser SIEMPRE se setee correctamente
+    auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        currentUser = user;
+        window.currentUser = user;
+        userReady = true;
+        console.log('✅ Usuario autenticado en opciones.html:', user.uid);
+        await cargarDatosUsuario(user);
+        syncWithGlobalState(user);
+      } else {
+        console.warn('⚠️ Sin usuario autenticado, redirigiendo a index...');
+        window.location.href = '../index.html';
+      }
+    });
 
     async function cargarDatosUsuario(user) {
-      document.getElementById('userUid').value = user.uid;
-      document.getElementById('displayName').value = user.displayName || user.email.split('@')[0];
-      // ✅ RUTA CORREGIDA: avatar
-      document.getElementById('avatarImg').src = user.photoURL || '../assets/img/invitado.avif';
-      newAvatarUrl = user.photoURL;
-
       try {
+        document.getElementById('userUid').value = user.uid;
+        document.getElementById('displayName').value = user.displayName || (user.email ? user.email.split('@')[0] : 'Usuario');
+        document.getElementById('avatarImg').src = user.photoURL || '../assets/img/invitado.avif';
+        newAvatarUrl = user.photoURL;
+
         const doc = await db.collection('users').doc(user.uid).get();
         if (doc.exists) {
           if (doc.data().customColor) {
             document.getElementById('nameColor').value = doc.data().customColor;
           } else {
-            document.getElementById('nameColor').value = getNeonColorByString(user.uid || user.displayName || user.email);
+            document.getElementById('nameColor').value = getNeonColorByString(user.uid || user.displayName || user.email || 'user');
           }
           if (doc.data().lastProfileUpdate) {
             lastProfileUpdate = doc.data().lastProfileUpdate.toMillis();
           }
         } else {
-          document.getElementById('nameColor').value = getNeonColorByString(user.uid || user.displayName || user.email);
+          document.getElementById('nameColor').value = getNeonColorByString(user.uid || user.displayName || user.email || 'user');
         }
-      } catch(e) { console.error("Error obteniendo datos: ", e); }
+      } catch(e) { 
+        console.error("Error obteniendo datos: ", e); 
+      }
     }
 
     function copiarUID() {
@@ -250,9 +243,9 @@
       if (!file) return;
 
       if (file.size > 2 * 1024 * 1024) {
-          alert('La imagen es muy pesada. El tamaño máximo permitido es 2 MB.');
-          e.target.value = '';
-          return;
+        alert('La imagen es muy pesada. El tamaño máximo permitido es 2 MB.');
+        e.target.value = '';
+        return;
       }
       
       const btnLabel = document.querySelector('.upload-btn');
@@ -278,11 +271,20 @@
     });
 
     async function guardarCambios() {
-      if (!currentUser) return;
       const saveBtn = document.getElementById('saveBtn');
       const statusMsg = document.getElementById('statusMsg');
+
+      // Diagnóstico: si el usuario no está listo, avisar
+      if (!userReady || !currentUser) {
+        statusMsg.style.color = '#ff0055';
+        statusMsg.innerText = '⚠️ Esperando datos del usuario... intenta de nuevo en un momento.';
+        console.warn('guardarCambios: currentUser es null. userReady =', userReady);
+        return;
+      }
+
       const newName = document.getElementById('displayName').value.trim();
       const newColor = document.getElementById('nameColor').value;
+
       if (!newName) {
         statusMsg.style.color = '#ff0055';
         statusMsg.innerText = 'El nombre no puede estar vacío.';
@@ -293,35 +295,40 @@
       const now = Date.now();
       const fiveDaysMs = 5 * 24 * 60 * 60 * 1000;
       if (!isAdmin && lastProfileUpdate > 0 && (now - lastProfileUpdate < fiveDaysMs)) {
-          const msLeft = fiveDaysMs - (now - lastProfileUpdate);
-          const daysLeft = Math.ceil(msLeft / (1000 * 60 * 60 * 24));
-          statusMsg.style.color = '#ff0055';
-          statusMsg.innerText = `⏳ Has cambiado tu perfil recientemente. Vuelve a intentarlo en ${daysLeft} días.`;
-          return;
+        const msLeft = fiveDaysMs - (now - lastProfileUpdate);
+        const daysLeft = Math.ceil(msLeft / (1000 * 60 * 60 * 24));
+        statusMsg.style.color = '#ff0055';
+        statusMsg.innerText = `⏳ Has cambiado tu perfil recientemente. Vuelve a intentarlo en ${daysLeft} días.`;
+        return;
       }
 
       saveBtn.disabled = true;
       saveBtn.innerText = 'GUARDANDO...';
-      statusMsg.innerText = '';
+      statusMsg.style.color = '#fff';
+      statusMsg.innerText = 'Guardando cambios...';
+
       try {
+        // 1. Actualizar perfil de Firebase Auth
         await currentUser.updateProfile({
           displayName: newName,
           photoURL: newAvatarUrl
         });
+
+        // 2. Guardar en Firestore
         await db.collection('users').doc(currentUser.uid).set({
           customColor: newColor,
-          lastProfileUpdate: firebase.firestore.FieldValue.serverTimestamp() 
+          lastProfileUpdate: firebase.firestore.FieldValue.serverTimestamp()
         }, { merge: true });
-        
-        // Actualizar comentarios históricos
+
+        // 3. Actualizar comentarios históricos
         statusMsg.style.color = '#fff';
         statusMsg.innerText = 'Actualizando comentarios históricos...';
-        
+
         const commentsRef = db.collection('comments').where('userId', '==', currentUser.uid);
         const snapshot = await commentsRef.get();
         const batch = db.batch();
         let ops = 0;
-        
+
         snapshot.forEach(doc => {
           batch.update(doc.ref, {
             userName: newName,
@@ -334,24 +341,30 @@
           await batch.commit();
         }
 
-        // Sincronizar con estado global si existe
-        if (window.ArchinimeState) {
-          ArchinimeState.set('currentUser', currentUser); // fuerza actualización
-          ArchinimeState.set('currentUserColor', newColor);
-        }
+        // 4. Sincronizar con estado global si existe
+        syncWithGlobalState(currentUser);
 
         lastProfileUpdate = Date.now();
         statusMsg.style.color = '#00fff7';
         statusMsg.innerText = '¡Cambios guardados exitosamente!';
+
+        // Actualizar currentUser local (para que los datos coincidan)
+        currentUser.displayName = newName;
+        currentUser.photoURL = newAvatarUrl;
+
       } catch (err) {
-        console.error(err);
+        console.error('Error al guardar:', err);
         statusMsg.style.color = '#ff0055';
-        statusMsg.innerText = 'Error al guardar los cambios.';
+        statusMsg.innerText = 'Error al guardar: ' + (err.message || 'desconocido');
       } finally {
         saveBtn.disabled = false;
         saveBtn.innerText = 'GUARDAR CAMBIOS';
       }
     }
+
+    // Exponer globalmente por si acaso
+    window.copiarUID = copiarUID;
+    window.guardarCambios = guardarCambios;
   </script>
 </body>
 </html>
