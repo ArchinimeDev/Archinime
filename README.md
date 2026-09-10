@@ -519,7 +519,7 @@ Consulta el archivo [LICENSE](LICENSE) para más detalles.
 
 <div align="center">
 
-<img src="https://cdn.jsdelivr.net/gh/Archinime/Banners@main/2.gif" alt="Avatar" width="120" style="border-radius: 50%;" />
+<img src="https://cdn.jsdelivr.net/gh/Archinime/Banners@main/Logo_Archinime.png" alt="Avatar" width="120" style="border-radius: 50%;" />
 
 <br><br>
 
