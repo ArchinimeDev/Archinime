@@ -152,13 +152,14 @@
   </div>
 </div>
 
-<!-- ===== MODO ESPECIAL ===== -->
+<!-- ===== MODO ESPECIAL (sin indicador de audio) ===== -->
 <div id="specialBanner" style="display:none;" class="banner-special">
   <video id="specialVideo" muted loop playsinline>
     <source src="assets/videos/atrevete.mp4" type="video/mp4">
   </video>
-  <div class="audio-indicator" id="specialAudioIndicator">
-    <i class="fas fa-volume-mute"></i> <span>Haz clic para activar sonido</span>
+  <div class="overlay-text">
+    <h2>🌟 MODO ESPECIAL</h2>
+    <p>Disfruta de este tráiler exclusivo</p>
   </div>
 </div>
 
@@ -1629,7 +1630,8 @@
       return;
     }
     frameCount++;
-    if (frameCount % 4 !== 0) {
+    // Reducir carga: procesar cada 6 frames en lugar de 4
+    if (frameCount % 6 !== 0) {
       requestAnimationFrame(processChroma);
       return;
     }
