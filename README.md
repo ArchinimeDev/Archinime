@@ -754,24 +754,8 @@ El proyecto usa reglas **granulares** con validación de tipos, tamaños y propi
 
 <div align="center">
 
-<!-- ✅ Estadísticas usando github-stats-extended (sucesor activo y estable) -->
-<img src="https://github-stats-extended.vercel.app/api?username=ArchinimeDev&show_icons=true&theme=radical&hide_border=true&bg_color=0D1117&title_color=00F0FF&icon_color=b114ff&text_color=FFFFFF" alt="Estadísticas de ArchinimeDev" width="100%" style="max-width: 500px;" />
-
-<br><br>
-
-<!-- ✅ GIFs al 40% para que se vean equilibrados y no tan grandes -->
 <img src="https://cdn.jsdelivr.net/gh/Archinime/Banners@main/estadisticas.gif" alt="Estadísticas" width="40%" />
 <img src="https://cdn.jsdelivr.net/gh/Archinime/Banners@main/lenguaje.gif" alt="Lenguajes" width="40%" />
-
-<br><br>
-
-<!-- ✅ Racha usando streak-stats.demolab.com (servicio estable recomendado) -->
-<img src="https://streak-stats.demolab.com/?user=ArchinimeDev&theme=radical&hide_border=true&background=0D1117&stroke=00F0FF&ring=b114ff&fire=ff1a6b" alt="Racha de ArchinimeDev" width="100%" style="max-width: 800px;" />
-
-<br><br>
-
-<!-- ✅ Trofeos usando el fork alternativo estable (hesreallyhim) -->
-<img src="https://github-profile-trophy-fork-two.vercel.app/?username=ArchinimeDev&theme=radical&no-frame=true&no-bg=true&column=7&margin-w=10" alt="Trofeos" width="100%" />
 
 </div>
 
@@ -782,11 +766,11 @@ El proyecto usa reglas **granulares** con validación de tipos, tamaños y propi
 ## 🐍 Contribuciones
 
 <div align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/ArchinimeDev/Archinime/output/github-snake-dark.svg" />
-    <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/ArchinimeDev/Archinime/output/github-snake.svg" />
-    <img alt="Snake animation" src="https://raw.githubusercontent.com/platane/snk/output/github-contribution-grid-snake.svg" width="100%" />
-  </picture>
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/platane/snk/output/github-contribution-grid-snake-dark.svg" />
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/platane/snk/output/github-contribution-grid-snake.svg" />
+  <img alt="github-snake" src="https://raw.githubusercontent.com/platane/snk/output/github-contribution-grid-snake-dark.svg" width="100%" />
+</picture>
 </div>
 
 ---
@@ -903,7 +887,6 @@ Consulta el archivo [LICENSE](LICENSE) para más detalles.
 
 <div align="center">
 
-<!-- ✅ Avatar más compacto, sin espacios extra innecesarios -->
 <img src="https://cdn.jsdelivr.net/gh/Archinime/Banners@main/Logo_Archinime.png" alt="Avatar" width="100" height="100" style="border-radius: 50%;" />
 
 <br>
