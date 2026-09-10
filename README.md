@@ -2,7 +2,7 @@
      HEADER ONDULADO ANIMADO
 ═══════════════════════════════════════════════════════ -->
 <div align="center">
-  <img src="https://capsule-render.vercel.app/api?type=waving&color=0:00F0FF,50:b114ff,100:ff1a6b&height=180&section=header&text=ARCHINIME&fontSize=70&fontColor=ffffff&animation=fadeIn&fontAlignY=40&desc=La%20Nueva%20Era%20del%20Anime&descAlignY=62&descAlign=50&descSize=18" alt="Header" width="100%" />
+  <img src="https://capsule-render.vercel.app/api?type=waving&color=0:00F0FF,50:b114ff,100:ff1a6b&height=200&section=header&text=ARCHINIME&fontSize=75&fontColor=ffffff&animation=fadeIn&fontAlignY=35&desc=La%20Nueva%20Era%20del%20Anime&descAlignY=60&descAlign=50&descSize=20" alt="Header" width="100%" />
 </div>
 
 <!-- ═══════════════════════════════════════════════════════
@@ -17,7 +17,7 @@
 ═══════════════════════════════════════════════════════ -->
 <div align="center">
   <a href="https://archinime.pages.dev/" target="_blank">
-    <img src="https://readme-typing-svg.herokuapp.com?font=Orbitron&weight=900&size=34&duration=2800&pause=500&color=00F0FF&center=true&vCenter=true&width=900&height=90&lines=ARCHINIME;La+Nueva+Era+del+Anime;Interfaz+Cyberpunk;Comunidad+en+Tiempo+Real;M%C3%A1s+de+160+Animes" alt="Typing SVG" />
+    <img src="https://readme-typing-svg.herokuapp.com?font=Orbitron&weight=900&size=36&duration=2500&pause=400&color=00F0FF&center=true&vCenter=true&width=900&height=90&lines=ARCHINIME;La+Nueva+Era+del+Anime;Interfaz+Cyberpunk;Comunidad+en+Tiempo+Real;M%C3%A1s+de+160+Animes" alt="Typing SVG" />
   </a>
 </div>
 
@@ -27,7 +27,7 @@
 <div align="center">
   <br>
   <a href="https://archinime.pages.dev/" target="_blank">
-    <img src="https://img.shields.io/badge/🚀_ENTRAR_A_ARCHINIME-archinime.pages.dev-00F0FF?style=for-the-badge&logo=googlechrome&logoColor=white&labelColor=05070A" alt="Ir a Archinime" height="45" />
+    <img src="https://img.shields.io/badge/🚀_ENTRAR_A_ARCHINIME-archinime.pages.dev-00F0FF?style=for-the-badge&logo=googlechrome&logoColor=white&labelColor=05070A" alt="Ir a Archinime" height="48" />
   </a>
   <br><br>
 </div>
@@ -93,7 +93,7 @@
 <!-- ═══════════════════════════════════════════════════════
      DIVISOR ANIMADO
 ═══════════════════════════════════════════════════════ -->
-<img src="https://raw.githubusercontent.com/trinib/trinib/82213791fa9ff58d3ca768ddd6de2489ec23ffca/images/footer.svg" alt="divider" width="100%" />
+<img src="https://capsule-render.vercel.app/api?type=rect&color=0:00F0FF,50:b114ff,100:ff1a6b&height=4&section=header" width="100%" />
 
 ## 🌌 Sobre el Proyecto
 
@@ -172,7 +172,7 @@ Todo está construido con **JavaScript puro + Firebase**, sin frameworks pesados
 
 ---
 
-<img src="https://capsule-render.vercel.app/api?type=rect&color=0:00F0FF,100:b114ff&height=3&section=header" width="100%" />
+<img src="https://capsule-render.vercel.app/api?type=rect&color=0:00F0FF,100:b114ff&height=4&section=header" width="100%" />
 
 ## ✨ Características
 
@@ -281,7 +281,7 @@ Todo está construido con **JavaScript puro + Firebase**, sin frameworks pesados
 
 ---
 
-<img src="https://capsule-render.vercel.app/api?type=rect&color=0:b114ff,100:ff1a6b&height=3&section=header" width="100%" />
+<img src="https://capsule-render.vercel.app/api?type=rect&color=0:b114ff,100:ff1a6b&height=4&section=header" width="100%" />
 
 ## 🎬 Capturas de Pantalla
 
@@ -376,7 +376,7 @@ Todo está construido con **JavaScript puro + Firebase**, sin frameworks pesados
 
 ---
 
-<img src="https://capsule-render.vercel.app/api?type=rect&color=0:ff1a6b,100:00F0FF&height=3&section=header" width="100%" />
+<img src="https://capsule-render.vercel.app/api?type=rect&color=0:ff1a6b,100:00F0FF&height=4&section=header" width="100%" />
 
 ## 🛠️ Stack Tecnológico
 
@@ -419,7 +419,7 @@ Todo está construido con **JavaScript puro + Firebase**, sin frameworks pesados
 
 ---
 
-<img src="https://capsule-render.vercel.app/api?type=rect&color=0:00F0FF,100:b114ff&height=3&section=header" width="100%" />
+<img src="https://capsule-render.vercel.app/api?type=rect&color=0:00F0FF,100:b114ff&height=4&section=header" width="100%" />
 
 ## 🏗️ Arquitectura
 
@@ -495,7 +495,7 @@ graph TB
 
 ---
 
-<img src="https://capsule-render.vercel.app/api?type=rect&color=0:b114ff,100:ff1a6b&height=3&section=header" width="100%" />
+<img src="https://capsule-render.vercel.app/api?type=rect&color=0:b114ff,100:ff1a6b&height=4&section=header" width="100%" />
 
 ## 📂 Estructura del Proyecto
 
@@ -561,7 +561,7 @@ Archinime/
 
 ---
 
-<img src="https://capsule-render.vercel.app/api?type=rect&color=0:ff1a6b,100:00F0FF&height=3&section=header" width="100%" />
+<img src="https://capsule-render.vercel.app/api?type=rect&color=0:ff1a6b,100:00F0FF&height=4&section=header" width="100%" />
 
 ## 🚀 Instalación Local
 
@@ -608,7 +608,7 @@ Luego abre **`http://localhost:8000`** en tu navegador.
 
 ---
 
-<img src="https://capsule-render.vercel.app/api?type=rect&color=0:00F0FF,100:b114ff&height=3&section=header" width="100%" />
+<img src="https://capsule-render.vercel.app/api?type=rect&color=0:00F0FF,100:b114ff&height=4&section=header" width="100%" />
 
 ## 🎮 Guía de Uso
 
@@ -717,7 +717,7 @@ Todos los usuarios recibirán la nueva versión en la siguiente carga.
 
 ---
 
-<img src="https://capsule-render.vercel.app/api?type=rect&color=0:b114ff,100:ff1a6b&height=3&section=header" width="100%" />
+<img src="https://capsule-render.vercel.app/api?type=rect&color=0:b114ff,100:ff1a6b&height=4&section=header" width="100%" />
 
 ## 🔐 Reglas de Firestore
 
@@ -748,13 +748,13 @@ El proyecto usa reglas **granulares** con validación de tipos, tamaños y propi
 
 ---
 
-<img src="https://capsule-render.vercel.app/api?type=rect&color=0:00F0FF,100:b114ff&height=3&section=header" width="100%" />
+<img src="https://capsule-render.vercel.app/api?type=rect&color=0:00F0FF,100:b114ff&height=4&section=header" width="100%" />
 
 ## 📊 Estadísticas
 
 <div align="center">
 
-<img src="https://github-readme-stats.vercel.app/api?username=ArchinimeDev&show_icons=true&theme=radical&hide_border=true&bg_color=0D1117&title_color=00F0FF&icon_color=b114ff&text_color=FFFFFF" alt="Estadísticas de ArchinimeDev" width="100%" style="max-width: 500px;" />
+<img src="https://github-readme-stats.vercel.app/api?username=ArchinimeDev&show_icons=true&theme=radical&hide_border=true&bg_color=0D1117&title_color=00F0FF&icon_color=b114ff&text_color=FFFFFF&border_radius=15" alt="Estadísticas de ArchinimeDev" width="100%" style="max-width: 500px;" />
 
 <br><br>
 
@@ -763,7 +763,7 @@ El proyecto usa reglas **granulares** con validación de tipos, tamaños y propi
 
 <br><br>
 
-<img src="https://github-readme-streak-stats.herokuapp.com/?user=ArchinimeDev&theme=radical&hide_border=true&background=0D1117&stroke=00F0FF&ring=b114ff&fire=ff1a6b" alt="Racha de ArchinimeDev" width="100%" style="max-width: 800px;" />
+<img src="https://github-readme-streak-stats.herokuapp.com/?user=ArchinimeDev&theme=radical&hide_border=true&background=0D1117&stroke=00F0FF&ring=b114ff&fire=ff1a6b&border_radius=15" alt="Racha de ArchinimeDev" width="100%" style="max-width: 800px;" />
 
 <br><br>
 
@@ -773,7 +773,21 @@ El proyecto usa reglas **granulares** con validación de tipos, tamaños y propi
 
 ---
 
-<img src="https://capsule-render.vercel.app/api?type=rect&color=0:ff1a6b,100:00F0FF&height=3&section=header" width="100%" />
+<img src="https://capsule-render.vercel.app/api?type=rect&color=0:ff1a6b,100:00F0FF&height=4&section=header" width="100%" />
+
+## 🐍 Contribuciones
+
+<div align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/ArchinimeDev/Archinime/output/github-snake-dark.svg" />
+    <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/ArchinimeDev/Archinime/output/github-snake.svg" />
+    <img alt="Snake animation" src="https://raw.githubusercontent.com/ArchinimeDev/Archinime/output/github-snake.svg" width="100%" />
+  </picture>
+</div>
+
+---
+
+<img src="https://capsule-render.vercel.app/api?type=rect&color=0:b114ff,100:ff1a6b&height=4&section=header" width="100%" />
 
 ## 🗺️ Roadmap
 
@@ -824,7 +838,7 @@ El proyecto usa reglas **granulares** con validación de tipos, tamaños y propi
 
 ---
 
-<img src="https://capsule-render.vercel.app/api?type=rect&color=0:b114ff,100:ff1a6b&height=3&section=header" width="100%" />
+<img src="https://capsule-render.vercel.app/api?type=rect&color=0:00F0FF,100:b114ff&height=4&section=header" width="100%" />
 
 ## 🤝 Contribuciones
 
@@ -869,7 +883,7 @@ El proyecto usa reglas **granulares** con validación de tipos, tamaños y propi
 
 ---
 
-<img src="https://capsule-render.vercel.app/api?type=rect&color=0:00F0FF,100:b114ff&height=3&section=header" width="100%" />
+<img src="https://capsule-render.vercel.app/api?type=rect&color=0:ff1a6b,100:00F0FF&height=4&section=header" width="100%" />
 
 ## 📄 Licencia
 
@@ -879,7 +893,7 @@ Consulta el archivo [LICENSE](LICENSE) para más detalles.
 
 ---
 
-<img src="https://capsule-render.vercel.app/api?type=rect&color=0:ff1a6b,100:00F0FF&height=3&section=header" width="100%" />
+<img src="https://capsule-render.vercel.app/api?type=rect&color=0:00F0FF,100:b114ff&height=4&section=header" width="100%" />
 
 ## 👤 Autor
 
@@ -942,5 +956,5 @@ Consulta el archivo [LICENSE](LICENSE) para más detalles.
      FOOTER ONDULADO ANIMADO
 ═══════════════════════════════════════════════════════ -->
 <div align="center">
-  <img src="https://capsule-render.vercel.app/api?type=waving&color=0:00F0FF,50:b114ff,100:ff1a6b&height=140&section=footer&text=ARCHINIME&fontSize=45&fontColor=ffffff&animation=fadeIn&fontAlignY=70" alt="Footer" width="100%" />
+  <img src="https://capsule-render.vercel.app/api?type=waving&color=0:00F0FF,50:b114ff,100:ff1a6b&height=160&section=footer&text=ARCHINIME&fontSize=50&fontColor=ffffff&animation=fadeIn&fontAlignY=70" alt="Footer" width="100%" />
 </div>
