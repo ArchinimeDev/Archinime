@@ -1,8 +1,7 @@
 // app-core.js
 // Inicialización central de Firebase y estado del usuario
-// ACTUALIZADO: Single source of truth para Firebase + Auth + Profile
-// v24.2 - Fix: botón "Opciones" redirige a opciones.html en vez de abrir modal interno
-// v24.1 - Fix: null checks, cooldown robusto, photoURL opcional, statusMsg visible
+// v24.3 - Modal de perfil rediseñado: círculo sólido + paleta nativa + presets + chip hex
+// v24.2 - (revertido) botón "Opciones" vuelve a abrir modal interno
 
 // ========== CONFIGURACIÓN DE FIREBASE ==========
 const firebaseConfig = {
@@ -35,6 +34,9 @@ window.currentUser = null;
 const CLOUDINARY_URL = 'https://api.cloudinary.com/v1_1/dbcqcai1q/upload';
 const CLOUDINARY_PRESET = 'stickers_archinime';
 
+// Colores preset para el modal
+const PRESET_COLORS_MODAL = ['#00f0ff', '#b114ff', '#ff1a6b', '#ffd700', '#00ff33', '#00aaff'];
+
 // ========== UTILIDADES ==========
 function getNeonColor(str) {
   const colors = ['#00f0ff','#ff1a6b','#b114ff','#ffd700','#00ff33','#ffaa00'];
@@ -54,7 +56,6 @@ function enableBodyScroll() {
   document.body.classList.remove('modal-open');
 }
 
-// Helper: convierte cualquier formato de timestamp Firestore a ms
 function firestoreTimestampToMs(ts) {
   if (!ts) return 0;
   if (typeof ts.toMillis === 'function') return ts.toMillis();
@@ -63,7 +64,6 @@ function firestoreTimestampToMs(ts) {
   return 0;
 }
 
-// Helper: muestra el estado en el modal de perfil (con estilo)
 function setProfileStatus(msg, color) {
   const el = document.getElementById('profileStatusMsg');
   if (!el) {
@@ -83,14 +83,59 @@ function setProfileStatus(msg, color) {
   }
 }
 
-// ========== NAVEGACIÓN A OPCIONES ==========
-// Detecta si estamos en la raíz o dentro de /pages/ y redirige correctamente
-function irAOpciones() {
-  const path = window.location.pathname;
-  const inPages = path.includes('/pages/');
-  const target = inPages ? './opciones.html' : 'pages/opciones.html';
-  console.log('🧭 Navegando a:', target);
-  window.location.href = target;
+// ========== PRESETS + PREVIEW DE COLOR EN EL MODAL ==========
+function renderProfileColorPresets(activeColor) {
+  const container = document.getElementById('profileColorPresets');
+  if (!container) return;
+  container.innerHTML = '';
+  PRESET_COLORS_MODAL.forEach(color => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'preset-dot' + (color.toLowerCase() === (activeColor || '').toLowerCase() ? ' active' : '');
+    btn.style.background = color;
+    btn.style.color = color;
+    btn.dataset.color = color;
+    btn.title = color.toUpperCase();
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const input = document.getElementById('profileNameColor');
+      if (input) input.value = color;
+      updateProfileColorPreview(color);
+    });
+    container.appendChild(btn);
+  });
+}
+
+function updateProfileColorPreview(color) {
+  // Círculo sólido del modal
+  const circle = document.getElementById('profileColorCircle');
+  if (circle) {
+    circle.style.background = color;
+    circle.style.boxShadow = `0 0 0 3px rgba(255,255,255,0.08), 0 0 18px ${color}, 0 0 32px ${color}`;
+  }
+  // Dot del chip hex
+  const dot = document.getElementById('profileColorDot');
+  if (dot) {
+    dot.style.background = color;
+    dot.style.boxShadow = `0 0 10px ${color}, 0 0 18px ${color}80`;
+  }
+  // Texto HEX
+  const hexText = document.getElementById('profileColorHexText');
+  if (hexText) hexText.textContent = (color || '#00F0FF').toUpperCase();
+  // Avatar del modal
+  const avatar = document.getElementById('profileAvatar');
+  if (avatar) {
+    avatar.style.borderColor = color;
+    avatar.style.boxShadow = `0 0 25px ${color}80, 0 0 45px ${color}40`;
+  }
+  // Marcar preset activo
+  document.querySelectorAll('#profileColorPresets .preset-dot').forEach(el => {
+    if ((el.dataset.color || '').toLowerCase() === (color || '').toLowerCase()) {
+      el.classList.add('active');
+    } else {
+      el.classList.remove('active');
+    }
+  });
 }
 
 // ========== UI DEL USUARIO ==========
@@ -137,13 +182,11 @@ function updateUserUI(user) {
     }
   }
 
-  // Actualizar chat si el panel está abierto
   const sidePanel = document.getElementById('sidePanel');
   if (sidePanel && sidePanel.classList.contains('open') && typeof window.actualizarEstadoChatPanel === 'function') {
     window.actualizarEstadoChatPanel();
   }
 
-  // Disparar evento para otros scripts
   document.dispatchEvent(new CustomEvent('userChanged', { detail: { user } }));
 }
 
@@ -216,9 +259,7 @@ function closeAuthModal() {
   if (errEl) errEl.textContent = '';
 }
 
-// ========== MODAL DE PERFIL (legacy - se mantiene por compatibilidad) ==========
-// Ya no se usa desde el botón "Opciones" del dropdown, pero se conserva
-// por si algún otro lugar del código lo invoca.
+// ========== MODAL DE PERFIL ==========
 function showProfileModal() {
   if (!currentUser) {
     showAuthModal();
@@ -234,9 +275,13 @@ function showProfileModal() {
   const nameInput = document.getElementById('profileDisplayName');
   if (nameInput) nameInput.value = currentUser.displayName || (currentUser.email ? currentUser.email.split('@')[0] : 'Usuario');
 
+  // Color inicial + render de presets + preview
+  let initialColor = getNeonColor(currentUser.uid);
+  const colorInput = document.getElementById('profileNameColor');
+  if (colorInput) colorInput.value = initialColor;
+
   db.collection('users').doc(currentUser.uid).get().then(doc => {
     const color = doc.exists && doc.data().customColor ? doc.data().customColor : getNeonColor(currentUser.uid);
-    const colorInput = document.getElementById('profileNameColor');
     if (colorInput) colorInput.value = color;
     if (doc.exists && doc.data().lastProfileUpdate) {
       lastProfileUpdate = firestoreTimestampToMs(doc.data().lastProfileUpdate);
@@ -244,8 +289,15 @@ function showProfileModal() {
     } else {
       lastProfileUpdate = 0;
     }
+    updateProfileColorPreview(color);
+    renderProfileColorPresets(color);
   }).catch(console.error);
 
+  // Render inmediato con el color por defecto (mientras llega Firestore)
+  updateProfileColorPreview(initialColor);
+  renderProfileColorPresets(initialColor);
+
+  setProfileStatus('');
   const modal = document.getElementById('profileModal');
   if (modal) modal.classList.add('show');
   disableBodyScroll();
@@ -277,7 +329,6 @@ function copiarUID() {
 async function guardarCambiosPerfil() {
   console.log('🟡 guardarCambiosPerfil invocado');
 
-  // ===== 1. Validaciones con null checks =====
   if (!currentUser) {
     console.warn('guardarCambiosPerfil: currentUser es null');
     setProfileStatus('⚠️ No hay sesión activa.', 'var(--neon-pink)');
@@ -302,7 +353,6 @@ async function guardarCambiosPerfil() {
     return;
   }
 
-  // ===== 2. Cooldown de 5 días =====
   const isAdmin = currentUser.email === 'archinime12@gmail.com';
   const now = Date.now();
   const fiveDays = 5 * 24 * 60 * 60 * 1000;
@@ -313,7 +363,6 @@ async function guardarCambiosPerfil() {
     return;
   }
 
-  // ===== 3. Bloquear botón (con null check) =====
   if (btn) {
     btn.disabled = true;
     btn.textContent = 'GUARDANDO...';
@@ -321,7 +370,6 @@ async function guardarCambiosPerfil() {
   setProfileStatus('Guardando cambios...', 'var(--neon-blue)');
 
   try {
-    // ===== 4. Actualizar Firebase Auth (photoURL solo si es válido) =====
     const profileUpdates = { displayName: name };
     if (newAvatarUrl && typeof newAvatarUrl === 'string' && newAvatarUrl.startsWith('http')) {
       profileUpdates.photoURL = newAvatarUrl;
@@ -330,14 +378,12 @@ async function guardarCambiosPerfil() {
     await currentUser.updateProfile(profileUpdates);
     console.log('✅ updateProfile OK');
 
-    // ===== 5. Guardar en Firestore =====
     await db.collection('users').doc(currentUser.uid).set({
       customColor: color,
       lastProfileUpdate: firebase.firestore.FieldValue.serverTimestamp()
     }, { merge: true });
     console.log('✅ Firestore set OK');
 
-    // ===== 6. Actualizar comentarios históricos (opcional, no aborta) =====
     try {
       setProfileStatus('Actualizando comentarios...', 'var(--neon-blue)');
       const commentsRef = db.collection('comments').where('userId', '==', currentUser.uid);
@@ -352,10 +398,8 @@ async function guardarCambiosPerfil() {
       console.log('✅ Comentarios actualizados:', snap.size);
     } catch (commentsErr) {
       console.warn('⚠️ No se pudieron actualizar comentarios históricos:', commentsErr);
-      // No abortamos: el guardado principal ya funcionó
     }
 
-    // ===== 7. Feedback y UI local =====
     lastProfileUpdate = Date.now();
     setProfileStatus('✅ ¡Cambios guardados exitosamente!', 'var(--neon-blue)');
 
@@ -378,11 +422,9 @@ async function guardarCambiosPerfil() {
       dropdownName.style.textShadow = `0 0 10px ${color}`;
     }
 
-    // Actualizar currentUser local
     currentUser.displayName = name;
     if (profileUpdates.photoURL) currentUser.photoURL = profileUpdates.photoURL;
 
-    // Sincronizar con estado global si existe
     if (window.ArchinimeState) {
       window.ArchinimeState.set('currentUser', currentUser);
       window.ArchinimeState.set('currentUserColor', color);
@@ -399,7 +441,7 @@ async function guardarCambiosPerfil() {
   }
 }
 
-// ========== SETUP DE LISTENERS (cuando el DOM está listo) ==========
+// ========== SETUP DE LISTENERS ==========
 function setupAuthUI() {
   // Tabs de login/registro
   document.querySelectorAll('.auth-tab').forEach(tab => {
@@ -414,7 +456,7 @@ function setupAuthUI() {
     });
   });
 
-  // Avatar en el modal de perfil (legacy)
+  // Avatar en el modal de perfil
   const avatarInput = document.getElementById('profileAvatarInput');
   if (avatarInput) {
     avatarInput.addEventListener('change', async (e) => {
@@ -446,28 +488,19 @@ function setupAuthUI() {
     });
   }
 
-  // ============ FIX PRINCIPAL v24.2 ============
-  // Click en el header del dropdown "Opciones" → NAVEGA a opciones.html
-  // (antes abría el modal feo interno de index.html)
+  // Listener del color picker nativo → actualiza preview en vivo
+  const colorInput = document.getElementById('profileNameColor');
+  if (colorInput) {
+    colorInput.addEventListener('input', (e) => updateProfileColorPreview(e.target.value));
+    colorInput.addEventListener('change', (e) => updateProfileColorPreview(e.target.value));
+  }
+
+  // Click en el header del dropdown → abre el modal
   const profileDropdownBtn = document.getElementById('profileDropdownBtn');
   if (profileDropdownBtn) {
     profileDropdownBtn.addEventListener('click', (e) => {
       e.stopPropagation();
-
-      // Si no hay sesión, mostrar login en vez de navegar
-      if (!auth.currentUser) {
-        showAuthModal();
-        const errEl = document.getElementById('authError');
-        if (errEl) errEl.textContent = "⚠️ Inicia sesión para configurar tu cuenta.";
-        return;
-      }
-
-      // Cerrar el dropdown por si acaso
-      const dropdown = document.getElementById('userDropdown');
-      if (dropdown) dropdown.classList.remove('active');
-
-      // Navegar a opciones.html
-      irAOpciones();
+      showProfileModal();
     });
   }
 
@@ -510,6 +543,7 @@ window.guardarCambiosPerfil = guardarCambiosPerfil;
 window.getNeonColor = getNeonColor;
 window.disableBodyScroll = disableBodyScroll;
 window.enableBodyScroll = enableBodyScroll;
-window.irAOpciones = irAOpciones;
+window.updateProfileColorPreview = updateProfileColorPreview;
+window.renderProfileColorPresets = renderProfileColorPresets;
 
-console.log('✅ app-core.js cargado correctamente (v24.2)');
+console.log('✅ app-core.js cargado correctamente (v24.3)');
