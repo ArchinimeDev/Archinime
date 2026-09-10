@@ -11,7 +11,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-  <script src="../js/core/state.js"></script>
+  <script src="../js/core/state.js?v=2025-04-10-v24.0-modular"></script>
 
   <style>
     :root {
@@ -99,7 +99,22 @@
     .save-btn:hover { background: #fff; box-shadow: 0 0 20px rgba(0,243,255,0.5); transform: translateY(-2px); }
     .save-btn:disabled { background: #555; cursor: not-allowed; box-shadow: none; transform: none; }
     
-    #statusMsg { text-align: center; margin-top: 15px; font-weight: bold; font-size: 0.9rem; }
+    #statusMsg {
+      text-align: center;
+      margin-top: 15px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      min-height: 24px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      transition: 0.3s;
+      word-break: break-word;
+    }
+    #statusMsg:not(:empty) {
+      background: rgba(0,0,0,0.6);
+      border: 1px solid currentColor;
+      box-shadow: 0 0 15px currentColor;
+    }
   </style>
 </head>
 <body>
@@ -170,6 +185,14 @@
       return neonColors[Math.abs(hash) % neonColors.length];
     }
 
+    // ========== Helper para mensajes de estado ==========
+    function setStatus(msg, color) {
+      const statusMsg = document.getElementById('statusMsg');
+      statusMsg.style.color = color || '#fff';
+      statusMsg.innerText = msg;
+      console.log('[opciones] status:', msg);
+    }
+
     // ========== Sincronización con estado global (opcional) ==========
     function syncWithGlobalState(user) {
       if (window.ArchinimeState) {
@@ -187,7 +210,6 @@
     }
 
     // ========== FUENTE DE VERDAD: auth.onAuthStateChanged ==========
-    // Esto garantiza que currentUser SIEMPRE se setee correctamente
     auth.onAuthStateChanged(async (user) => {
       if (user) {
         currentUser = user;
@@ -207,18 +229,22 @@
         document.getElementById('userUid').value = user.uid;
         document.getElementById('displayName').value = user.displayName || (user.email ? user.email.split('@')[0] : 'Usuario');
         document.getElementById('avatarImg').src = user.photoURL || '../assets/img/invitado.avif';
-        newAvatarUrl = user.photoURL;
+        newAvatarUrl = user.photoURL || null;
 
         const doc = await db.collection('users').doc(user.uid).get();
         if (doc.exists) {
-          if (doc.data().customColor) {
-            document.getElementById('nameColor').value = doc.data().customColor;
+          const data = doc.data();
+          if (data.customColor) {
+            document.getElementById('nameColor').value = data.customColor;
           } else {
             document.getElementById('nameColor').value = getNeonColorByString(user.uid || user.displayName || user.email || 'user');
           }
-          if (doc.data().lastProfileUpdate) {
-            lastProfileUpdate = doc.data().lastProfileUpdate.toMillis();
+          if (data.lastProfileUpdate) {
+            lastProfileUpdate = data.lastProfileUpdate.toMillis
+              ? data.lastProfileUpdate.toMillis()
+              : (data.lastProfileUpdate.seconds ? data.lastProfileUpdate.seconds * 1000 : 0);
           }
+          console.log('📅 lastProfileUpdate cargado:', new Date(lastProfileUpdate));
         } else {
           document.getElementById('nameColor').value = getNeonColorByString(user.uid || user.displayName || user.email || 'user');
         }
@@ -231,10 +257,11 @@
       const uidInput = document.getElementById('userUid');
       if (uidInput.value) {
         navigator.clipboard.writeText(uidInput.value);
-        const statusMsg = document.getElementById('statusMsg');
-        statusMsg.style.color = '#00fff7';
-        statusMsg.innerText = '¡ID copiado al portapapeles!';
-        setTimeout(() => { if(statusMsg.innerText.includes('copiado')) statusMsg.innerText = ''; }, 3000);
+        setStatus('¡ID copiado al portapapeles!', '#00fff7');
+        setTimeout(() => {
+          const s = document.getElementById('statusMsg');
+          if (s.innerText.includes('copiado')) s.innerText = '';
+        }, 3000);
       }
     }
 
@@ -262,6 +289,7 @@
         if (data.secure_url) {
           newAvatarUrl = data.secure_url;
           document.getElementById('avatarImg').src = newAvatarUrl;
+          setStatus('Avatar subido. Pulsa GUARDAR para aplicar.', '#00fff7');
         }
       } catch (err) {
         alert("Error subiendo la imagen.");
@@ -272,12 +300,12 @@
 
     async function guardarCambios() {
       const saveBtn = document.getElementById('saveBtn');
-      const statusMsg = document.getElementById('statusMsg');
+
+      console.log('🟡 guardarCambios invocado. userReady=', userReady, 'currentUser=', currentUser);
 
       // Diagnóstico: si el usuario no está listo, avisar
       if (!userReady || !currentUser) {
-        statusMsg.style.color = '#ff0055';
-        statusMsg.innerText = '⚠️ Esperando datos del usuario... intenta de nuevo en un momento.';
+        setStatus('⚠️ Esperando datos del usuario... intenta de nuevo en un momento.', '#ff0055');
         console.warn('guardarCambios: currentUser es null. userReady =', userReady);
         return;
       }
@@ -286,8 +314,7 @@
       const newColor = document.getElementById('nameColor').value;
 
       if (!newName) {
-        statusMsg.style.color = '#ff0055';
-        statusMsg.innerText = 'El nombre no puede estar vacío.';
+        setStatus('El nombre no puede estar vacío.', '#ff0055');
         return;
       }
 
@@ -297,65 +324,71 @@
       if (!isAdmin && lastProfileUpdate > 0 && (now - lastProfileUpdate < fiveDaysMs)) {
         const msLeft = fiveDaysMs - (now - lastProfileUpdate);
         const daysLeft = Math.ceil(msLeft / (1000 * 60 * 60 * 24));
-        statusMsg.style.color = '#ff0055';
-        statusMsg.innerText = `⏳ Has cambiado tu perfil recientemente. Vuelve a intentarlo en ${daysLeft} días.`;
+        setStatus(`⏳ Has cambiado tu perfil recientemente. Vuelve a intentarlo en ${daysLeft} días.`, '#ff0055');
         return;
       }
 
       saveBtn.disabled = true;
       saveBtn.innerText = 'GUARDANDO...';
-      statusMsg.style.color = '#fff';
-      statusMsg.innerText = 'Guardando cambios...';
+      setStatus('Guardando cambios...', '#fff');
 
       try {
         // 1. Actualizar perfil de Firebase Auth
-        await currentUser.updateProfile({
-          displayName: newName,
-          photoURL: newAvatarUrl
-        });
+        //    Solo incluimos photoURL si tiene valor (evita errores silenciosos)
+        const profileUpdates = { displayName: newName };
+        if (newAvatarUrl && typeof newAvatarUrl === 'string' && newAvatarUrl.startsWith('http')) {
+          profileUpdates.photoURL = newAvatarUrl;
+        }
+        console.log('📝 profileUpdates:', profileUpdates);
+        await currentUser.updateProfile(profileUpdates);
+        console.log('✅ updateProfile OK');
 
         // 2. Guardar en Firestore
         await db.collection('users').doc(currentUser.uid).set({
           customColor: newColor,
           lastProfileUpdate: firebase.firestore.FieldValue.serverTimestamp()
         }, { merge: true });
+        console.log('✅ Firestore set OK');
 
         // 3. Actualizar comentarios históricos
-        statusMsg.style.color = '#fff';
-        statusMsg.innerText = 'Actualizando comentarios históricos...';
+        setStatus('Actualizando comentarios históricos...', '#fff');
 
-        const commentsRef = db.collection('comments').where('userId', '==', currentUser.uid);
-        const snapshot = await commentsRef.get();
-        const batch = db.batch();
-        let ops = 0;
+        try {
+          const commentsRef = db.collection('comments').where('userId', '==', currentUser.uid);
+          const snapshot = await commentsRef.get();
+          const batch = db.batch();
+          let ops = 0;
 
-        snapshot.forEach(doc => {
-          batch.update(doc.ref, {
-            userName: newName,
-            userAvatar: newAvatarUrl,
-            customColor: newColor
+          snapshot.forEach(doc => {
+            batch.update(doc.ref, {
+              userName: newName,
+              userAvatar: newAvatarUrl || currentUser.photoURL || '../assets/img/invitado.avif',
+              customColor: newColor
+            });
+            ops++;
           });
-          ops++;
-        });
-        if (ops > 0) {
-          await batch.commit();
+          if (ops > 0) {
+            await batch.commit();
+            console.log('✅ Comentarios actualizados:', ops);
+          }
+        } catch (commentsErr) {
+          console.warn('⚠️ No se pudieron actualizar comentarios históricos:', commentsErr);
+          // No abortamos: el guardado principal ya funcionó
         }
 
         // 4. Sincronizar con estado global si existe
         syncWithGlobalState(currentUser);
 
         lastProfileUpdate = Date.now();
-        statusMsg.style.color = '#00fff7';
-        statusMsg.innerText = '¡Cambios guardados exitosamente!';
+        setStatus('✅ ¡Cambios guardados exitosamente!', '#00fff7');
 
         // Actualizar currentUser local (para que los datos coincidan)
         currentUser.displayName = newName;
-        currentUser.photoURL = newAvatarUrl;
+        if (profileUpdates.photoURL) currentUser.photoURL = profileUpdates.photoURL;
 
       } catch (err) {
-        console.error('Error al guardar:', err);
-        statusMsg.style.color = '#ff0055';
-        statusMsg.innerText = 'Error al guardar: ' + (err.message || 'desconocido');
+        console.error('❌ Error al guardar:', err);
+        setStatus('Error al guardar: ' + (err.message || 'desconocido'), '#ff0055');
       } finally {
         saveBtn.disabled = false;
         saveBtn.innerText = 'GUARDAR CAMBIOS';
