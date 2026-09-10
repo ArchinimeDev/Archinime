@@ -14,7 +14,7 @@
   <!-- VERSIÓN (forzar limpieza de caché) -->
   <script>
     (function() {
-      const APP_VERSION = "2025-04-10-v24.2-redirect-opciones";
+      const APP_VERSION = "2025-04-10-v24.3-modal-rediseñado";
       const stored = localStorage.getItem('archinime_app_version');
       if (stored !== APP_VERSION) {
         localStorage.setItem('archinime_app_version', APP_VERSION);
@@ -79,6 +79,168 @@
 
   <!-- CSS EXTERNO -->
   <link rel="stylesheet" href="css/styles.css">
+
+  <!-- ===== ESTILOS DEL MODAL DE PERFIL (nuevo diseño v24.3) ===== -->
+  <style>
+    /* Fila completa del selector de color */
+    #profileModal .profile-color-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(0,240,255,0.05), rgba(177,20,255,0.05));
+      border: 1px solid rgba(177, 20, 255, 0.25);
+      transition: 0.3s;
+    }
+    #profileModal .profile-color-row:hover {
+      border-color: rgba(0, 240, 255, 0.45);
+      box-shadow: 0 0 20px rgba(0, 240, 255, 0.08);
+    }
+
+    /* Círculo sólido — sin icono dentro, solo color puro */
+    #profileModal .profile-color-circle {
+      width: 54px;
+      height: 54px;
+      min-width: 54px;
+      aspect-ratio: 1 / 1;
+      border-radius: 50%;
+      background: #00f0ff;
+      box-shadow: 0 0 0 3px rgba(255,255,255,0.08), 0 0 18px #00f0ff, 0 0 32px #00f0ff;
+      transition: box-shadow 0.3s, background 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+    #profileModal .profile-color-circle::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.3), transparent 55%);
+      pointer-events: none;
+    }
+
+    /* Bloque de información a la derecha del círculo */
+    #profileModal .profile-color-info {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      flex: 1;
+      min-width: 0;
+    }
+    #profileModal .profile-color-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.72rem;
+      letter-spacing: 1.5px;
+      font-weight: 700;
+      color: var(--neon-blue);
+      text-shadow: 0 0 8px rgba(0, 240, 255, 0.55);
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    #profileModal .profile-color-row-bottom {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 2px;
+    }
+
+    /* Presets (dottos de colores) */
+    #profileModal .profile-presets {
+      display: flex;
+      gap: 6px;
+    }
+    #profileModal .profile-presets .preset-dot {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid rgba(255,255,255,0.15);
+      padding: 0;
+      transition: transform 0.15s, border-color 0.2s, box-shadow 0.2s;
+      box-shadow: 0 0 6px currentColor;
+    }
+    #profileModal .profile-presets .preset-dot:hover {
+      transform: scale(1.2);
+      border-color: #fff;
+    }
+    #profileModal .profile-presets .preset-dot.active {
+      border-color: #fff;
+      transform: scale(1.15);
+      box-shadow: 0 0 12px currentColor, 0 0 0 2px rgba(255,255,255,0.3);
+    }
+
+    /* Chip HEX */
+    #profileModal .profile-color-hex {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'Orbitron', monospace;
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: #fff;
+      background: rgba(0,0,0,0.5);
+      padding: 3px 9px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.12);
+      letter-spacing: 1px;
+      margin-left: auto;
+    }
+    #profileModal .profile-color-hex .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--neon-blue);
+      box-shadow: 0 0 8px var(--neon-blue);
+      transition: 0.3s;
+    }
+
+    /* Paleta nativa visible */
+    #profileModal .profile-native-picker {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+      padding: 8px 12px;
+      border-radius: 10px;
+      background: rgba(0,0,0,0.35);
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    #profileModal .profile-native-picker label {
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+      font-weight: 600;
+      letter-spacing: 0.4px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    #profileModal .profile-native-picker input[type="color"] {
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      width: 42px;
+      height: 34px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      background: none;
+      padding: 0;
+      overflow: hidden;
+    }
+    #profileModal .profile-native-picker input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; border-radius: 8px; }
+    #profileModal .profile-native-picker input[type="color"]::-webkit-color-swatch {
+      border: 2px solid rgba(255,255,255,0.15);
+      border-radius: 8px;
+    }
+    #profileModal .profile-native-picker input[type="color"]::-moz-color-swatch {
+      border: 2px solid rgba(255,255,255,0.15);
+      border-radius: 8px;
+    }
+  </style>
 </head>
 <body>
 
@@ -303,16 +465,18 @@
   </div>
 </div>
 
-<!-- ===== MODAL DE PERFIL (legacy - se mantiene por compatibilidad, ya no se usa desde el dropdown) ===== -->
+<!-- ===== MODAL DE PERFIL (v24.3 — círculo sólido + paleta nativa + presets) ===== -->
 <div id="profileModal" class="profile-modal">
   <div class="profile-card">
     <div class="profile-close" onclick="closeProfileModal()"><i class="fas fa-times"></i></div>
     <h2 style="font-family:'Orbitron'; text-align:center; color:var(--neon-blue); margin-bottom:16px; font-size:1.2rem;">CONFIGURACIÓN</h2>
+
     <div class="profile-avatar">
       <img id="profileAvatar" src="assets/img/invitado.avif">
       <label class="profile-upload-btn" for="profileAvatarInput"><i class="fas fa-upload"></i> Subir avatar</label>
       <input type="file" id="profileAvatarInput" accept="image/*" style="display:none;">
     </div>
+
     <div class="profile-field">
       <label>ID Único</label>
       <div style="display:flex; gap:6px;">
@@ -320,17 +484,34 @@
         <button class="profile-upload-btn" onclick="copiarUID()" style="margin:0; padding:0 12px;"><i class="fas fa-copy"></i></button>
       </div>
     </div>
+
     <div class="profile-field">
       <label>Nombre Público</label>
       <input type="text" id="profileDisplayName" placeholder="Ej: CyberNinja">
     </div>
+
     <div class="profile-field">
       <label>Color de Nombre</label>
-      <div class="color-picker-wrapper">
-        <input type="color" id="profileNameColor" class="color-picker" value="#00f0ff">
-        <span style="font-size:0.75rem; color:var(--text-secondary);">Elige tu neón</span>
+      <div class="profile-color-row">
+        <div class="profile-color-circle" id="profileColorCircle"></div>
+        <div class="profile-color-info">
+          <span class="profile-color-title"><i class="fas fa-bolt"></i> Tu Neón</span>
+          <div class="profile-color-row-bottom">
+            <div class="profile-presets" id="profileColorPresets"></div>
+            <span class="profile-color-hex">
+              <span class="dot" id="profileColorDot"></span>
+              <span id="profileColorHexText">#00F0FF</span>
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="profile-native-picker">
+        <label for="profileNameColor"><i class="fas fa-palette"></i> Paleta:</label>
+        <input type="color" id="profileNameColor" value="#00f0ff">
+        <span style="font-size:0.7rem; color:var(--text-secondary); margin-left:auto;">Clic para elegir cualquier color</span>
       </div>
     </div>
+
     <button id="profileSaveBtn" class="profile-save-btn" onclick="guardarCambiosPerfil()">GUARDAR CAMBIOS</button>
     <div id="profileStatusMsg" class="profile-status" style="min-height:22px; margin-top:12px; text-align:center; font-weight:700; font-size:0.9rem; padding:8px 10px; border-radius:8px; transition:0.3s; word-break:break-word;"></div>
   </div>
@@ -388,7 +569,7 @@
 
 <!-- ===== SCRIPTS ===== -->
 <!-- app-core.js PRIMERO: contiene Firebase, auth, perfil, etc. -->
-<script src="js/core/app-core.js?v=2025-04-10-v24.2-redirect-opciones"></script>
+<script src="js/core/app-core.js?v=2025-04-10-v24.3-modal-rediseñado"></script>
 <script src="data/catalogo.js?v=2025-04-10-v24.0-modular"></script>
 <script src="js/utils/animaciones.js"></script>
 <script src="js/utils/musica_fondo.js"></script>
@@ -569,7 +750,6 @@
     }
   };
 
-  // Listener específico para cargar stickers del usuario
   auth.onAuthStateChanged(user => {
     if (user) loadUserStickers();
     else { userStickersCollection = []; renderUserStickers(); }
@@ -645,7 +825,6 @@
     }
   };
 
-  // Expuesto para que app-core.js lo pueda llamar desde updateUserUI
   window.actualizarEstadoChatPanel = function() {
     const user = auth.currentUser;
     const inputArea = document.getElementById('chatInputArea');
@@ -1540,7 +1719,6 @@
     let els = getEls();
     let missing = ids.filter(id => !els[id]);
 
-    // Si faltan elementos, reintentar hasta 5 veces (por si el DOM se está re-renderizando)
     if (missing.length) {
       if (!showNextEvent._retries) showNextEvent._retries = 0;
       showNextEvent._retries++;
