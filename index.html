@@ -14,7 +14,7 @@
   <!-- VERSIÓN (forzar limpieza de caché) -->
   <script>
     (function() {
-      const APP_VERSION = "2025-04-07-v21.0-chat-fixes";
+      const APP_VERSION = "2025-04-08-v22.0-performance";
       const stored = localStorage.getItem('archinime_app_version');
       if (stored !== APP_VERSION) {
         localStorage.setItem('archinime_app_version', APP_VERSION);
@@ -103,8 +103,8 @@
 <!-- ===== PARTÍCULAS ===== -->
 <canvas id="particlesCanvas"></canvas>
 
-<!-- ===== FONDO VIDEO ===== -->
-<video id="bg-video" poster="assets/img/galaxia-morado1.avif" autoplay muted loop playsinline preload="auto" style="position:fixed; inset:0; width:100%; height:100%; object-fit:cover; z-index:-2; opacity:0; transition:opacity 1.2s; filter:brightness(0.5) contrast(1.1);">
+<!-- ===== FONDO VIDEO (preload metadata para carga rápida) ===== -->
+<video id="bg-video" poster="assets/img/galaxia-morado1.avif" autoplay muted loop playsinline preload="metadata" style="position:fixed; inset:0; width:100%; height:100%; object-fit:cover; z-index:-2; opacity:0; transition:opacity 1.2s; filter:brightness(0.5) contrast(1.1);">
   <source src="assets/videos/galaxia.mp4" type="video/mp4">
 </video>
 <div id="overlay" style="position:fixed; inset:0; z-index:-1; background:radial-gradient(ellipse at 30% 40%, rgba(177,20,255,0.08), rgba(5,7,10,0.9)); pointer-events:none;"></div>
@@ -152,9 +152,9 @@
   </div>
 </div>
 
-<!-- ===== MODO ESPECIAL (sin indicador de audio) ===== -->
+<!-- ===== MODO ESPECIAL ===== -->
 <div id="specialBanner" style="display:none;" class="banner-special">
-  <video id="specialVideo" muted loop playsinline>
+  <video id="specialVideo" muted loop playsinline preload="metadata">
     <source src="assets/videos/atrevete.mp4" type="video/mp4">
   </video>
   <div class="overlay-text">
@@ -227,7 +227,6 @@
     </div>
   </div>
   
-  <!-- Área de entrada del chat (visible solo para usuarios autenticados) -->
   <div id="chatInputContainerPanel">
     <div class="chat-input-row" id="chatInputArea">
       <input id="chatInputPanel" type="text" placeholder="Escribe un mensaje..." maxlength="300">
@@ -267,7 +266,6 @@
     </div>
   </div>
 
-  <!-- Área para invitados (solo icono + botón) -->
   <div id="chatGuestArea" style="display:none;">
     <i class="fas fa-lock"></i>
     <button class="guest-login-btn" onclick="showAuthModal()">Iniciar sesión</button>
@@ -337,7 +335,6 @@
   </div>
 </div>
 
-<!-- ===== MODAL DETALLE ===== -->
 <div id="detailModal" class="detail-modal">
   <div class="detail-card">
     <div class="detail-cover" id="detailCover">
@@ -360,7 +357,6 @@
   </div>
 </div>
 
-<!-- ===== EVENT MODAL ===== -->
 <div id="eventModal">
   <div class="event-card">
     <div class="event-close" onclick="closeEventModal()"><i class="fas fa-times"></i></div>
@@ -385,7 +381,7 @@
 <div id="stageContainer">
   <div id="fgContainer">
     <canvas id="fgCanvas"></canvas>
-    <video id="fgVideo" muted loop playsinline></video>
+    <video id="fgVideo" muted loop playsinline preload="none"></video>
   </div>
 </div>
 
@@ -407,18 +403,25 @@
   const providerGoogle = new firebase.auth.GoogleAuthProvider();
 </script>
 
-<script src="data/catalogo.js?v=2025-04-07-v21.0-chat-fixes"></script>
+<script src="data/catalogo.js?v=2025-04-08-v22.0-performance"></script>
 <script src="js/utils/animaciones.js"></script>
 <script src="js/utils/musica_fondo.js"></script>
 <script src="js/components/special-mode.js"></script>
 <script src="js/components/notification-system.js"></script>
 <script src="js/utils/gifs.js"></script>
-<script src="js/components/banner-carousel.js?v=2025-04-07-v21.0-chat-fixes"></script>
+<script src="js/components/banner-carousel.js?v=2025-04-08-v22.0-performance"></script>
 
-<!-- ===== SCRIPT PRINCIPAL (con toda la lógica de la app) ===== -->
+<!-- ===== SCRIPT PRINCIPAL (OPTIMIZADO) ===== -->
 <script>
   // ============================================
-  // SISTEMA DE STICKERS (CORREGIDO)
+  // CONFIGURACIÓN DE DEBUG (cambiar a false en producción)
+  // ============================================
+  const DEBUG = false;
+  const log = (...args) => { if (DEBUG) console.log(...args); };
+  const warn = (...args) => { if (DEBUG) console.warn(...args); };
+
+  // ============================================
+  // SISTEMA DE STICKERS
   // ============================================
   let userStickersCollection = [];
   const CATBOX_USERHASH = 'd825312c9594a0a1b16c12c50';
@@ -464,8 +467,6 @@
     mostrarPreviewSticker(url);
     const panel = document.getElementById('stickerPanelFull');
     if (panel) panel.classList.remove('active');
-    const textarea = document.getElementById('comentarioTexto');
-    if (textarea) validarBotonPrincipal(textarea);
   };
 
   function mostrarPreviewSticker(url) {
@@ -494,8 +495,6 @@
     const vid = document.getElementById('previewStickerVidObj');
     if (img) img.src = '';
     if (vid) vid.src = '';
-    const textarea = document.getElementById('comentarioTexto');
-    if (textarea) validarBotonPrincipal(textarea);
   };
 
   window.eliminarSticker = async function(url) {
@@ -590,103 +589,7 @@
   });
 
   // ============================================
-  // COMENTARIOS - SOLO LECTURA (DESACTIVADOS)
-  // ============================================
-  let comentariosUnsubscribe = null;
-  let comentariosInicializados = false;
-
-  function initComentariosSystem() {
-    if (comentariosInicializados) return;
-    comentariosInicializados = true;
-    
-    const formContainer = document.getElementById('comentarioFormContainer');
-    const loginMsg = document.getElementById('comentarioLoginMessage');
-    if (formContainer) formContainer.style.display = 'none';
-    if (loginMsg) {
-      loginMsg.style.display = 'block';
-      loginMsg.innerHTML = '<i class="fas fa-info-circle"></i> Los comentarios están deshabilitados. Solo puedes visualizar los existentes.';
-      loginMsg.style.color = 'var(--text-secondary)';
-      loginMsg.style.textAlign = 'center';
-      loginMsg.style.padding = '20px';
-    }
-    
-    setupComentariosRealtimeListener();
-  }
-
-  function setupComentariosRealtimeListener() {
-    if (comentariosUnsubscribe) comentariosUnsubscribe();
-    const animeId = window.comentariosAnimeId || '1';
-    const season = parseInt(window.comentariosSeason) || 1;
-    const episode = parseInt(window.comentariosEpisode) || 1;
-    if (!animeId || isNaN(season) || isNaN(episode)) {
-      const container = document.getElementById('comentariosList');
-      if (container) container.innerHTML = '<div class="empty-comments">Faltan datos del episodio.</div>';
-      return;
-    }
-    const commentsRef = db.collection('comments')
-      .where('animeId', '==', animeId)
-      .where('season', '==', season)
-      .where('episode', '==', episode)
-      .orderBy('timestamp', 'desc')
-      .limit(150);
-
-    comentariosUnsubscribe = commentsRef.onSnapshot(snapshot => {
-      const container = document.getElementById('comentariosList');
-      if (!container) return;
-      if (snapshot.empty) {
-        container.innerHTML = `<div class="empty-comments"><i class="fas fa-ghost"></i> No hay comentarios aún.</div>`;
-        return;
-      }
-      let html = '';
-      snapshot.docs.reverse().forEach(doc => {
-        const data = doc.data();
-        const userName = data.userName || 'Usuario';
-        const userAvatar = data.userAvatar || 'assets/img/invitado.avif';
-        let texto = data.texto || '';
-        const timestamp = data.timestamp?.toDate() || new Date();
-        const fecha = timestamp.toLocaleString();
-        const customColor = data.customColor || '#00f0ff';
-        texto = texto.replace(/\[Sticker\]\([^)]*\)/g, '');
-        texto = texto.replace(/\n/g, '<br>');
-        let stickerHtml = '';
-        if (data.esSticker && data.stickerUrl) {
-          const isVideo = data.stickerUrl.match(/\.(mp4|webm)$/i);
-          const tag = isVideo ? 'video autoplay loop muted playsinline' : 'img';
-          stickerHtml = `<div style="margin-top:8px; max-width:150px; border-radius:8px; overflow:hidden; border:1px solid ${customColor}; background:#000;"><${tag} src="${data.stickerUrl}" style="width:100%; height:auto; display:block; object-fit:contain;"></div>`;
-        }
-        html += `
-          <div style="display:flex; gap:12px; padding:12px; border-bottom:1px solid rgba(255,255,255,0.05); align-items:flex-start;">
-            <img src="${userAvatar}" style="width:40px; height:40px; border-radius:50%; object-fit:cover; border:2px solid ${customColor}; flex-shrink:0;">
-            <div style="flex:1; min-width:0;">
-              <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-                <span style="font-weight:700; color:${customColor};">${userName}</span>
-                <span style="font-size:0.65rem; color:#aaa;">${fecha}</span>
-              </div>
-              <div style="margin-top:4px; word-wrap:break-word;">${texto}</div>
-              ${stickerHtml}
-            </div>
-          </div>
-        `;
-      });
-      container.innerHTML = html;
-    }, error => {
-      console.error('Error en comentarios:', error);
-      const container = document.getElementById('comentariosList');
-      if (container) container.innerHTML = `<div style="color:var(--neon-pink); padding:20px;">Error: ${error.message}</div>`;
-    });
-  }
-
-  document.addEventListener('DOMContentLoaded', () => {
-    if (!window.comentariosAnimeId) {
-      window.comentariosAnimeId = '1';
-      window.comentariosSeason = '1';
-      window.comentariosEpisode = '1';
-    }
-    initComentariosSystem();
-  });
-
-  // ============================================
-  // CHAT GLOBAL (PANEL LATERAL) - CORREGIDO
+  // CHAT GLOBAL (PANEL LATERAL)
   // ============================================
   const sidePanel = document.getElementById('sidePanel');
   const sideClose = document.getElementById('sidePanelClose');
@@ -775,9 +678,7 @@
   function iniciarEscuchaChatPanel() {
     if (chatUnsubscribePanel) chatUnsubscribePanel();
     const user = auth.currentUser;
-    const query = db.collection('globalChat')
-      .orderBy('timestamp', 'desc')
-      .limit(100);
+    const query = db.collection('globalChat').orderBy('timestamp', 'desc').limit(100);
 
     chatUnsubscribePanel = query.onSnapshot(snapshot => {
       const container = document.getElementById('chatMessagesPanel');
@@ -817,9 +718,7 @@
         }
 
         const isOwner = user && user.uid === uid;
-        const deleteBtn = isOwner ? `
-          <button class="chat-delete-msg" data-id="${doc.id}"><i class="fas fa-trash"></i></button>
-        ` : '';
+        const deleteBtn = isOwner ? `<button class="chat-delete-msg" data-id="${doc.id}"><i class="fas fa-trash"></i></button>` : '';
 
         html += `
           <div class="chat-message" data-id="${doc.id}">
@@ -837,9 +736,7 @@
         `;
       });
       container.innerHTML = html;
-      requestAnimationFrame(() => {
-        container.scrollTop = container.scrollHeight;
-      });
+      requestAnimationFrame(() => { container.scrollTop = container.scrollHeight; });
 
       container.querySelectorAll('.chat-delete-msg').forEach(btn => {
         btn.addEventListener('click', function(e) {
@@ -868,12 +765,17 @@
     return div.innerHTML;
   }
 
+  // ===== getNeonColor (única definición) =====
   function getNeonColor(str) {
     const colors = ['#00f0ff','#ff1a6b','#b114ff','#ffd700','#00ff33','#ffaa00'];
     let h = 0;
     for (let i=0; i<str.length; i++) h = str.charCodeAt(i) + ((h<<5)-h);
     return colors[Math.abs(h)%colors.length];
   }
+  window.getCurrentUserColor = function() {
+    if (!auth.currentUser) return null;
+    return null; // se resuelve desde db.users
+  };
 
   window.enviarMensajeChatPanel = async function() {
     const user = auth.currentUser;
@@ -888,7 +790,6 @@
     try {
       let textoFinal = texto;
       if (sticker) textoFinal += (texto ? '\n' : '') + `[Sticker](${sticker})`;
-      const color = window.getCurrentUserColor ? window.getCurrentUserColor() : null;
       await db.collection('globalChat').add({
         userId: user.uid,
         userName: user.displayName || user.email.split('@')[0] || 'Usuario',
@@ -896,7 +797,7 @@
         texto: textoFinal,
         esSticker: !!sticker,
         stickerUrl: sticker || null,
-        customColor: color || null,
+        customColor: null,
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
       });
       input.value = '';
@@ -973,54 +874,46 @@
     }
   });
 
-  // ===== MODAL PARA STICKER (COPIAR/ROBAR) =====
+  // ===== MODAL PARA STICKER =====
   function abrirStickerModalGlobal(url) {
-    if (typeof openStickerModal === 'function') {
-      openStickerModal(url);
-    } else {
-      let modal = document.getElementById('stickerViewModalGlobal');
-      if (!modal) {
-        modal = document.createElement('div');
-        modal.id = 'stickerViewModalGlobal';
-        modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(5,5,10,0.95);backdrop-filter:blur(10px);z-index:100000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;opacity:0;transition:0.3s;';
-        modal.innerHTML = `
-          <div style="position:relative; text-align:center; max-width:90vw;">
-            <button onclick="cerrarStickerModalGlobal()" style="position:absolute;top:-50px;right:-10px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:#fff;width:40px;height:40px;border-radius:50%;font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:0.2s;"><i class="fas fa-times"></i></button>
-            <img id="stickerModalImgGlobal" src="" style="display:none; max-width:100%;max-height:70vh;border-radius:16px;box-shadow:0 10px 40px rgba(0,255,247,0.2);object-fit:contain;">
-            <video id="stickerModalVidGlobal" src="" autoplay loop muted playsinline style="display:none; max-width:100%;max-height:70vh;border-radius:16px;box-shadow:0 10px 40px rgba(0,255,247,0.2);object-fit:contain;"></video>
-            <br><button id="stickerModalStealBtnGlobal" style="margin-top:25px;background:var(--neon-blue);border:none;color:#000;padding:12px 25px;border-radius:25px;font-weight:800;font-family:'Orbitron',sans-serif;letter-spacing:1px;cursor:pointer;box-shadow:0 0 15px rgba(0,255,247,0.4);transition:0.2s;">
-              <i class="fas fa-mask"></i> ROBAR STICKER
-            </button>
-          </div>
-        `;
-        document.body.appendChild(modal);
-      }
-      const isVideo = url.match(/\.(mp4|webm)$/i);
-      const imgEl = document.getElementById('stickerModalImgGlobal');
-      const vidEl = document.getElementById('stickerModalVidGlobal');
-      if (isVideo) { imgEl.style.display = 'none'; vidEl.src = url; vidEl.style.display = 'block'; }
-      else { vidEl.style.display = 'none'; imgEl.src = url; imgEl.style.display = 'block'; }
-      document.getElementById('stickerModalStealBtnGlobal').onclick = () => {
-        if (auth.currentUser) {
-          if (typeof window.robarStickerSistema === 'function') {
-            window.robarStickerSistema(url);
-          } else {
-            db.collection('userStickers').doc(auth.currentUser.uid).set({
-              stickers: firebase.firestore.FieldValue.arrayUnion(url)
-            }, { merge: true }).then(() => {
-              alert('Sticker robado!');
-              cargarStickersChatPanel();
-              loadUserStickers();
-            }).catch(alert);
-          }
-          cerrarStickerModalGlobal();
-        } else {
-          alert('Inicia sesión para robar stickers');
-        }
-      };
-      modal.style.display = 'flex';
-      setTimeout(() => modal.style.opacity = '1', 10);
+    let modal = document.getElementById('stickerViewModalGlobal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'stickerViewModalGlobal';
+      modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(5,5,10,0.95);backdrop-filter:blur(8px);z-index:100000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;opacity:0;transition:0.3s;';
+      modal.innerHTML = `
+        <div style="position:relative; text-align:center; max-width:90vw;">
+          <button onclick="cerrarStickerModalGlobal()" style="position:absolute;top:-50px;right:-10px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:#fff;width:40px;height:40px;border-radius:50%;font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:0.2s;"><i class="fas fa-times"></i></button>
+          <img id="stickerModalImgGlobal" src="" style="display:none; max-width:100%;max-height:70vh;border-radius:16px;box-shadow:0 10px 40px rgba(0,255,247,0.2);object-fit:contain;">
+          <video id="stickerModalVidGlobal" src="" autoplay loop muted playsinline style="display:none; max-width:100%;max-height:70vh;border-radius:16px;box-shadow:0 10px 40px rgba(0,255,247,0.2);object-fit:contain;"></video>
+          <br><button id="stickerModalStealBtnGlobal" style="margin-top:25px;background:var(--neon-blue);border:none;color:#000;padding:12px 25px;border-radius:25px;font-weight:800;font-family:'Orbitron',sans-serif;letter-spacing:1px;cursor:pointer;box-shadow:0 0 15px rgba(0,255,247,0.4);transition:0.2s;">
+            <i class="fas fa-mask"></i> ROBAR STICKER
+          </button>
+        </div>
+      `;
+      document.body.appendChild(modal);
     }
+    const isVideo = url.match(/\.(mp4|webm)$/i);
+    const imgEl = document.getElementById('stickerModalImgGlobal');
+    const vidEl = document.getElementById('stickerModalVidGlobal');
+    if (isVideo) { imgEl.style.display = 'none'; vidEl.src = url; vidEl.style.display = 'block'; }
+    else { vidEl.style.display = 'none'; imgEl.src = url; imgEl.style.display = 'block'; }
+    document.getElementById('stickerModalStealBtnGlobal').onclick = () => {
+      if (auth.currentUser) {
+        db.collection('userStickers').doc(auth.currentUser.uid).set({
+          stickers: firebase.firestore.FieldValue.arrayUnion(url)
+        }, { merge: true }).then(() => {
+          alert('Sticker robado!');
+          cargarStickersChatPanel();
+          loadUserStickers();
+        }).catch(alert);
+        cerrarStickerModalGlobal();
+      } else {
+        alert('Inicia sesión para robar stickers');
+      }
+    };
+    modal.style.display = 'flex';
+    setTimeout(() => modal.style.opacity = '1', 10);
   }
 
   function cerrarStickerModalGlobal() {
@@ -1034,19 +927,19 @@
   window.cerrarStickerModal = cerrarStickerModalGlobal;
 
   // ============================================
-  // RESTO DEL CÓDIGO (catálogo, filtros, etc.)
+  // INICIALIZACIÓN BÁSICA
   // ============================================
   window.videoList = videoList || [];
   window.musicListGlobal = musicListGlobal || [];
   window.toggleNotifMenu = function() {
     document.getElementById('notifMenu').classList.toggle('active');
   };
-  window.startNotificationSequence = function() { console.log("Notificaciones listas"); };
+  window.startNotificationSequence = function() { log("Notificaciones listas"); };
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('./sw.js').then(reg => {
-        console.log('SW registrado:', reg);
+        log('SW registrado:', reg);
       }).catch(err => console.error('SW error:', err));
     });
   }
@@ -1064,7 +957,8 @@
   window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredPrompt = e; updateButtons(); });
   installBtn.addEventListener('click', () => {
     if (isIos()) {
-      document.getElementById('iosInstallModal').style.display = 'flex';
+      const m = document.getElementById('iosInstallModal');
+      if (m) m.style.display = 'flex';
     } else if (deferredPrompt) {
       deferredPrompt.prompt();
       deferredPrompt.userChoice.then(() => { deferredPrompt = null; updateButtons(); });
@@ -1075,12 +969,18 @@
   window.matchMedia('(display-mode: standalone)').addEventListener('change', updateButtons);
   window.addEventListener('DOMContentLoaded', updateButtons);
 
-  // ===== LOADER (con GIF) =====
+  // ===== LOADER OPTIMIZADO (sessionStorage + 3s timeout) =====
   let loadingCompleted = false;
   const loadingScreen = document.getElementById('loadingScreen');
   const percentEl = document.getElementById('loadingPercentage');
   const lineEl = document.getElementById('loaderLine');
   const gifImg = document.getElementById('personaje-gif');
+
+  // Si ya se mostró el loader en esta sesión, ocultarlo al instante
+  if (sessionStorage.getItem('archinime_loader_shown') === '1') {
+    loadingScreen.classList.add('hidden');
+    loadingCompleted = true;
+  }
 
   if (typeof listaDeGifs !== 'undefined' && listaDeGifs.length > 0) {
     const gifElegido = listaDeGifs[Math.floor(Math.random() * listaDeGifs.length)];
@@ -1100,33 +1000,63 @@
     loadingCompleted = true;
     updateProgress(100);
     percentEl.textContent = 'SISTEMA LISTO';
+    sessionStorage.setItem('archinime_loader_shown', '1');
     setTimeout(() => {
       loadingScreen.classList.add('hidden');
       document.body.style.overflow = '';
-    }, 700);
+    }, 500);
   }
 
   let prog = 0;
   const loadInterval = setInterval(() => {
     if (loadingCompleted) { clearInterval(loadInterval); return; }
     if (prog < 85) { prog += Math.random() * 8; if (prog > 85) prog = 85; updateProgress(prog); }
-  }, 200);
-  window.addEventListener('firstAnimesLoaded', () => { clearInterval(loadInterval); updateProgress(100); finishLoading(); });
-  setTimeout(() => { if (!loadingCompleted) finishLoading(); }, 8000);
+  }, 150);
 
-  // ===== RESTO DEL CÓDIGO (catálogo, filtros, etc.) =====
+  window.addEventListener('firstAnimesLoaded', () => { clearInterval(loadInterval); updateProgress(100); finishLoading(); });
+  // Reducido de 8000ms a 3000ms
+  setTimeout(() => { if (!loadingCompleted) finishLoading(); }, 3000);
+
+  // ===== UTILIDADES =====
   function shuffleArray(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
 
+  // ===== RATINGS CON CACHÉ =====
   let firestoreRatings = new Map();
+  const RATINGS_CACHE_KEY = 'archinime_ratings_cache';
+  const RATINGS_CACHE_TTL = 2 * 60 * 60 * 1000; // 2 horas
+
   async function loadRatings() {
+    // Intentar cargar desde caché
+    try {
+      const cached = localStorage.getItem(RATINGS_CACHE_KEY);
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (parsed.timestamp && (Date.now() - parsed.timestamp < RATINGS_CACHE_TTL)) {
+          parsed.data.forEach(([id, val]) => firestoreRatings.set(parseInt(id), val));
+          log('✅ Ratings cargadas desde caché:', firestoreRatings.size);
+          return;
+        }
+      }
+    } catch (e) { warn('Error leyendo caché de ratings:', e); }
+
+    // Cargar desde Firestore
     try {
       const snap = await db.collection('animeRatings').get();
       snap.forEach(doc => {
         const d = doc.data();
         if (typeof d.avg === 'number') firestoreRatings.set(parseInt(doc.id), { avg: d.avg, count: d.count || 0 });
       });
-    } catch (e) { console.warn('Error ratings:', e); }
+      // Guardar en caché
+      try {
+        localStorage.setItem(RATINGS_CACHE_KEY, JSON.stringify({
+          data: Array.from(firestoreRatings.entries()),
+          timestamp: Date.now()
+        }));
+      } catch (e) { warn('No se pudo guardar caché:', e); }
+      log('✅ Ratings cargadas desde Firestore:', firestoreRatings.size);
+    } catch (e) { console.error('Error ratings:', e); }
   }
+
   function getDisplayRating(anime) {
     const id = parseInt(anime.id);
     if (firestoreRatings.has(id)) return firestoreRatings.get(id).avg.toFixed(1);
@@ -1311,8 +1241,10 @@
       const ratingVal = getNumericRating(anime);
       const roundedRating = Math.round(ratingVal * 10) / 10;
       const badge = (roundedRating >= 4.9 && roundedRating <= 5.0) ? '<div class="badge">🔥 TOP</div>' : '';
+      // Lazy loading para las tarjetas después de las 6 primeras
+      const loadingAttr = i < 6 ? 'eager' : 'lazy';
       card.innerHTML = `
-        <img src="${img}" alt="${anime.title}" loading="eager" decoding="async" style="background:#0b0e14;">
+        <img src="${img}" alt="${anime.title}" loading="${loadingAttr}" decoding="async" style="background:#0b0e14;">
         ${badge}
         <div class="info">
           <strong>${anime.title}</strong>
@@ -1361,14 +1293,10 @@
       hideAllSuggestions();
       cargarDatosYMostrar();
     }
-    if (e.key === 'Escape') {
-      hideAllSuggestions();
-    }
+    if (e.key === 'Escape') { hideAllSuggestions(); }
   }
   document.addEventListener('click', function(e) {
-    if (!e.target.closest('.search-wrapper')) {
-      hideAllSuggestions();
-    }
+    if (!e.target.closest('.search-wrapper')) hideAllSuggestions();
   });
   searchInput.addEventListener('input', handleSearchInput);
   searchInput.addEventListener('keydown', handleSearchKeydown);
@@ -1399,12 +1327,6 @@
   let currentUser = null, newAvatarUrl = null, lastProfileUpdate = 0;
   const CLOUDINARY_URL = 'https://api.cloudinary.com/v1_1/dbcqcai1q/upload';
   const CLOUDINARY_PRESET = 'stickers_archinime';
-
-  function getNeonColor(str) {
-    const colors = ['#00f0ff','#ff1a6b','#b114ff','#ffd700','#00ff33','#ffaa00'];
-    let h = 0; for (let i=0; i<str.length; i++) h = str.charCodeAt(i) + ((h<<5)-h);
-    return colors[Math.abs(h)%colors.length];
-  }
 
   function showProfileModal() {
     if (!currentUser) { showAuthModal(); document.getElementById('authError').textContent = "⚠️ Inicia sesión para configurar."; return; }
@@ -1522,9 +1444,7 @@
       dAvatar.style.borderColor = 'var(--neon-blue)'; dAvatar.style.boxShadow = 'none';
       dName.style.color = 'var(--neon-blue)'; dName.style.textShadow = 'none';
     }
-    if (sidePanel.classList.contains('open')) {
-      actualizarEstadoChatPanel();
-    }
+    if (sidePanel.classList.contains('open')) actualizarEstadoChatPanel();
   }
   document.getElementById('profileDropdownBtn').addEventListener('click', (e) => { e.stopPropagation(); showProfileModal(); });
   document.getElementById('userAvatarBtn').addEventListener('click', e => { e.stopPropagation(); document.getElementById('userDropdown').classList.toggle('active'); });
@@ -1600,7 +1520,7 @@
     });
   }
 
-  // ===== CHROMA KEY (ANIMACIONES FIJAS) =====
+  // ===== CHROMA KEY (OPTIMIZADO) =====
   function randomizeFgPosition() {
     const container = document.getElementById('stageContainer');
     if (!container) return;
@@ -1617,10 +1537,11 @@
   fgVideo.style.display = 'none';
   fgVideo.src = currentAnim.src;
   fgVideo.addEventListener('loadedmetadata', () => {
-    const maxW = 300;
+    // Reducido de 300 a 200 para mejor rendimiento
+    const maxW = 200;
     const ratio = fgVideo.videoWidth / fgVideo.videoHeight;
     fgCanvas.width = maxW;
-    fgCanvas.height = maxW / ratio;
+    fgCanvas.height = Math.round(maxW / ratio);
   });
   let frameCount = 0;
   let chromaActive = true;
@@ -1630,8 +1551,8 @@
       return;
     }
     frameCount++;
-    // Reducir carga: procesar cada 6 frames en lugar de 4
-    if (frameCount % 6 !== 0) {
+    // Procesar cada 12 frames (antes 6) para aliviar la CPU
+    if (frameCount % 12 !== 0) {
       requestAnimationFrame(processChroma);
       return;
     }
@@ -1693,7 +1614,7 @@
   });
   window.addEventListener('DOMContentLoaded', startVisualMedia);
 
-  // ===== FUNCIONES DE DETALLE Y EVENTOS =====
+  // ===== DETALLE Y EVENTOS =====
   function buildContentDetails(anime) {
     if (!anime.seasons || anime.seasons.length === 0) {
       return `<p style="color: var(--text-secondary); line-height: 1.6;">${anime.desc || 'Descripción no disponible.'}</p>`;
@@ -1765,7 +1686,6 @@
   window.openDetail = openDetail;
   window.closeDetailModal = closeDetailModal;
 
-  // Event modal
   let eventQueue = [];
   let isEventModalShowing = false;
   function showNextEvent() {
@@ -1785,31 +1705,23 @@
     document.getElementById('eventModal').classList.add('show');
     disableBodyScroll();
     if (window.eventTimeout) clearTimeout(window.eventTimeout);
-    window.eventTimeout = setTimeout(() => {
-      closeEventModal();
-    }, 8000);
+    window.eventTimeout = setTimeout(() => { closeEventModal(); }, 8000);
   }
   function closeEventModal() {
     document.getElementById('eventModal').classList.remove('show');
     enableBodyScroll();
     isEventModalShowing = false;
-    setTimeout(() => {
-      showNextEvent();
-    }, 1500);
+    setTimeout(() => { showNextEvent(); }, 1500);
   }
   window.closeEventModal = closeEventModal;
   function addEventToQueue(anime) {
     if (eventQueue.length >= 5) return;
     eventQueue.push(anime);
-    if (!isEventModalShowing) {
-      showNextEvent();
-    }
+    if (!isEventModalShowing) showNextEvent();
   }
   function checkForNewAnimes() {
     const newAnimes = baseAnimes.slice(0, 3);
-    newAnimes.forEach(anime => {
-      addEventToQueue(anime);
-    });
+    newAnimes.forEach(anime => { addEventToQueue(anime); });
   }
 
   document.addEventListener('keydown', e => {
@@ -1834,34 +1746,29 @@
   window.closeProfileModal = closeProfileModal;
   window.copiarUID = copiarUID;
 
-  // ===== INICIALIZACIÓN FINAL =====
+  // ===== INICIALIZACIÓN FINAL OPTIMIZADA =====
   inicializarAnuncio();
+
+  // 1. Mostrar el catálogo INMEDIATAMENTE (sin esperar ratings)
+  if (typeof catalogoArray !== 'undefined') {
+    baseAnimes = shuffleArray([...catalogoArray]);
+    searchableIndex = buildSearchableIndex(baseAnimes);
+  } else {
+    baseAnimes = [];
+    searchableIndex = [];
+  }
+  cargarDatosYMostrar();
+
+  // 2. Cargar ratings en paralelo (con caché)
   loadRatings().then(() => {
-    if (typeof catalogoArray !== 'undefined') {
-      baseAnimes = shuffleArray([...catalogoArray]);
-      searchableIndex = buildSearchableIndex(baseAnimes);
-    } else {
-      baseAnimes = [];
-      searchableIndex = [];
+    // Refrescar la vista si el usuario sigue en la primera página sin filtros
+    if (currentPage === 1 && !currentFilters.search && !currentFilters.genre && !currentFilters.demographic && !currentFilters.rating) {
+      cargarDatosYMostrar();
     }
-    cargarDatosYMostrar();
-    setTimeout(() => {
-      checkForNewAnimes();
-    }, 3000);
-  }).catch(err => {
-    console.error('Error al cargar ratings:', err);
-    if (typeof catalogoArray !== 'undefined') {
-      baseAnimes = shuffleArray([...catalogoArray]);
-      searchableIndex = buildSearchableIndex(baseAnimes);
-    } else {
-      baseAnimes = [];
-      searchableIndex = [];
-    }
-    cargarDatosYMostrar();
-    setTimeout(() => {
-      checkForNewAnimes();
-    }, 3000);
-  });
+  }).catch(err => console.error('Error al cargar ratings:', err));
+
+  // 3. Notificaciones de nuevos animes después de un momento
+  setTimeout(() => { checkForNewAnimes(); }, 3000);
 
   window.addEventListener('load', () => { if (window.startNotificationSequence) window.startNotificationSequence(); });
 
@@ -1895,12 +1802,7 @@
     observer.observe(carousel);
     const slideObserver = new MutationObserver(() => {
       const rect = carousel.getBoundingClientRect();
-      const isVisible = (
-        rect.top < window.innerHeight &&
-        rect.bottom > 0 &&
-        rect.left < window.innerWidth &&
-        rect.right > 0
-      );
+      const isVisible = (rect.top < window.innerHeight && rect.bottom > 0 && rect.left < window.innerWidth && rect.right > 0);
       if (isVisible) resumeActiveVideo();
       else pauseAllVideos();
     });
@@ -1928,7 +1830,7 @@
     resize();
   })();
 
-  console.log('🚀 Archinime cargado correctamente con optimizaciones para móviles.');
+  log('🚀 Archinime cargado correctamente con optimizaciones de rendimiento.');
 </script>
 
 </body>
