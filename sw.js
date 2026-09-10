@@ -3,20 +3,18 @@
    Estrategia híbrida con control absoluto sobre catalogo.js
    MEJORADO: Caché más inteligente, actualizaciones en caliente
    ACTUALIZADO: Rutas a la nueva estructura de carpetas
+   v103 - Fix: bump versión para forzar actualización
    ============================================================ */
 
-const CACHE_STATIC = 'archinime-static-v102';
-const CACHE_DYNAMIC = 'archinime-dynamic-v102';
-const CACHE_IMAGES = 'archinime-images-v102';
-const CACHE_FONTS = 'archinime-fonts-v102';
+const CACHE_STATIC = 'archinime-static-v103';
+const CACHE_DYNAMIC = 'archinime-dynamic-v103';
+const CACHE_IMAGES = 'archinime-images-v103';
+const CACHE_FONTS = 'archinime-fonts-v103';
 
+// OJO: opciones.html y anime-detail NO van en precache para que siempre se sirvan frescos
 const STATIC_ASSETS = [
   '/',
   '/index.html',
-  '/pages/anime-detail.html',
-  '/pages/video-player.html',
-  '/pages/carga.html',
-  '/pages/opciones.html',
   '/manifest.json',
   '/assets/img/Logo_Archinime.avif',
   '/assets/img/Logo_Archinime.png',
@@ -29,7 +27,7 @@ const STATIC_ASSETS = [
 
 // Instalación
 self.addEventListener('install', event => {
-  console.log('[SW] Instalando...');
+  console.log('[SW] Instalando v103...');
   self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_STATIC).then(cache => {
@@ -41,7 +39,7 @@ self.addEventListener('install', event => {
 
 // Activación
 self.addEventListener('activate', event => {
-  console.log('[SW] Activando...');
+  console.log('[SW] Activando v103...');
   const currentCaches = [CACHE_STATIC, CACHE_DYNAMIC, CACHE_IMAGES, CACHE_FONTS];
   event.waitUntil(
     caches.keys().then(cacheNames => {
@@ -53,9 +51,8 @@ self.addEventListener('activate', event => {
           }
         })
       );
-    })
+    }).then(() => self.clients.claim())
   );
-  return self.clients.claim();
 });
 
 // Fetch
@@ -78,9 +75,19 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // HTML -> network-first
+  // ===== HTML CRÍTICO: SIEMPRE RED PRIMERO, SIN CACHÉ =====
+  // Esto incluye opciones.html, anime-detail.html, etc.
   if (request.destination === 'document' || url.pathname.endsWith('.html') || url.pathname === '/') {
-    event.respondWith(networkFirst(request));
+    event.respondWith(
+      fetch(request, { cache: 'no-store' })
+        .then(response => {
+          // Guardamos copia fresca por si se cae la red
+          const clone = response.clone();
+          caches.open(CACHE_DYNAMIC).then(cache => cache.put(request, clone));
+          return response;
+        })
+        .catch(() => caches.match(request))
+    );
     return;
   }
 
