@@ -150,66 +150,101 @@ Todo está construido con **JavaScript puro + Firebase**, sin frameworks pesados
 
 <div align="center">
 
-> 📸 Un recorrido visual por la interfaz de **Archinime** — desde la portada hasta el reproductor.
+<img src="https://cdn.jsdelivr.net/gh/Archinime/Banners@main/banners.gif" alt="Archinime Preview" width="100%" />
+
+<br>
+
+> 📸 Un recorrido visual completo por la interfaz de **Archinime** — desde la portada hasta el reproductor.
 
 </div>
+
+---
 
 ### 🏠 Pantalla de Inicio
 
 <div align="center">
   <a href="https://archinime.pages.dev/" target="_blank">
-    <img src="https://cdn.jsdelivr.net/gh/Archinime/Banners@main/inicio.png" alt="Pantalla de inicio de Archinime" width="90%" />
+    <img src="https://cdn.jsdelivr.net/gh/Archinime/Banners@main/inicio.png" alt="Pantalla de inicio de Archinime" width="100%" />
   </a>
 </div>
 
 > La pantalla principal con el **banner carrusel**, la **barra de búsqueda con sugerencias en vivo**, el **grid de animes** y todos los **filtros de género, demografía y ranking** en la parte superior.
 
-<br>
+---
 
 ### 📚 Catálogo de Animes
 
 <div align="center">
-  <img src="https://cdn.jsdelivr.net/gh/Archinime/Banners@main/anime.png" alt="Catálogo de animes" width="90%" />
+  <img src="https://cdn.jsdelivr.net/gh/Archinime/Banners@main/anime.png" alt="Catálogo de animes" width="100%" />
 </div>
 
 > El **grid completo** con +160 animes. Cada tarjeta muestra la portada, el título y la calificación actual en estrellas. Se incluye **paginación** con navegación fluida y **efectos 3D** al pasar el cursor en escritorio.
 
-<br>
+---
 
-### 🔔 Sistema de Notificaciones
-
-<div align="center">
-  <img src="https://cdn.jsdelivr.net/gh/Archinime/Banners@main/notificaciones.png" alt="Sistema de notificaciones" width="90%" />
-</div>
-
-> Panel de **notificaciones inteligentes** con cola de popups, badge dinámico, historial persistente y sincronización con Firestore. Incluye alertas de **nuevos episodios**, **estrenos** y **respuestas a comentarios**.
-
-<br>
-
-### 💬 Chat Global
+### ⚡ Módulos Interactivos
 
 <div align="center">
-  <img src="https://cdn.jsdelivr.net/gh/Archinime/Banners@main/chat.png" alt="Chat global" width="90%" />
+
+<table>
+<tr>
+<td width="50%" align="center">
+
+**🔔 Sistema de Notificaciones**
+
+<a href="https://cdn.jsdelivr.net/gh/Archinime/Banners@main/notificaciones.png" target="_blank">
+  <img src="https://cdn.jsdelivr.net/gh/Archinime/Banners@main/notificaciones.png" alt="Sistema de notificaciones" width="100%" />
+</a>
+
+<sub>Cola de popups, badge dinámico, historial persistente y sincronización con Firestore.</sub>
+
+</td>
+<td width="50%" align="center">
+
+**💬 Chat Global**
+
+<a href="https://cdn.jsdelivr.net/gh/Archinime/Banners@main/chat.png" target="_blank">
+  <img src="https://cdn.jsdelivr.net/gh/Archinime/Banners@main/chat.png" alt="Chat global" width="100%" />
+</a>
+
+<sub>Mensajes en tiempo real, stickers personalizables y colores neón por usuario.</sub>
+
+</td>
+</tr>
+<tr>
+<td width="50%" align="center">
+
+**🎥 Detalle del Anime**
+
+<a href="https://cdn.jsdelivr.net/gh/Archinime/Banners@main/detalle.png" target="_blank">
+  <img src="https://cdn.jsdelivr.net/gh/Archinime/Banners@main/detalle.png" alt="Detalle del anime" width="100%" />
+</a>
+
+<sub>Votación por estrellas, temporadas, OVAs, películas y recomendaciones.</sub>
+
+</td>
+<td width="50%" align="center">
+
+**⚡ Animaciones y Efectos**
+
+<a href="https://cdn.jsdelivr.net/gh/Archinime/Banners@main/animacion.png" target="_blank">
+  <img src="https://cdn.jsdelivr.net/gh/Archinime/Banners@main/animacion.png" alt="Animaciones y efectos" width="100%" />
+</a>
+
+<sub>Partículas, chroma key en vivo, cursor con glow y transiciones fluidas.</sub>
+
+</td>
+</tr>
+</table>
+
 </div>
 
-> **Chat global en tiempo real** con panel lateral deslizante. Soporta mensajes de texto, **stickers personalizables** (imágenes y videos), colores neón por usuario y eliminación de mensajes propios.
-
-<br>
-
-### 🎥 Detalle del Anime
-
-<div align="center">
-  <img src="https://cdn.jsdelivr.net/gh/Archinime/Banners@main/detalle.png" alt="Detalle del anime" width="90%" />
-</div>
-
-> Vista de **detalle del anime** con portada, sinopsis, géneros, sistema de **votación por estrellas**, lista de **temporadas / OVAs / películas** con episodios marcables como vistos, y sección de **recomendaciones** basadas en el catálogo.
-
-<br>
+---
 
 ### 📺 Reproductor de Video
 
 <div align="center">
-  <img src="https://cdn.jsdelivr.net/gh/Archinime/Banners@main/video.png" alt="Reproductor de video" width="90%" />
+  <img src="https://cdn.jsdelivr.net/gh/Archinime/Banners@main/video.png" alt="Reproductor de video" width="100%" />
 </div>
 
 > El **reproductor multipropósito** con:
@@ -219,17 +254,7 @@ Todo está construido con **JavaScript puro + Firebase**, sin frameworks pesados
 > - Sección completa de **comentarios con reacciones** y **stickers**
 > - Botón de **descarga** con barra de progreso
 
-<br>
-
-### ⚡ Animaciones y Efectos Visuales
-
-<div align="center">
-  <img src="https://cdn.jsdelivr.net/gh/Archinime/Banners@main/animacion.png" alt="Animaciones y efectos" width="90%" />
-</div>
-
-> Los **efectos visuales únicos** de Archinime: partículas interactivas, **chroma key en vivo** con canvas, cursor personalizado con glow, animaciones fluidas de entrada y todos los detalles cyberpunk que hacen única la experiencia.
-
-<br>
+---
 
 ### 🏠 Habitación 3D Interactiva (Lunari OS)
 
