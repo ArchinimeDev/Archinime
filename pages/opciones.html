@@ -36,18 +36,22 @@
       padding: 20px;
       overflow-x: hidden;
     }
+
+    /* ============================================ */
+    /* ===== CONTENEDOR PRINCIPAL — ANCHO FIJO ==== */
+    /* ============================================ */
     .options-container {
       background: var(--glass-bg);
       border: 1px solid var(--accent-color);
       border-radius: 20px;
       padding: 40px;
-      /* ANCHO FIJO — no depende del contenido */
-      width: 500px;
-      max-width: 100%;
+      width: 500px !important;
+      min-width: 500px !important;
+      max-width: 500px !important;
+      box-sizing: border-box !important;
       box-shadow: 0 15px 50px rgba(0,0,0,0.9), 0 0 20px rgba(188, 19, 254, 0.2);
       backdrop-filter: blur(15px);
-      /* evita que el contenido lo estire */
-      overflow: hidden;
+      overflow: hidden !important;
     }
     .back-btn {
       display: inline-flex;
@@ -88,10 +92,10 @@
     .upload-btn:hover { background: rgba(255,255,255,0.1); border-color: var(--primary-color); }
 
     /* ============================================ */
-    /* ========== SELECTOR DE COLOR NUEVO ========= */
+    /* ========== SELECTOR DE COLOR =============== */
     /* ============================================ */
     .color-picker-wrapper {
-      display: flex;
+      display: flex !important;
       align-items: center;
       gap: 18px;
       padding: 16px 18px;
@@ -99,8 +103,9 @@
       background: linear-gradient(135deg, rgba(0,255,247,0.04), rgba(188,19,254,0.06));
       border: 1px solid rgba(188, 19, 254, 0.25);
       transition: border-color 0.3s, box-shadow 0.3s;
-      /* Evita que el contenido estire el wrapper */
-      overflow: hidden;
+      width: 100% !important;
+      box-sizing: border-box !important;
+      overflow: hidden !important;
     }
     .color-picker-wrapper:hover {
       border-color: rgba(0, 255, 247, 0.45);
@@ -110,10 +115,11 @@
     /* Círculo sólido — tamaño fijo, no crece */
     .color-circle {
       position: relative;
-      width: 62px;
-      height: 62px;
-      min-width: 62px;
-      flex-shrink: 0;
+      width: 62px !important;
+      height: 62px !important;
+      min-width: 62px !important;
+      max-width: 62px !important;
+      flex: 0 0 62px !important;
       aspect-ratio: 1 / 1;
       border-radius: 50%;
       background: #00fff7;
@@ -125,6 +131,7 @@
         0 0 18px #00fff7,
         0 0 32px #00fff7;
       overflow: hidden;
+      box-sizing: border-box !important;
     }
     .color-circle::before {
       content: '';
@@ -139,10 +146,10 @@
       display: flex;
       flex-direction: column;
       gap: 6px;
-      flex: 1 1 0;
-      /* CLAVE: evita que el contenido empuje el layout */
-      min-width: 0;
-      overflow: hidden;
+      flex: 1 1 auto;
+      min-width: 0 !important;
+      width: 100%;
+      overflow: hidden !important;
     }
     .color-title {
       font-family: 'Orbitron', sans-serif;
@@ -165,12 +172,14 @@
 
     /* Fila de presets + chip HEX — layout fijo */
     .color-bottom-row {
-      display: flex;
+      display: flex !important;
       align-items: center;
       gap: 10px;
       margin-top: 2px;
-      /* No permitas que el contenido cambie el ancho */
-      overflow: hidden;
+      width: 100% !important;
+      min-width: 0 !important;
+      overflow: hidden !important;
+      flex-wrap: nowrap !important;
     }
 
     /* Chips de colores preestablecidos */
@@ -180,15 +189,18 @@
       flex-shrink: 0;
     }
     .preset-dot {
-      width: 18px;
-      height: 18px;
-      min-width: 18px;
+      width: 18px !important;
+      height: 18px !important;
+      min-width: 18px !important;
+      max-width: 18px !important;
+      flex: 0 0 18px !important;
       border-radius: 50%;
       cursor: pointer;
       border: 2px solid rgba(255,255,255,0.15);
       padding: 0;
       transition: transform 0.15s, border-color 0.2s, box-shadow 0.2s;
       box-shadow: 0 0 6px currentColor;
+      box-sizing: border-box !important;
     }
     .preset-dot:hover {
       transform: scale(1.2);
@@ -200,50 +212,64 @@
       box-shadow: 0 0 12px currentColor, 0 0 0 2px rgba(255,255,255,0.3);
     }
 
-    /* Chip HEX — ANCHO FIJO para que no cambie con el contenido */
+    /* ============================================ */
+    /* ===== CHIP HEX — ANCHO FIJO E INVIOLABLE === */
+    /* ============================================ */
     .color-hex {
-      display: inline-flex;
+      display: inline-flex !important;
       align-items: center;
       justify-content: center;
       gap: 6px;
-      font-family: 'Orbitron', monospace;
-      font-size: 0.7rem;
-      font-weight: 700;
+      font-family: 'Courier New', 'Consolas', monospace !important;
+      font-size: 0.72rem !important;
+      font-weight: 700 !important;
       color: #fff;
       background: rgba(0,0,0,0.5);
-      padding: 3px 9px;
+      padding: 0 !important;
       border-radius: 12px;
       border: 1px solid rgba(255,255,255,0.12);
       letter-spacing: 1px;
-      transition: 0.3s;
-      /* ANCHO FIJO — esto soluciona el problema */
-      width: 96px;
-      min-width: 96px;
-      flex-shrink: 0;
+      transition: none !important;
+      width: 96px !important;
+      min-width: 96px !important;
+      max-width: 96px !important;
+      height: 22px !important;
+      flex: 0 0 96px !important;
       margin-left: auto;
-      font-variant-numeric: tabular-nums;
-      font-feature-settings: "tnum";
+      box-sizing: border-box !important;
+      overflow: hidden !important;
     }
     .color-hex .dot {
-      width: 6px;
-      height: 6px;
-      min-width: 6px;
+      width: 6px !important;
+      height: 6px !important;
+      min-width: 6px !important;
+      max-width: 6px !important;
+      flex: 0 0 6px !important;
       border-radius: 50%;
       background: var(--primary-color);
       box-shadow: 0 0 8px var(--primary-color);
-      transition: 0.3s;
+      transition: background 0.2s, box-shadow 0.2s !important;
     }
     #colorHexText {
-      /* Ancho fijo para el texto del código */
-      display: inline-block;
-      width: 60px;
-      text-align: center;
-      white-space: nowrap;
+      display: inline-block !important;
+      width: 62px !important;
+      min-width: 62px !important;
+      max-width: 62px !important;
+      flex: 0 0 62px !important;
+      text-align: center !important;
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      font-family: 'Courier New', 'Consolas', monospace !important;
+      font-variant-numeric: tabular-nums !important;
+      letter-spacing: 0 !important;
+      text-transform: uppercase !important;
     }
 
-    /* Paleta nativa visible */
+    /* ============================================ */
+    /* ===== PALETA NATIVA — ANCHO FIJO =========== */
+    /* ============================================ */
     .native-picker-row {
-      display: flex;
+      display: flex !important;
       align-items: center;
       gap: 12px;
       margin-top: 10px;
@@ -251,7 +277,10 @@
       border-radius: 12px;
       background: rgba(0,0,0,0.35);
       border: 1px solid rgba(255,255,255,0.08);
-      overflow: hidden;
+      width: 100% !important;
+      box-sizing: border-box !important;
+      overflow: hidden !important;
+      flex-wrap: nowrap !important;
     }
     .native-picker-row label {
       font-size: 0.75rem;
@@ -263,22 +292,24 @@
       align-items: center;
       gap: 6px;
       white-space: nowrap;
-      flex-shrink: 0;
+      flex: 0 0 auto !important;
     }
     .native-picker-row input[type="color"].native-picker {
       -webkit-appearance: none;
       -moz-appearance: none;
       appearance: none;
-      width: 46px;
-      min-width: 46px;
-      height: 34px;
+      width: 46px !important;
+      min-width: 46px !important;
+      max-width: 46px !important;
+      height: 34px !important;
+      flex: 0 0 46px !important;
       border: none;
       border-radius: 8px;
       cursor: pointer;
       background: none;
       padding: 0;
       overflow: hidden;
-      flex-shrink: 0;
+      box-sizing: border-box !important;
     }
     .native-picker-row input[type="color"].native-picker::-webkit-color-swatch-wrapper { padding: 0; border-radius: 8px; }
     .native-picker-row input[type="color"].native-picker::-webkit-color-swatch {
@@ -294,6 +325,9 @@
       color: #888;
       margin-left: auto;
       white-space: nowrap;
+      flex: 0 1 auto !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
     }
 
     .save-btn {
@@ -321,15 +355,45 @@
       box-shadow: 0 0 15px currentColor;
     }
 
-    @media (max-width: 420px) {
-      .options-container { padding: 26px 20px; }
-      .color-circle { width: 54px; height: 54px; min-width: 54px; }
+    /* ============================================ */
+    /* ===== RESPONSIVE — ANCHO 100% MÓVIL ======== */
+    /* ============================================ */
+    @media (max-width: 560px) {
+      .options-container {
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        padding: 26px 20px;
+      }
+      .color-circle {
+        width: 54px !important;
+        height: 54px !important;
+        min-width: 54px !important;
+        max-width: 54px !important;
+        flex: 0 0 54px !important;
+      }
       .color-picker-wrapper { gap: 14px; padding: 14px; }
       .color-title { font-size: 0.68rem; }
       .color-subtitle { font-size: 0.7rem; }
-      .preset-dot { width: 16px; height: 16px; min-width: 16px; }
-      .color-hex { width: 88px; min-width: 88px; }
-      #colorHexText { width: 54px; }
+      .preset-dot {
+        width: 16px !important;
+        height: 16px !important;
+        min-width: 16px !important;
+        max-width: 16px !important;
+        flex: 0 0 16px !important;
+      }
+      .color-hex {
+        width: 88px !important;
+        min-width: 88px !important;
+        max-width: 88px !important;
+        flex: 0 0 88px !important;
+      }
+      #colorHexText {
+        width: 58px !important;
+        min-width: 58px !important;
+        max-width: 58px !important;
+        flex: 0 0 58px !important;
+      }
       .native-picker-hint { display: none; }
     }
   </style>
@@ -447,6 +511,8 @@
       });
     }
 
+    // ========== Actualizar vista previa del color ==========
+    // IMPORTANTE: solo cambia el TEXTO del chip hex, no toca width ni estilos
     function updateColorPreview(color) {
       const circle = document.getElementById('colorCircle');
       if (circle) {
