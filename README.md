@@ -70,7 +70,6 @@
 - [🚀 Instalación Local](#-instalación-local)
 - [🎮 Guía de Uso](#-guía-de-uso)
 - [🔐 Reglas de Firestore](#-reglas-de-firestore)
-- [📊 Estadísticas](#-estadísticas)
 - [🗺️ Roadmap](#️-roadmap)
 - [🤝 Contribuciones](#-contribuciones)
 - [📄 Licencia](#-licencia)
@@ -412,8 +411,8 @@ Archinime/
 
 ```bash
 # 1. Clona el repositorio
-git clone https://github.com/Archinime/-Archinime-.git
-cd -Archinime-
+git clone https://github.com/ArchinimeDev/Archinime.git
+cd Archinime
 
 # 2. Levanta un servidor local
 # Opción A: con Python
@@ -518,16 +517,15 @@ Para ver las reglas completas, revisa el archivo `firestore.rules` en el reposit
 
 <div align="center">
 
-<img src="https://github-stats-alpha.vercel.app/api?username=Archinime&cc=05070A&tc=00F0FF&ic=b114ff&bc=0D1117" width="100%" style="max-width: 500px;" />
+<img src="https://github-readme-stats.vercel.app/api?username=ArchinimeDev&show_icons=true&theme=radical&hide_border=true&bg_color=0D1117&title_color=00F0FF&icon_color=b114ff&text_color=FFFFFF" alt="Estadísticas de ArchinimeDev" width="100%" style="max-width: 500px;" />
 
 <br><br>
 
-<img src="https://cdn.jsdelivr.net/gh/Archinime/Banners@main/estadisticas.gif" alt="Estadísticas" width="48%" />
-<img src="https://cdn.jsdelivr.net/gh/Archinime/Banners@main/lenguaje.gif" alt="Lenguajes" width="48%" />
+<img src="https://github-readme-stats.vercel.app/api/top-langs/?username=ArchinimeDev&layout=compact&theme=radical&hide_border=true&bg_color=0D1117&title_color=00F0FF&text_color=FFFFFF" alt="Lenguajes de ArchinimeDev" width="100%" style="max-width: 400px;" />
 
 <br><br>
 
-<img src="https://github-readme-streak-stats.herokuapp.com/?user=Archinime&theme=radical&hide_border=true&background=0D1117&stroke=00F0FF&ring=b114ff&fire=ff1a6b" alt="Racha" width="100%" style="max-width: 800px;" />
+<img src="https://github-readme-streak-stats.herokuapp.com/?user=ArchinimeDev&theme=radical&hide_border=true&background=0D1117&stroke=00F0FF&ring=b114ff&fire=ff1a6b" alt="Racha de ArchinimeDev" width="100%" style="max-width: 800px;" />
 
 </div>
 
@@ -612,7 +610,7 @@ Consulta el archivo [LICENSE](LICENSE) para más detalles.
 
 <br><br>
 
-### **Archinime**
+### **ArchinimeDev**
 
 *Desarrollador Full Stack · Creador independiente · Apasionado del anime*
 
@@ -620,7 +618,7 @@ Consulta el archivo [LICENSE](LICENSE) para más detalles.
 
 <p align="center">
   <a href="https://www.youtube.com/@Archinime-k2g"><img src="https://img.shields.io/badge/YouTube-FF0000?style=for-the-badge&logo=youtube&logoColor=white" /></a>
-  <a href="https://github.com/Archinime"><img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white" /></a>
+  <a href="https://github.com/ArchinimeDev"><img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white" /></a>
   <a href="https://twitter.com/Archinime"><img src="https://img.shields.io/badge/Twitter-1DA1F2?style=for-the-badge&logo=twitter&logoColor=white" /></a>
   <a href="https://discord.gg/archinime"><img src="https://img.shields.io/badge/Discord-5865F2?style=for-the-badge&logo=discord&logoColor=white" /></a>
   <a href="https://www.instagram.com/archinime"><img src="https://img.shields.io/badge/Instagram-E4405F?style=for-the-badge&logo=instagram&logoColor=white" /></a>
@@ -643,7 +641,7 @@ Consulta el archivo [LICENSE](LICENSE) para más detalles.
 
 <br>
 
-<img src="https://komarev.com/ghpvc/?username=Archinime&color=b114ff&style=flat-square&label=VISITAS" alt="Visitas" />
+<img src="https://komarev.com/ghpvc/?username=ArchinimeDev&color=b114ff&style=flat-square&label=VISITAS" alt="Visitas" />
 
 <br><br>
 
@@ -653,6 +651,6 @@ Consulta el archivo [LICENSE](LICENSE) para más detalles.
 
 **⭐ Si te gusta Archinime, dale una estrella al repositorio**
 
-**Hecho con ❤️ y mucho café ☕ por Archinime**
+**Hecho con ❤️ y mucho café ☕ por ArchinimeDev**
 
 </div>
