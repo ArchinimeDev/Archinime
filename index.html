@@ -10,19 +10,6 @@
   <title>ARCHINIME · La Nueva Era del Anime</title>
   <meta name="description" content="La interfaz más inmersiva para ver anime. Efectos visuales, comunidad y calidad HD.">
   <link rel="canonical" href="https://archinimedev.github.io/Archinime/">
-  
-  <!-- VERSIÓN (forzar limpieza de caché) -->
-  <script>
-    (function() {
-      const APP_VERSION = "2025-04-10-v24.3-modal-rediseñado";
-      const stored = localStorage.getItem('archinime_app_version');
-      if (stored !== APP_VERSION) {
-        localStorage.setItem('archinime_app_version', APP_VERSION);
-        if ('caches' in window) caches.keys().then(keys => keys.forEach(key => caches.delete(key)));
-        window.location.reload(true);
-      }
-    })();
-  </script>
 
   <!-- Theme-color dinámico -->
   <script>
@@ -80,7 +67,7 @@
   <!-- CSS EXTERNO -->
   <link rel="stylesheet" href="css/styles.css">
 
-  <!-- ===== ESTILOS DEL MODAL DE PERFIL (nuevo diseño v24.3) ===== -->
+  <!-- ===== ESTILOS DEL MODAL DE PERFIL (v24.3) ===== -->
   <style>
     /* Fila completa del selector de color */
     #profileModal .profile-color-row {
@@ -173,29 +160,52 @@
       box-shadow: 0 0 12px currentColor, 0 0 0 2px rgba(255,255,255,0.3);
     }
 
-    /* Chip HEX */
+    /* Chip HEX — ancho fijo */
     #profileModal .profile-color-hex {
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       gap: 6px;
-      font-family: 'Orbitron', monospace;
+      font-family: 'Courier New', 'Consolas', monospace;
       font-size: 0.68rem;
       font-weight: 700;
       color: #fff;
       background: rgba(0,0,0,0.5);
-      padding: 3px 9px;
+      padding: 0;
       border-radius: 12px;
       border: 1px solid rgba(255,255,255,0.12);
-      letter-spacing: 1px;
+      letter-spacing: 0;
+      width: 96px;
+      min-width: 96px;
+      max-width: 96px;
+      height: 22px;
+      flex: 0 0 96px;
       margin-left: auto;
+      overflow: hidden;
     }
     #profileModal .profile-color-hex .dot {
       width: 6px;
       height: 6px;
+      min-width: 6px;
+      max-width: 6px;
+      flex: 0 0 6px;
       border-radius: 50%;
       background: var(--neon-blue);
       box-shadow: 0 0 8px var(--neon-blue);
       transition: 0.3s;
+    }
+    #profileModal #profileColorHexText {
+      display: inline-block;
+      width: 62px;
+      min-width: 62px;
+      max-width: 62px;
+      flex: 0 0 62px;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      font-family: 'Courier New', 'Consolas', monospace;
+      letter-spacing: 0;
+      text-transform: uppercase;
     }
 
     /* Paleta nativa visible */
@@ -569,14 +579,14 @@
 
 <!-- ===== SCRIPTS ===== -->
 <!-- app-core.js PRIMERO: contiene Firebase, auth, perfil, etc. -->
-<script src="js/core/app-core.js?v=2025-04-10-v24.3-modal-rediseñado"></script>
-<script src="data/catalogo.js?v=2025-04-10-v24.0-modular"></script>
+<script src="js/core/app-core.js"></script>
+<script src="data/catalogo.js"></script>
 <script src="js/utils/animaciones.js"></script>
 <script src="js/utils/musica_fondo.js"></script>
 <script src="js/components/special-mode.js"></script>
 <script src="js/components/notification-system.js"></script>
 <script src="js/utils/gifs.js"></script>
-<script src="js/components/banner-carousel.js?v=2025-04-10-v24.0-modular"></script>
+<script src="js/components/banner-carousel.js"></script>
 
 <!-- ===== SCRIPT PRINCIPAL ===== -->
 <script>
@@ -1091,11 +1101,29 @@
   };
   window.startNotificationSequence = function() { log("Notificaciones listas"); };
 
+  // ===== SERVICE WORKER =====
+  // Con updateViaCache:'none' + reg.update() en cada carga, SOLO hay que
+  // subir SW_VERSION en sw.js para invalidar todo automáticamente.
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js').then(reg => {
-        log('SW registrado:', reg);
-      }).catch(err => console.error('SW error:', err));
+      navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' })
+        .then(reg => {
+          log('SW registrado:', reg);
+          // Buscar actualización al cargar
+          reg.update().catch(() => {});
+          // Y cada 30 min mientras la app esté abierta
+          setInterval(() => reg.update().catch(() => {}), 30 * 60 * 1000);
+        })
+        .catch(err => console.error('SW error:', err));
+
+      // Cuando un SW nuevo tome el control, recargar automáticamente
+      let refreshing = false;
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (refreshing) return;
+        refreshing = true;
+        console.log('🔄 Nueva versión detectada, recargando...');
+        window.location.reload();
+      });
     });
   }
 
