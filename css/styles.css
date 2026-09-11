@@ -692,7 +692,7 @@ body {
   width: 100%;
   height: 100%;
   display: block;
-  object-fit: cover; /* Por defecto cover, pero JS lo cambiará en móvil a contain */
+  object-fit: cover;
 }
 
 .banner-special .overlay-text {
@@ -718,24 +718,21 @@ body {
 /* ============================================
    ===== MODO ESPECIAL: OCULTAR ANIMACIONES =====
    ============================================
-   Cuando body tiene la clase .special-mode,
-   se ocultan las animaciones de fondo (video,
-   partículas, chroma key, cursor) para dar
-   protagonismo total al video del tráiler.
+   En modo especial se ocultan SOLO las animaciones
+   que compiten con el tráiler (partículas, chroma
+   key, cursor, sparks).
+
+   El video de fondo (galaxia) y el overlay morado
+   SE MANTIENEN visibles para que la página no se
+   vea negra alrededor del tráiler.
    ============================================ */
-body.special-mode #bg-video,
-body.special-mode #overlay,
 body.special-mode #particlesCanvas,
 body.special-mode #stageContainer,
 body.special-mode #customCursor {
   display: none !important;
-  visibility: hidden !important;
-  opacity: 0 !important;
-  animation: none !important;
-  transition: none !important;
 }
 
-/* También ocultamos cualquier spark creado dinámicamente */
+/* Ocultamos cualquier spark creado dinámicamente */
 body.special-mode .spark {
   display: none !important;
 }
@@ -2214,12 +2211,11 @@ body.special-mode .spark {
     margin: 0 !important;
     max-width: 100% !important;
     width: 100% !important;
-    /* No forzamos altura, se ajusta automáticamente */
   }
   #specialBanner {
     position: relative !important;
     width: 100% !important;
-    height: auto !important; /* altura automática según el video */
+    height: auto !important;
     max-width: 100% !important;
     margin: 0 !important;
     padding: 0 !important;
@@ -2232,7 +2228,7 @@ body.special-mode .spark {
   #specialVideo {
     width: 100% !important;
     height: auto !important;
-    object-fit: contain !important; /* video completo sin recortes */
+    object-fit: contain !important;
     display: block !important;
   }
 }
