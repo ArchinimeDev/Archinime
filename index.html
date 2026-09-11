@@ -264,11 +264,29 @@
 <!-- ===== PARTÍCULAS ===== -->
 <canvas id="particlesCanvas"></canvas>
 
-<!-- ===== FONDO VIDEO ===== -->
-<video id="bg-video" poster="https://cdn.jsdelivr.net/gh/ArchinimeDev/Archinime@main/assets/img/galaxia-morado1.avif" muted loop playsinline preload="none" style="position:fixed; inset:0; width:100%; height:100%; object-fit:cover; z-index:-2; opacity:0; transition:opacity 1.2s; filter:brightness(0.5) contrast(1.1);">
+<!-- ===== FONDO VIDEO =====
+     ✅ FIX v3:
+       - preload="auto" (ya estaba)
+       - Añadido webkit-playsinline para iOS antiguo
+       - brightness subido de 0.5 → 0.6 para que la galaxia respire
+     El JS (startVisualMedia) hace play() en móvil y desktop
+     y AHORA fuerza opacity=1 sin esperar a play().
+-->
+<video id="bg-video" poster="https://cdn.jsdelivr.net/gh/ArchinimeDev/Archinime@main/assets/img/galaxia-morado1.avif" muted loop playsinline webkit-playsinline preload="auto" style="position:fixed; inset:0; width:100%; height:100%; object-fit:cover; z-index:-2; opacity:0; transition:opacity 1.2s; filter:brightness(0.6) contrast(1.1);">
   <source src="https://cdn.jsdelivr.net/gh/ArchinimeDev/Archinime@main/assets/videos/galaxia.mp4" type="video/mp4">
 </video>
-<div id="overlay" style="position:fixed; inset:0; z-index:-1; background:radial-gradient(ellipse at 30% 40%, rgba(177,20,255,0.08), rgba(5,7,10,0.9)); pointer-events:none;"></div>
+
+<!-- ===== OVERLAY =====
+     ✅ FIX v3: gradiente suavizado. Antes el borde era rgba(5,7,10,0.9)
+     (90% opaco) y tapaba la galaxia por completo. Ahora es ~0.55-0.75
+     para que el video se vea sin perder legibilidad del texto.
+-->
+<div id="overlay" style="position:fixed; inset:0; z-index:-1;
+  background: radial-gradient(ellipse at 30% 40%,
+    rgba(177,20,255,0.10) 0%,
+    rgba(5,7,10,0.55) 65%,
+    rgba(5,7,10,0.75) 100%);
+  pointer-events:none;"></div>
 
 <!-- ===== NAVBAR ===== -->
 <nav class="cyber-nav" role="navigation">
@@ -313,7 +331,9 @@
   </div>
 </div>
 
-<!-- ===== MODO ESPECIAL ===== -->
+<!-- ===== MODO ESPECIAL =====
+     ✅ Sin poster: el CSS pone la galaxia de fallback en el ::before.
+-->
 <div id="specialBanner" style="display:none;" class="banner-special">
   <video id="specialVideo" muted loop playsinline preload="metadata">
     <source src="assets/videos/atrevete.mp4" type="video/mp4">
@@ -1553,13 +1573,6 @@
   // ============================================================
   // ===== CHROMA KEY (v4 - FUNCIONA EN MÓVIL Y DESKTOP) =====
   // ============================================================
-  // ✅ FIX: Antes solo funcionaba en desktop por 3 razones:
-  //    1) window.chromaPaused = true al inicio → nunca arrancaba.
-  //    2) IS_MOBILE_DEVICE bloqueaba init, processChroma y startChroma.
-  //    3) CSS ocultaba #stageContainer en móvil.
-  //   Ahora arranca en AMBOS dispositivos (móvil usa frame skip
-  //   mayor y canvas más pequeño para no consumir CPU en exceso).
-  // ============================================================
   function randomizeFgPosition() {
     const container = document.getElementById('stageContainer');
     if (!container) return;
@@ -1650,18 +1663,73 @@
   });
 
   // ===== INICIO DE MULTIMEDIA =====
-  // ✅ Ahora el chroma se reproduce en TODOS los dispositivos
+  // ✅ FIX v3: forzamos opacity=1 de inmediato (antes solo se hacía
+  //    dentro de play(), y si la promesa quedaba pending → video invisible).
+  //    Ahora el poster/la galaxia se ven SÍ o SÍ, y el autoplay se
+  //    intenta por múltiples vías (loadedmetadata/canplay/timeout + gesto).
   function startVisualMedia() {
     const bgVideo = document.getElementById('bg-video');
+
+    // ===== bg-video (galaxia) =====
     if (bgVideo) {
-      if (IS_MOBILE_DEVICE) {
-        // En móvil solo mostramos el poster (no cargamos el video de fondo)
+      // Aseguramos mute/playsinline antes de intentar autoplay
+      bgVideo.muted = true;
+      bgVideo.playsInline = true;
+      bgVideo.setAttribute('muted', '');
+      bgVideo.setAttribute('playsinline', '');
+      bgVideo.setAttribute('webkit-playsinline', '');
+
+      // ✅ FIX CLAVE: mostrar SIEMPRE el video (o su poster) de inmediato,
+      // sin esperar a play(). Antes quedaba opacity:0 para siempre si la
+      // promesa nunca se resolvía o rechazaba.
+      bgVideo.style.opacity = '1';
+
+      const tryPlayBg = () => {
+        // Evita play() innecesario si ya está corriendo
+        if (!bgVideo.paused && !bgVideo.ended && bgVideo.readyState > 2) return;
+
+        const playPromise = bgVideo.play();
+        if (playPromise !== undefined && playPromise !== null) {
+          playPromise.then(() => {
+            log('🎥 bg-video reproduciendo');
+          }).catch((err) => {
+            console.warn('⚠️ Autoplay bg-video bloqueado:', err);
+            // Reintentar tras la primera interacción del usuario
+            const onUserGesture = () => {
+              bgVideo.muted = true;
+              bgVideo.play().then(() => {
+                log('🎥 bg-video reproducido tras gesto del usuario');
+              }).catch(() => {});
+              document.removeEventListener('touchstart', onUserGesture);
+              document.removeEventListener('click', onUserGesture);
+              document.removeEventListener('scroll', onUserGesture);
+            };
+            document.addEventListener('touchstart', onUserGesture, { once: true, passive: true });
+            document.addEventListener('click', onUserGesture, { once: true });
+            document.addEventListener('scroll', onUserGesture, { once: true, passive: true });
+          });
+        }
+      };
+
+      // Intentar reproducir en cuanto haya datos suficientes (varios eventos)
+      ['loadedmetadata', 'loadeddata', 'canplay', 'canplaythrough'].forEach(ev =>
+        bgVideo.addEventListener(ev, tryPlayBg, { once: true })
+      );
+
+      if (bgVideo.readyState >= 2) tryPlayBg();
+
+      // Reintentos de seguridad por si los eventos no disparan a tiempo
+      setTimeout(tryPlayBg, 800);
+      setTimeout(tryPlayBg, 2500);
+
+      // Si hay error de red, dejamos el poster visible igual
+      bgVideo.addEventListener('error', () => {
+        console.warn('❌ bg-video falló al cargar — se muestra el poster');
         bgVideo.style.opacity = '1';
-      } else {
-        bgVideo.play().then(() => { bgVideo.style.opacity = '1'; }).catch(()=>{});
-      }
+      }, { once: true });
     }
-    // ✅ Chroma video: reproducir en TODOS los dispositivos
+
+    // ===== fgVideo (chroma key) — mismo comportamiento que antes =====
     if (fgVideo && currentAnim) {
       fgVideo.muted = true;
       const tryPlay = () => {
@@ -1669,7 +1737,6 @@
           window.startChroma();
         }).catch((e) => {
           console.warn('fgVideo autoplay bloqueado, esperando interacción:', e);
-          // Reintento tras interacción del usuario (algunos móviles lo exigen)
           const onUserGesture = () => {
             fgVideo.play().then(() => window.startChroma()).catch(()=>{});
             document.removeEventListener('touchstart', onUserGesture);
@@ -1681,6 +1748,7 @@
       };
       tryPlay();
     }
+
     randomizeFgPosition();
   }
 
