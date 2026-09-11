@@ -269,17 +269,15 @@
        - preload="auto" (ya estaba)
        - Añadido webkit-playsinline para iOS antiguo
        - brightness subido de 0.5 → 0.6 para que la galaxia respire
-     El JS (startVisualMedia) hace play() en móvil y desktop
-     y AHORA fuerza opacity=1 sin esperar a play().
+     El JS (startVisualMedia) fuerza opacity=1 sin esperar a play()
 -->
 <video id="bg-video" poster="https://cdn.jsdelivr.net/gh/ArchinimeDev/Archinime@main/assets/img/galaxia-morado1.avif" muted loop playsinline webkit-playsinline preload="auto" style="position:fixed; inset:0; width:100%; height:100%; object-fit:cover; z-index:-2; opacity:0; transition:opacity 1.2s; filter:brightness(0.6) contrast(1.1);">
   <source src="https://cdn.jsdelivr.net/gh/ArchinimeDev/Archinime@main/assets/videos/galaxia.mp4" type="video/mp4">
 </video>
 
 <!-- ===== OVERLAY =====
-     ✅ FIX v3: gradiente suavizado. Antes el borde era rgba(5,7,10,0.9)
-     (90% opaco) y tapaba la galaxia por completo. Ahora es ~0.55-0.75
-     para que el video se vea sin perder legibilidad del texto.
+     ✅ FIX v3: gradiente suavizado (antes el borde era 90% opaco y
+     tapaba la galaxia por completo). Ahora 0.55 → 0.75.
 -->
 <div id="overlay" style="position:fixed; inset:0; z-index:-1;
   background: radial-gradient(ellipse at 30% 40%,
@@ -1571,7 +1569,7 @@
   }
 
   // ============================================================
-  // ===== CHROMA KEY (v4 - FUNCIONA EN MÓVIL Y DESKTOP) =====
+  // ===== CHROMA KEY (v5 - NÍTIDO EN TODAS LAS PANTALLAS) =====
   // ============================================================
   function randomizeFgPosition() {
     const container = document.getElementById('stageContainer');
@@ -1586,9 +1584,22 @@
   const fgCtx = fgCanvas.getContext('2d', { willReadFrequently: true });
 
   const IS_MOBILE_DEVICE = window.matchMedia('(max-width: 768px)').matches;
-  // ⚡ En móvil procesamos menos frames y usamos canvas más pequeño
+  // ⚡ En móvil procesamos menos frames
   const CHROMA_FRAME_SKIP = IS_MOBILE_DEVICE ? 28 : 20;
-  const CHROMA_CANVAS_WIDTH = IS_MOBILE_DEVICE ? 110 : 160;
+
+  // ✅ FIX BLUR v1: el canvas se resuelve a partir del tamaño REAL
+  // renderizado en pantalla × devicePixelRatio (cap 2x), no un valor fijo.
+  // Antes: canvas 110-160px estirado a 220px → borroso.
+  // Ahora: canvas ~440px en desktop / ~280px en móvil → nítido.
+  function getChromaCanvasWidth() {
+    const stage = document.getElementById('stageContainer');
+    const cssWidth = stage
+      ? stage.getBoundingClientRect().width
+      : (IS_MOBILE_DEVICE ? 140 : 220);
+    const dpr = Math.min(window.devicePixelRatio || 1, 2); // cap 2x
+    // Nunca menos de 240px ni más de 520px (equilibrio nitidez/CPU)
+    return Math.min(520, Math.max(240, Math.round(cssWidth * dpr)));
+  }
 
   let currentAnim = null;
   let isTransitioning = false;
@@ -1598,17 +1609,28 @@
   // ✅ Arranca ACTIVO (antes estaba en true y nunca se iniciaba en modo normal)
   window.chromaPaused = false;
 
+  // ✅ Redimensiona el canvas respetando aspect ratio del video,
+  //    resolución real en pantalla y DPR. Nunca upscalea por encima
+  //    de la resolución nativa del video fuente.
+  function resizeChromaCanvas() {
+    if (!fgVideo.videoWidth || !fgVideo.videoHeight) return;
+    const ratio = fgVideo.videoWidth / fgVideo.videoHeight || 1;
+    const nativeW = fgVideo.videoWidth || 0;
+    const targetW = getChromaCanvasWidth();
+    const w = nativeW > 0 ? Math.min(targetW, nativeW) : targetW;
+    fgCanvas.width = w;
+    fgCanvas.height = Math.round(w / ratio);
+  }
+
   // ✅ Inicializamos en TODOS los dispositivos
   if (videoList.length > 0) {
     currentAnim = videoList[Math.floor(Math.random() * videoList.length)];
     fgVideo.style.display = 'none';
     fgVideo.src = currentAnim.src;
     fgVideo.load();
-    fgVideo.addEventListener('loadedmetadata', () => {
-      const ratio = fgVideo.videoWidth / fgVideo.videoHeight || 1;
-      fgCanvas.width = CHROMA_CANVAS_WIDTH;
-      fgCanvas.height = Math.round(CHROMA_CANVAS_WIDTH / ratio);
-    });
+    fgVideo.addEventListener('loadedmetadata', resizeChromaCanvas);
+    // Reajustar si rotan el móvil o cambian tamaño de ventana
+    window.addEventListener('resize', resizeChromaCanvas);
   } else {
     const sc = document.getElementById('stageContainer');
     if (sc) sc.style.display = 'none';
@@ -1672,7 +1694,6 @@
 
     // ===== bg-video (galaxia) =====
     if (bgVideo) {
-      // Aseguramos mute/playsinline antes de intentar autoplay
       bgVideo.muted = true;
       bgVideo.playsInline = true;
       bgVideo.setAttribute('muted', '');
@@ -1685,7 +1706,6 @@
       bgVideo.style.opacity = '1';
 
       const tryPlayBg = () => {
-        // Evita play() innecesario si ya está corriendo
         if (!bgVideo.paused && !bgVideo.ended && bgVideo.readyState > 2) return;
 
         const playPromise = bgVideo.play();
@@ -1694,7 +1714,6 @@
             log('🎥 bg-video reproduciendo');
           }).catch((err) => {
             console.warn('⚠️ Autoplay bg-video bloqueado:', err);
-            // Reintentar tras la primera interacción del usuario
             const onUserGesture = () => {
               bgVideo.muted = true;
               bgVideo.play().then(() => {
@@ -1774,7 +1793,6 @@
   if (fgContainer) {
     fgContainer.addEventListener('click', (e) => {
       e.stopPropagation();
-      // ✅ Ahora también funciona en móvil
       if (isTransitioning || window.chromaPaused || !currentAnim) return;
       createSparks(e.clientX, e.clientY);
       isTransitioning = true;
