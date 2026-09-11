@@ -1,11 +1,12 @@
 /**
- * MODO ESPECIAL - ARCHINIME (v5 - OPTIMIZADO)
+ * MODO ESPECIAL - ARCHINIME (v6 - CHROMA EN MÓVIL)
  * - En PC: fullscreen con object-fit: cover
  * - En móviles: banner normal con object-fit: contain
  * - Modo especial: oculta partículas, chroma key, cursor y sparks.
  *   El bg-video (galaxia) y el overlay morado se MANTIENEN.
  * - ⚡ Detiene por completo el bucle rAF del chroma key con
  *   window.stopChroma() → 0% CPU en chroma mientras está activo.
+ * - ✅ FIX: Ahora reanuda el chroma también en móvil (antes solo desktop).
  */
 
 const SPECIAL_PROBABILITY = 0.10; // 10% modo especial (sube a 1.0 para probar siempre)
@@ -61,8 +62,6 @@ function intentarReproducirVideo(videoElement, videoList, index) {
 }
 
 // ===== PAUSAR ANIMACIONES DE FONDO =====
-// Detiene POR COMPLETO el chroma key (cancela el rAF).
-// El bg-video NO se toca: sigue corriendo para mantener el fondo galaxia.
 function pausarAnimacionesFondo() {
   try {
     const fgVideo = document.getElementById('fgVideo');
@@ -80,18 +79,15 @@ function pausarAnimacionesFondo() {
 }
 
 // ===== REANUDAR ANIMACIONES DE FONDO =====
+// ✅ FIX: ahora se reanuda en móvil y desktop por igual
 function reanudarAnimacionesFondo() {
   try {
-    const isMobile = window.matchMedia('(max-width: 768px)').matches;
-
-    if (!isMobile) {
-      // ⚡ Reiniciar el bucle rAF del chroma
-      if (typeof window.startChroma === 'function') {
-        window.startChroma();
-      }
-      const fgVideo = document.getElementById('fgVideo');
-      if (fgVideo) fgVideo.play().catch(() => {});
+    // ⚡ Reiniciar el bucle rAF del chroma (ambos dispositivos)
+    if (typeof window.startChroma === 'function') {
+      window.startChroma();
     }
+    const fgVideo = document.getElementById('fgVideo');
+    if (fgVideo) fgVideo.play().catch(() => {});
 
     // Limpiar estilos inline residuales
     const cursor = document.getElementById('customCursor');
@@ -210,7 +206,6 @@ function activarModoEspecial() {
   }
 
   // Ocultar SOLO las animaciones que compiten con el tráiler.
-  // El bg-video sigue corriendo.
   document.body.classList.add('special-mode');
   pausarAnimacionesFondo();
 
@@ -297,8 +292,6 @@ function initSpecialMode() {
 
     const specialBanner = document.getElementById('specialBanner');
     if (specialBanner) specialBanner.style.display = 'none';
-
-    // El bg-video se arranca desde index.html (startVisualMedia)
   }
 }
 
