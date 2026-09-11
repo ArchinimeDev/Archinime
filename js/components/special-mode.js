@@ -4,12 +4,15 @@
  * - En móviles: Se muestra como un banner normal, con object-fit: contain
  * - Si un video falla al cargar, intenta con el siguiente
  * - Probabilidad al 100% para pruebas (cambiar a 0.10 para producción)
+ * - Cuando el modo especial está activo, se ocultan/pausan TODAS las
+ *   animaciones de fondo (video galaxia, partículas, chroma key, cursor)
+ *   para dar protagonismo total al tráiler y ahorrar recursos.
  */
 
 const SPECIAL_PROBABILITY = 1.0; // 100% para pruebas (0.10 en producción)
 const SPECIAL_VIDEOS = [
   'https://cdn.jsdelivr.net/gh/ArchinimeDev/Archinime@main/assets/videos/atrevete.mp4',
-  'https://cdn.jsdelivr.net/gh/ArchinimeDev/Archinime@main/assets/videos/baki.mp4',
+  'https://cdn.jsdelivr.net/gh/ArchinimeDev/Archinime@main/assets/videos/bakihanma.mp4',
   'https://cdn.jsdelivr.net/gh/ArchinimeDev/Archinime@main/assets/videos/efecto.mp4'
 ];
 
@@ -65,6 +68,69 @@ function intentarReproducirVideo(videoElement, videoList, index) {
   // Si el video ya está en caché y se carga rápido, puede que no dispare 'loadeddata'
   // así que intentamos reproducir directamente
   videoElement.play().catch(() => {});
+}
+
+// ===== PAUSAR TODAS LAS ANIMACIONES DE FONDO =====
+function pausarAnimacionesFondo() {
+  try {
+    // Pausar video de fondo (galaxia)
+    const bgVideo = document.getElementById('bg-video');
+    if (bgVideo && !bgVideo.paused) {
+      bgVideo.pause();
+    }
+
+    // Pausar video del chroma key
+    const fgVideo = document.getElementById('fgVideo');
+    if (fgVideo && !fgVideo.paused) {
+      fgVideo.pause();
+    }
+
+    // Ocultar cursor custom (por si acaso)
+    const cursor = document.getElementById('customCursor');
+    if (cursor) cursor.style.display = 'none';
+
+    // Ocultar canvas de partículas (por si acaso)
+    const particles = document.getElementById('particlesCanvas');
+    if (particles) particles.style.display = 'none';
+
+    console.log('⏸️ Animaciones de fondo pausadas (modo especial)');
+  } catch (e) {
+    console.warn('Error pausando animaciones:', e);
+  }
+}
+
+// ===== REANUDAR TODAS LAS ANIMACIONES DE FONDO =====
+function reanudarAnimacionesFondo() {
+  try {
+    // Reanudar video de fondo
+    const bgVideo = document.getElementById('bg-video');
+    if (bgVideo) {
+      bgVideo.play().then(() => {
+        bgVideo.style.opacity = '1';
+      }).catch(() => {});
+    }
+
+    // Reanudar chroma key
+    const fgVideo = document.getElementById('fgVideo');
+    if (fgVideo) {
+      fgVideo.play().catch(() => {});
+    }
+
+    // Restaurar cursor
+    const cursor = document.getElementById('customCursor');
+    if (cursor) cursor.style.display = '';
+
+    // Restaurar partículas
+    const particles = document.getElementById('particlesCanvas');
+    if (particles) {
+      // En móvil el CSS las oculta de todas formas, pero restauramos el estilo inline
+      particles.style.display = '';
+    }
+
+    console.log('▶️ Animaciones de fondo reanudadas');
+  } catch (e) {
+    console.warn('Error reanudando animaciones:', e);
+  }
 }
 
 function activarModoEspecial() {
@@ -175,7 +241,9 @@ function activarModoEspecial() {
     });
   }
 
+  // 🔥 Ocultar/pausar TODAS las animaciones de fondo
   document.body.classList.add('special-mode');
+  pausarAnimacionesFondo();
 
   const nav = document.querySelector('.cyber-nav');
   if (nav) {
@@ -238,7 +306,9 @@ function desactivarModoEspecial() {
     nav.style.zIndex = '';
   }
 
+  // 🔥 Restaurar TODAS las animaciones de fondo
   document.body.classList.remove('special-mode');
+  reanudarAnimacionesFondo();
 
   if (window.startMusic && typeof window.startMusic === 'function') {
     window.startMusic();
