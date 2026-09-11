@@ -1,15 +1,14 @@
 /**
- * MODO ESPECIAL - ARCHINIME (v3 - FIX FONDO DE VIDEO)
+ * MODO ESPECIAL - ARCHINIME (v5 - OPTIMIZADO)
  * - En PC: fullscreen con object-fit: cover
  * - En móviles: banner normal con object-fit: contain
- * - Si un video falla al cargar, intenta con el siguiente
- * - Modo especial: pausa TODAS las animaciones de fondo
- *   (video galaxia, partículas, chroma key, cursor)
- * - FIX: al salir del modo especial el fondo se restaura
- *   de forma fiable con requestAnimationFrame.
+ * - Modo especial: oculta partículas, chroma key, cursor y sparks.
+ *   El bg-video (galaxia) y el overlay morado se MANTIENEN.
+ * - ⚡ Detiene por completo el bucle rAF del chroma key con
+ *   window.stopChroma() → 0% CPU en chroma mientras está activo.
  */
 
-const SPECIAL_PROBABILITY = 0.10; // 10% modo especial · sube a 1.0 para probarlo siempre
+const SPECIAL_PROBABILITY = 0.10; // 10% modo especial (sube a 1.0 para probar siempre)
 const SPECIAL_VIDEOS = [
   'https://cdn.jsdelivr.net/gh/ArchinimeDev/Archinime@main/assets/videos/atrevete.mp4',
   'https://cdn.jsdelivr.net/gh/ArchinimeDev/Archinime@main/assets/videos/bakihanma.mp4',
@@ -62,58 +61,54 @@ function intentarReproducirVideo(videoElement, videoList, index) {
 }
 
 // ===== PAUSAR ANIMACIONES DE FONDO =====
+// Detiene POR COMPLETO el chroma key (cancela el rAF).
+// El bg-video NO se toca: sigue corriendo para mantener el fondo galaxia.
 function pausarAnimacionesFondo() {
   try {
-    const bgVideo = document.getElementById('bg-video');
-    if (bgVideo && !bgVideo.paused) bgVideo.pause();
-
     const fgVideo = document.getElementById('fgVideo');
     if (fgVideo && !fgVideo.paused) fgVideo.pause();
 
-    console.log('⏸️ Animaciones de fondo pausadas (modo especial)');
+    // ⚡ Detener el bucle rAF del chroma → 0% CPU
+    if (typeof window.stopChroma === 'function') {
+      window.stopChroma();
+    }
+
+    console.log('⏸️ Chroma key detenido por completo (modo especial)');
   } catch (e) {
     console.warn('Error pausando animaciones:', e);
   }
 }
 
-// ===== REANUDAR ANIMACIONES DE FONDO (FIX) =====
+// ===== REANUDAR ANIMACIONES DE FONDO =====
 function reanudarAnimacionesFondo() {
   try {
-    const bgVideo = document.getElementById('bg-video');
+    const isMobile = window.matchMedia('(max-width: 768px)').matches;
 
-    // Usamos requestAnimationFrame para asegurarnos de que la clase
-    // .special-mode ya fue eliminada del <body> ANTES de tocar los estilos.
-    // Sin esto, la CSS con !important "gana" al inline durante un frame y
-    // el navegador puede no recalcular bien la visibilidad.
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        if (bgVideo) {
-          bgVideo.style.opacity = '1';
-          bgVideo.style.visibility = 'visible';
-          bgVideo.style.pointerEvents = 'auto';
-          bgVideo.play().catch(() => {});
-        }
+    if (!isMobile) {
+      // ⚡ Reiniciar el bucle rAF del chroma
+      if (typeof window.startChroma === 'function') {
+        window.startChroma();
+      }
+      const fgVideo = document.getElementById('fgVideo');
+      if (fgVideo) fgVideo.play().catch(() => {});
+    }
 
-        const fgVideo = document.getElementById('fgVideo');
-        if (fgVideo) fgVideo.play().catch(() => {});
+    // Limpiar estilos inline residuales
+    const cursor = document.getElementById('customCursor');
+    if (cursor) {
+      cursor.style.display = '';
+      cursor.style.visibility = '';
+      cursor.style.opacity = '';
+    }
 
-        const cursor = document.getElementById('customCursor');
-        if (cursor) {
-          cursor.style.display = '';
-          cursor.style.visibility = '';
-          cursor.style.opacity = '';
-        }
+    const particles = document.getElementById('particlesCanvas');
+    if (particles) {
+      particles.style.display = '';
+      particles.style.visibility = '';
+      particles.style.opacity = '';
+    }
 
-        const particles = document.getElementById('particlesCanvas');
-        if (particles) {
-          particles.style.display = '';
-          particles.style.visibility = '';
-          particles.style.opacity = '';
-        }
-
-        console.log('▶️ Animaciones de fondo reanudadas');
-      });
-    });
+    console.log('▶️ Animaciones de fondo reanudadas');
   } catch (e) {
     console.warn('Error reanudando animaciones:', e);
   }
@@ -214,7 +209,8 @@ function activarModoEspecial() {
     });
   }
 
-  // Oculta/pausa TODAS las animaciones de fondo
+  // Ocultar SOLO las animaciones que compiten con el tráiler.
+  // El bg-video sigue corriendo.
   document.body.classList.add('special-mode');
   pausarAnimacionesFondo();
 
@@ -278,7 +274,6 @@ function desactivarModoEspecial() {
     nav.style.zIndex = '';
   }
 
-  // 🔥 Quitar la clase primero, y LUEGO en el próximo frame restaurar estilos
   document.body.classList.remove('special-mode');
   reanudarAnimacionesFondo();
 
@@ -303,13 +298,7 @@ function initSpecialMode() {
     const specialBanner = document.getElementById('specialBanner');
     if (specialBanner) specialBanner.style.display = 'none';
 
-    // 🔥 Asegurar que el fondo de video es visible y se reproduce
-    const bgVideo = document.getElementById('bg-video');
-    if (bgVideo) {
-      bgVideo.style.opacity = '1';
-      bgVideo.style.visibility = 'visible';
-      bgVideo.play().catch(() => {});
-    }
+    // El bg-video se arranca desde index.html (startVisualMedia)
   }
 }
 
