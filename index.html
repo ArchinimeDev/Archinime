@@ -264,12 +264,8 @@
 <!-- ===== PARTÍCULAS ===== -->
 <canvas id="particlesCanvas"></canvas>
 
-<!-- ===== FONDO VIDEO ===== 
-     - autoplay ELIMINADO: se controla desde JS
-     - preload="none": NO se descarga hasta que JS lo pida
-     - En móvil NO se reproduce, solo se ve el poster
--->
-<video id="bg-video" poster="assets/img/galaxia-morado1.avif" muted loop playsinline preload="none" style="position:fixed; inset:0; width:100%; height:100%; object-fit:cover; z-index:-2; opacity:0; transition:opacity 1.2s; filter:brightness(0.5) contrast(1.1);">
+<!-- ===== FONDO VIDEO ===== -->
+<video id="bg-video" poster="https://cdn.jsdelivr.net/gh/ArchinimeDev/Archinime@main/assets/img/galaxia-morado1.avif" muted loop playsinline preload="none" style="position:fixed; inset:0; width:100%; height:100%; object-fit:cover; z-index:-2; opacity:0; transition:opacity 1.2s; filter:brightness(0.5) contrast(1.1);">
   <source src="https://cdn.jsdelivr.net/gh/ArchinimeDev/Archinime@main/assets/videos/galaxia.mp4" type="video/mp4">
 </video>
 <div id="overlay" style="position:fixed; inset:0; z-index:-1; background:radial-gradient(ellipse at 30% 40%, rgba(177,20,255,0.08), rgba(5,7,10,0.9)); pointer-events:none;"></div>
@@ -468,7 +464,7 @@
   </div>
 </div>
 
-<!-- ===== MODAL DE PERFIL (v24.3) ===== -->
+<!-- ===== MODAL DE PERFIL ===== -->
 <div id="profileModal" class="profile-modal">
   <div class="profile-card">
     <div class="profile-close" onclick="closeProfileModal()"><i class="fas fa-times"></i></div>
@@ -566,7 +562,7 @@
 <div id="stageContainer">
   <div id="fgContainer">
     <canvas id="fgCanvas"></canvas>
-    <video id="fgVideo" muted loop playsinline preload="none"></video>
+    <video id="fgVideo" muted loop playsinline preload="auto"></video>
   </div>
 </div>
 
@@ -1555,10 +1551,14 @@
   }
 
   // ============================================================
-  // ===== CHROMA KEY (OPTIMIZADO) =====
-  // - Solo se inicializa en DESKTOP (en móvil se oculta el contenedor)
-  // - Bucle rAF cancelable con window.stopChroma()
-  // - frameSkip 20 y canvas 160 (antes 12 y 200)
+  // ===== CHROMA KEY (v4 - FUNCIONA EN MÓVIL Y DESKTOP) =====
+  // ============================================================
+  // ✅ FIX: Antes solo funcionaba en desktop por 3 razones:
+  //    1) window.chromaPaused = true al inicio → nunca arrancaba.
+  //    2) IS_MOBILE_DEVICE bloqueaba init, processChroma y startChroma.
+  //    3) CSS ocultaba #stageContainer en móvil.
+  //   Ahora arranca en AMBOS dispositivos (móvil usa frame skip
+  //   mayor y canvas más pequeño para no consumir CPU en exceso).
   // ============================================================
   function randomizeFgPosition() {
     const container = document.getElementById('stageContainer');
@@ -1573,33 +1573,36 @@
   const fgCtx = fgCanvas.getContext('2d', { willReadFrequently: true });
 
   const IS_MOBILE_DEVICE = window.matchMedia('(max-width: 768px)').matches;
-  const CHROMA_FRAME_SKIP = 20;        // ⚡ antes 12
-  const CHROMA_CANVAS_WIDTH = 160;     // ⚡ antes 200
+  // ⚡ En móvil procesamos menos frames y usamos canvas más pequeño
+  const CHROMA_FRAME_SKIP = IS_MOBILE_DEVICE ? 28 : 20;
+  const CHROMA_CANVAS_WIDTH = IS_MOBILE_DEVICE ? 110 : 160;
 
   let currentAnim = null;
   let isTransitioning = false;
   let frameCount = 0;
   let chromaRAF = null;
-  window.chromaPaused = true;
 
-  // Solo inicializamos el chroma si NO es móvil y hay videos
-  if (!IS_MOBILE_DEVICE && videoList.length > 0) {
+  // ✅ Arranca ACTIVO (antes estaba en true y nunca se iniciaba en modo normal)
+  window.chromaPaused = false;
+
+  // ✅ Inicializamos en TODOS los dispositivos
+  if (videoList.length > 0) {
     currentAnim = videoList[Math.floor(Math.random() * videoList.length)];
     fgVideo.style.display = 'none';
     fgVideo.src = currentAnim.src;
+    fgVideo.load();
     fgVideo.addEventListener('loadedmetadata', () => {
-      const ratio = fgVideo.videoWidth / fgVideo.videoHeight;
+      const ratio = fgVideo.videoWidth / fgVideo.videoHeight || 1;
       fgCanvas.width = CHROMA_CANVAS_WIDTH;
       fgCanvas.height = Math.round(CHROMA_CANVAS_WIDTH / ratio);
     });
   } else {
-    // En móvil ocultamos el contenedor completo (ya está en CSS igual)
     const sc = document.getElementById('stageContainer');
     if (sc) sc.style.display = 'none';
   }
 
   function processChroma() {
-    if (window.chromaPaused || IS_MOBILE_DEVICE || !currentAnim) {
+    if (window.chromaPaused || !currentAnim) {
       chromaRAF = null;
       return;
     }
@@ -1626,9 +1629,8 @@
     chromaRAF = requestAnimationFrame(processChroma);
   }
 
-  // API pública para encender/apagar el bucle rAF del chroma
   window.startChroma = function() {
-    if (IS_MOBILE_DEVICE || !currentAnim) return;
+    if (!currentAnim) return;
     if (chromaRAF !== null) return;
     window.chromaPaused = false;
     chromaRAF = requestAnimationFrame(processChroma);
@@ -1642,28 +1644,42 @@
     }
   };
 
-  if (!IS_MOBILE_DEVICE) {
-    fgVideo.addEventListener('play', () => {
-      if (!window.chromaPaused) window.startChroma();
-    });
-  }
+  // ✅ Listener registrado SIEMPRE (mobile + desktop)
+  fgVideo.addEventListener('play', () => {
+    if (!window.chromaPaused) window.startChroma();
+  });
 
   // ===== INICIO DE MULTIMEDIA =====
-  // Desktop: reproducir bg-video + chroma
-  // Móvil: solo mostrar poster del bg-video (no descargar video, no chroma)
+  // ✅ Ahora el chroma se reproduce en TODOS los dispositivos
   function startVisualMedia() {
     const bgVideo = document.getElementById('bg-video');
-    if (IS_MOBILE_DEVICE) {
-      if (bgVideo) bgVideo.style.opacity = '1';
-      return;
-    }
-    // Desktop
     if (bgVideo) {
-      bgVideo.play().then(() => { bgVideo.style.opacity = '1'; }).catch(()=>{});
+      if (IS_MOBILE_DEVICE) {
+        // En móvil solo mostramos el poster (no cargamos el video de fondo)
+        bgVideo.style.opacity = '1';
+      } else {
+        bgVideo.play().then(() => { bgVideo.style.opacity = '1'; }).catch(()=>{});
+      }
     }
-    if (fgVideo) {
+    // ✅ Chroma video: reproducir en TODOS los dispositivos
+    if (fgVideo && currentAnim) {
       fgVideo.muted = true;
-      fgVideo.play().catch(()=>{});
+      const tryPlay = () => {
+        fgVideo.play().then(() => {
+          window.startChroma();
+        }).catch((e) => {
+          console.warn('fgVideo autoplay bloqueado, esperando interacción:', e);
+          // Reintento tras interacción del usuario (algunos móviles lo exigen)
+          const onUserGesture = () => {
+            fgVideo.play().then(() => window.startChroma()).catch(()=>{});
+            document.removeEventListener('touchstart', onUserGesture);
+            document.removeEventListener('click', onUserGesture);
+          };
+          document.addEventListener('touchstart', onUserGesture, { once: true });
+          document.addEventListener('click', onUserGesture, { once: true });
+        });
+      };
+      tryPlay();
     }
     randomizeFgPosition();
   }
@@ -1690,7 +1706,8 @@
   if (fgContainer) {
     fgContainer.addEventListener('click', (e) => {
       e.stopPropagation();
-      if (IS_MOBILE_DEVICE || isTransitioning || window.chromaPaused || !currentAnim) return;
+      // ✅ Ahora también funciona en móvil
+      if (isTransitioning || window.chromaPaused || !currentAnim) return;
       createSparks(e.clientX, e.clientY);
       isTransitioning = true;
       fgContainer.classList.add('poof');
