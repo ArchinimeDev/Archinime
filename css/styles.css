@@ -683,7 +683,13 @@ body {
   .banner-slide .banner-info p { font-size: 0.75rem; }
 }
 
-/* ===== MODO ESPECIAL ===== */
+/* =========================================================
+   ===== MODO ESPECIAL =====
+   =========================================================
+   ✅ FIX v3: El background-image vive en un ::before con
+   z-index: 0. El video tiene position:relative + z-index:1
+   → SIEMPRE queda encima, garantizado.
+   ========================================================= */
 .banner-special {
   display: none;
   position: relative;
@@ -696,9 +702,24 @@ body {
   overflow: hidden;
   background: #000;
   box-shadow: none !important;
+  isolation: isolate;
+}
+
+.banner-special::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url('https://cdn.jsdelivr.net/gh/ArchinimeDev/Archinime@main/assets/img/galaxia-morado1.avif');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: 0;
+  pointer-events: none;
 }
 
 .banner-special video {
+  position: relative;
+  z-index: 1;
   width: 100%;
   height: 100%;
   display: block;
@@ -2130,16 +2151,26 @@ body.special-mode .spark {
   100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
 }
 
-/* ⚡ En móvil OCULTAMOS el chroma key por completo (ahorra 100% CPU) */
+/* ===================================================================
+   ===== CHROMA KEY EN MÓVIL (AHORA SÍ SE MUESTRA) =====
+   ===================================================================
+   ⚠️ ANTES: `display: none !important` ocultaba el chroma en móvil.
+   ✅ AHORA: se muestra con tamaño reducido para que no tape
+      el chat flotante ni los controles.
+   =================================================================== */
 @media (max-width: 768px) {
-  #stageContainer { display: none !important; }
+  #stageContainer {
+    width: 140px;
+    bottom: 10px;
+    right: 10px;
+  }
 }
 
 @media (max-width: 480px) {
   #stageContainer {
-    width: 120px;
-    bottom: 10px;
-    right: 6px;
+    width: 110px;
+    bottom: 8px;
+    right: 8px;
   }
 }
 
@@ -2211,15 +2242,12 @@ body.special-mode .spark {
 }
 
 /* ===================================================================
-   ===== REGLAS MÓVIL BANNER ESPECIAL — AHORA SOLO EN MODO ESPECIAL =====
+   ===== REGLAS MÓVIL BANNER ESPECIAL — SOLO EN MODO ESPECIAL =====
    ===================================================================
-   ⚠️ FIX: Antes estas reglas tenían `display: block !important` sin
-   condición. Eso sobrescribía el `display:none` inline del HTML y el
-   `specialBanner.style.display = 'none'` del JS, provocando que en
-   móvil el video del modo especial se viera SIEMPRE (con su primer
-   fotograma) debajo de los banners normales, incluso en modo normal.
-   Ahora están "scopeadas" con `body.special-mode`, así solo aplican
-   cuando el modo especial está activo de verdad.
+   ⚠️ FIX v1: Reglas scoped a body.special-mode (no se ve en modo normal).
+   ✅ FIX v2: El background-image está en el ::before base del
+      .banner-special, así que no hay que duplicarlo aquí. Solo
+      se ajustan las dimensiones móviles.
    =================================================================== */
 @media (max-width: 768px) {
   #bannerContainer {
@@ -2249,5 +2277,7 @@ body.special-mode .spark {
     height: auto !important;
     object-fit: contain !important;
     display: block !important;
+    position: relative !important;
+    z-index: 1 !important;
   }
 }
