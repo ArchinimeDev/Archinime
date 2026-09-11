@@ -686,10 +686,10 @@ body {
 /* =========================================================
    ===== MODO ESPECIAL =====
    =========================================================
-   ✅ FIX v2: Se añade background-image con la galaxia morada
-   como fallback SIEMPRE visible detrás del video del modo
-   especial. Mientras el video carga (o si falla), se ve la
-   galaxia en lugar del color de fondo de la página.
+   ✅ FIX v3: El background-image ahora vive en un ::before
+   con z-index: 0. El video tiene position:relative + z-index:1
+   → SIEMPRE queda encima, garantizado. Ya no hay conflicto
+   entre el background del padre y el video.
    ========================================================= */
 .banner-special {
   display: none;
@@ -702,19 +702,31 @@ body {
   border: none !important;
   overflow: hidden;
   background: #000;
+  box-shadow: none !important;
+  isolation: isolate; /* crea un stacking context limpio */
+}
+
+/* Imagen de fallback (galaxia) SIEMPRE detrás del video */
+.banner-special::before {
+  content: '';
+  position: absolute;
+  inset: 0;
   background-image: url('https://cdn.jsdelivr.net/gh/ArchinimeDev/Archinime@main/assets/img/galaxia-morado1.avif');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  box-shadow: none !important;
+  z-index: 0;
+  pointer-events: none;
 }
 
 .banner-special video {
+  position: relative;
+  z-index: 1; /* encima de la imagen */
   width: 100%;
   height: 100%;
   display: block;
   object-fit: cover;
-  background: transparent;
+  /* ⚠️ NO ponemos background aquí, es lo que causaba el bug */
 }
 
 .banner-special .overlay-text {
@@ -2225,13 +2237,11 @@ body.special-mode .spark {
 /* ===================================================================
    ===== REGLAS MÓVIL BANNER ESPECIAL — SOLO EN MODO ESPECIAL =====
    ===================================================================
-   ⚠️ FIX v1: Estas reglas tenían `display: block !important` sin
-   condición, lo que sobrescribía el `display:none` inline del HTML
-   y hacía que el video del modo especial apareciera SIEMPRE en móvil.
-   Ahora están "scopeadas" con `body.special-mode`.
-
-   ✅ FIX v2: Se añade `background-image` con la galaxia morada como
-   fallback visible mientras el video carga o si falla.
+   ⚠️ FIX v1: Reglas scoped a body.special-mode (no se ve en modo normal).
+   ⚠️ FIX v2: Imagen galaxia como fallback.
+   ✅ FIX v3: El background-image se ha movido al ::before del
+      .banner-special (ver arriba). Aquí solo se aplican las
+      dimensiones móviles. El video queda encima gracias a z-index.
    =================================================================== */
 @media (max-width: 768px) {
   #bannerContainer {
@@ -2253,17 +2263,18 @@ body.special-mode .spark {
     border: none !important;
     overflow: hidden !important;
     background: #000 !important;
-    background-image: url('https://cdn.jsdelivr.net/gh/ArchinimeDev/Archinime@main/assets/img/galaxia-morado1.avif') !important;
-    background-size: cover !important;
-    background-position: center !important;
-    background-repeat: no-repeat !important;
     display: block !important;
   }
+
+  /* El ::before con la galaxia se hereda del bloque base — no hace
+     falta redefinirlo aquí porque el ::before no cambia en móvil. */
 
   body.special-mode #specialVideo {
     width: 100% !important;
     height: auto !important;
     object-fit: contain !important;
     display: block !important;
+    position: relative !important;
+    z-index: 1 !important; /* ✅ encima de la galaxia */
   }
 }
