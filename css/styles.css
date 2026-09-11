@@ -1,3 +1,13 @@
+/* ===== REDUCED MOTION (accesibilidad + ahorro de CPU) ===== */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 /* ===== BASE ===== */
 :root {
   --bg-deep: #05070a;
@@ -673,7 +683,7 @@ body {
   .banner-slide .banner-info p { font-size: 0.75rem; }
 }
 
-/* ===== MODO ESPECIAL (se controla con JS) ===== */
+/* ===== MODO ESPECIAL ===== */
 .banner-special {
   display: none;
   position: relative;
@@ -718,13 +728,10 @@ body {
 /* ============================================
    ===== MODO ESPECIAL: OCULTAR ANIMACIONES =====
    ============================================
-   En modo especial se ocultan SOLO las animaciones
-   que compiten con el tráiler (partículas, chroma
-   key, cursor, sparks).
-
-   El video de fondo (galaxia) y el overlay morado
-   SE MANTIENEN visibles para que la página no se
-   vea negra alrededor del tráiler.
+   Solo ocultamos partículas, chroma key, cursor y sparks.
+   El bg-video y el overlay morado SE MANTIENEN visibles.
+   El chroma key además se DETIENE por completo vía JS
+   (window.stopChroma cancela el requestAnimationFrame).
    ============================================ */
 body.special-mode #particlesCanvas,
 body.special-mode #stageContainer,
@@ -732,7 +739,6 @@ body.special-mode #customCursor {
   display: none !important;
 }
 
-/* Ocultamos cualquier spark creado dinámicamente */
 body.special-mode .spark {
   display: none !important;
 }
@@ -882,6 +888,7 @@ body.special-mode .spark {
   .grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
 }
 
+/* ⚡ will-change eliminado de .card (evita crear 36 capas GPU) */
 .card {
   position: relative;
   border-radius: var(--radius-md);
@@ -895,8 +902,18 @@ body.special-mode .spark {
   transform: translateY(30px);
   opacity: 0;
   animation: cardEntry 0.6s ease forwards;
-  will-change: transform, opacity;
 }
+
+/* ⚡ En móvil desactivamos la animación de entrada de las cards
+   (36 animaciones CSS simultáneas es lo que más lagea la primera carga) */
+@media (max-width: 768px) {
+  .card {
+    animation: none;
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .card:nth-child(1) { animation-delay: 0.02s; }
 .card:nth-child(2) { animation-delay: 0.06s; }
 .card:nth-child(3) { animation-delay: 0.10s; }
@@ -2120,15 +2137,12 @@ body.special-mode .spark {
   0% { transform: translate(0, 0) scale(1); opacity: 1; }
   100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
 }
+
+/* ⚡ En móvil OCULTAMOS el chroma key por completo (ahorra 100% CPU) */
 @media (max-width: 768px) {
-  #stageContainer {
-    width: 150px;
-    bottom: 10px;
-    right: 10px;
-  }
-  .fg-left { left: 10px; right: auto; }
-  .fg-right { right: 10px; left: auto; }
+  #stageContainer { display: none !important; }
 }
+
 @media (max-width: 480px) {
   #stageContainer {
     width: 120px;
