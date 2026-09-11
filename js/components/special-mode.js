@@ -1,15 +1,15 @@
 /**
- * MODO ESPECIAL - ARCHINIME (VERSIÓN ADAPTATIVA CON REINTENTO)
- * - En PC: Ocupa toda la pantalla (fullscreen) con object-fit: cover
- * - En móviles: Se muestra como un banner normal, con object-fit: contain
+ * MODO ESPECIAL - ARCHINIME (v3 - FIX FONDO DE VIDEO)
+ * - En PC: fullscreen con object-fit: cover
+ * - En móviles: banner normal con object-fit: contain
  * - Si un video falla al cargar, intenta con el siguiente
- * - Probabilidad al 100% para pruebas (cambiar a 0.10 para producción)
- * - Cuando el modo especial está activo, se ocultan/pausan TODAS las
- *   animaciones de fondo (video galaxia, partículas, chroma key, cursor)
- *   para dar protagonismo total al tráiler y ahorrar recursos.
+ * - Modo especial: pausa TODAS las animaciones de fondo
+ *   (video galaxia, partículas, chroma key, cursor)
+ * - FIX: al salir del modo especial el fondo se restaura
+ *   de forma fiable con requestAnimationFrame.
  */
 
-const SPECIAL_PROBABILITY = 1.0; // 100% para pruebas (0.10 en producción)
+const SPECIAL_PROBABILITY = 0.10; // 10% modo especial · sube a 1.0 para probarlo siempre
 const SPECIAL_VIDEOS = [
   'https://cdn.jsdelivr.net/gh/ArchinimeDev/Archinime@main/assets/videos/atrevete.mp4',
   'https://cdn.jsdelivr.net/gh/ArchinimeDev/Archinime@main/assets/videos/bakihanma.mp4',
@@ -27,12 +27,10 @@ function getNavHeight() {
   return nav ? nav.offsetHeight : 68;
 }
 
-// ===== FUNCIÓN PARA INTENTAR REPRODUCIR UN VIDEO, CON REINTENTO =====
+// ===== REPRODUCIR VIDEO CON REINTENTO =====
 function intentarReproducirVideo(videoElement, videoList, index) {
-  // Si ya no hay más videos, salir
   if (index >= videoList.length) {
     console.error('❌ Todos los videos fallaron. Usando el primero como fallback.');
-    // Forzar el primer video (puede que tampoco funcione, pero al menos lo intenta)
     videoElement.src = videoList[0];
     videoElement.load();
     videoElement.play().catch(() => {});
@@ -42,56 +40,35 @@ function intentarReproducirVideo(videoElement, videoList, index) {
   const src = videoList[index];
   console.log(`🎬 Intentando cargar: ${src}`);
 
-  // Remover listeners anteriores para evitar acumulación
   videoElement.removeEventListener('error', onVideoError);
   videoElement.removeEventListener('loadeddata', onVideoLoaded);
 
-  // Definir manejadores
-  function onVideoError(e) {
+  function onVideoError() {
     console.warn(`⚠️ Error al cargar ${src}, pasando al siguiente...`);
-    // Intentar con el siguiente
     intentarReproducirVideo(videoElement, videoList, index + 1);
   }
 
   function onVideoLoaded() {
     console.log(`✅ Video cargado correctamente: ${src}`);
-    // Reproducir
     videoElement.play().catch(() => {});
   }
 
   videoElement.addEventListener('error', onVideoError);
   videoElement.addEventListener('loadeddata', onVideoLoaded);
 
-  // Asignar src y cargar
   videoElement.src = src;
   videoElement.load();
-  // Si el video ya está en caché y se carga rápido, puede que no dispare 'loadeddata'
-  // así que intentamos reproducir directamente
   videoElement.play().catch(() => {});
 }
 
-// ===== PAUSAR TODAS LAS ANIMACIONES DE FONDO =====
+// ===== PAUSAR ANIMACIONES DE FONDO =====
 function pausarAnimacionesFondo() {
   try {
-    // Pausar video de fondo (galaxia)
     const bgVideo = document.getElementById('bg-video');
-    if (bgVideo && !bgVideo.paused) {
-      bgVideo.pause();
-    }
+    if (bgVideo && !bgVideo.paused) bgVideo.pause();
 
-    // Pausar video del chroma key
     const fgVideo = document.getElementById('fgVideo');
-    if (fgVideo && !fgVideo.paused) {
-      fgVideo.pause();
-    }
-
-    // Ocultar cursor custom (por si acaso)
-    const cursor = document.getElementById('customCursor');
-    if (cursor) cursor.style.display = 'none';
-
-    // Ocultar canvas de partículas (por si acaso)
-    const particles = document.getElementById('particlesCanvas');
-    if (particles) particles.style.display = 'none';
+    if (fgVideo && !fgVideo.paused) fgVideo.pause();
 
     console.log('⏸️ Animaciones de fondo pausadas (modo especial)');
   } catch (e) {
@@ -99,47 +76,56 @@ function pausarAnimacionesFondo() {
   }
 }
 
-// ===== REANUDAR TODAS LAS ANIMACIONES DE FONDO =====
+// ===== REANUDAR ANIMACIONES DE FONDO (FIX) =====
 function reanudarAnimacionesFondo() {
   try {
-    // Reanudar video de fondo
     const bgVideo = document.getElementById('bg-video');
-    if (bgVideo) {
-      bgVideo.play().then(() => {
-        bgVideo.style.opacity = '1';
-      }).catch(() => {});
-    }
 
-    // Reanudar chroma key
-    const fgVideo = document.getElementById('fgVideo');
-    if (fgVideo) {
-      fgVideo.play().catch(() => {});
-    }
+    // Usamos requestAnimationFrame para asegurarnos de que la clase
+    // .special-mode ya fue eliminada del <body> ANTES de tocar los estilos.
+    // Sin esto, la CSS con !important "gana" al inline durante un frame y
+    // el navegador puede no recalcular bien la visibilidad.
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        if (bgVideo) {
+          bgVideo.style.opacity = '1';
+          bgVideo.style.visibility = 'visible';
+          bgVideo.style.pointerEvents = 'auto';
+          bgVideo.play().catch(() => {});
+        }
 
-    // Restaurar cursor
-    const cursor = document.getElementById('customCursor');
-    if (cursor) cursor.style.display = '';
+        const fgVideo = document.getElementById('fgVideo');
+        if (fgVideo) fgVideo.play().catch(() => {});
 
-    // Restaurar partículas
-    const particles = document.getElementById('particlesCanvas');
-    if (particles) {
-      // En móvil el CSS las oculta de todas formas, pero restauramos el estilo inline
-      particles.style.display = '';
-    }
+        const cursor = document.getElementById('customCursor');
+        if (cursor) {
+          cursor.style.display = '';
+          cursor.style.visibility = '';
+          cursor.style.opacity = '';
+        }
 
-    console.log('▶️ Animaciones de fondo reanudadas');
+        const particles = document.getElementById('particlesCanvas');
+        if (particles) {
+          particles.style.display = '';
+          particles.style.visibility = '';
+          particles.style.opacity = '';
+        }
+
+        console.log('▶️ Animaciones de fondo reanudadas');
+      });
+    });
   } catch (e) {
     console.warn('Error reanudando animaciones:', e);
   }
 }
 
+// ===== ACTIVAR MODO ESPECIAL =====
 function activarModoEspecial() {
   if (window.isSpecialMode) return;
   window.isSpecialMode = true;
 
   console.log('🌟 MODO ESPECIAL ACTIVADO');
 
-  // Detener música
   if (window.stopMusic && typeof window.stopMusic === 'function') {
     window.stopMusic();
   } else {
@@ -160,18 +146,15 @@ function activarModoEspecial() {
     return;
   }
 
-  // Ocultar carrusel
   carousel.style.display = 'none';
   bannerContainer.style.padding = '0';
   bannerContainer.style.margin = '0';
   bannerContainer.style.maxWidth = '100%';
 
-  // Mostrar banner especial
   specialBanner.style.display = 'block';
 
   const isMobile = isMobileDevice();
 
-  // Estilos generales
   specialBanner.style.position = 'relative';
   specialBanner.style.width = '100%';
   specialBanner.style.maxWidth = '100%';
@@ -183,7 +166,6 @@ function activarModoEspecial() {
   specialBanner.style.overflow = 'hidden';
   specialBanner.style.backgroundColor = '#000';
 
-  // Configuración según dispositivo
   if (isMobile) {
     specialBanner.style.height = 'auto';
     videoElement.style.width = '100%';
@@ -200,48 +182,39 @@ function activarModoEspecial() {
     videoElement.style.display = 'block';
   }
 
-  // Elegir un índice aleatorio para empezar
   const randomIndex = Math.floor(Math.random() * SPECIAL_VIDEOS.length);
-  // Empezar la reproducción con reintento
   intentarReproducirVideo(videoElement, SPECIAL_VIDEOS, randomIndex);
 
   videoElement.loop = true;
   videoElement.muted = false;
   videoElement.volume = 0.9;
 
-  // Animación de entrada
   specialBanner.classList.remove('special-exit');
   specialBanner.classList.add('special-enter');
 
-  // Reproducción con sonido (el reintento ya maneja la carga, pero el play puede fallar por autoplay)
   const playPromise = videoElement.play();
   if (playPromise !== undefined) {
     playPromise.then(() => {
       console.log('✅ Sonido activado');
-    }).catch(error => {
+    }).catch(() => {
       console.warn('⚠️ Autoplay bloqueado, mute temporal');
       videoElement.muted = true;
       videoElement.play().then(() => {
-        // El usuario puede hacer clic en cualquier parte para activar el sonido
         const activateAudio = () => {
           videoElement.muted = false;
           videoElement.volume = 0.9;
-          videoElement.play().then(() => {
-            console.log('🔊 Sonido activado tras interacción');
-          }).catch(() => {});
+          videoElement.play().catch(() => {});
           document.removeEventListener('click', activateAudio);
           document.removeEventListener('touchstart', activateAudio);
         };
         document.addEventListener('click', activateAudio, { once: true });
         document.addEventListener('touchstart', activateAudio, { once: true });
         specialBanner.addEventListener('click', activateAudio, { once: true });
-      }).catch(err => {
-        console.error('Error al reproducir:', err);
-      });
+      }).catch(err => console.error('Error al reproducir:', err));
     });
   }
 
-  // 🔥 Ocultar/pausar TODAS las animaciones de fondo
+  // Oculta/pausa TODAS las animaciones de fondo
   document.body.classList.add('special-mode');
   pausarAnimacionesFondo();
 
@@ -252,6 +225,7 @@ function activarModoEspecial() {
   }
 }
 
+// ===== DESACTIVAR MODO ESPECIAL =====
 function desactivarModoEspecial() {
   if (!window.isSpecialMode) return;
   window.isSpecialMode = false;
@@ -268,7 +242,6 @@ function desactivarModoEspecial() {
     setTimeout(() => {
       specialBanner.style.display = 'none';
       specialBanner.classList.remove('special-exit');
-      // Restaurar estilos
       specialBanner.style.position = '';
       specialBanner.style.width = '';
       specialBanner.style.maxWidth = '';
@@ -288,7 +261,6 @@ function desactivarModoEspecial() {
         video.style.margin = '';
         video.pause();
         video.src = '';
-        // Eliminar listeners para evitar fugas
         video.removeEventListener('error', null);
         video.removeEventListener('loadeddata', null);
       }
@@ -306,7 +278,7 @@ function desactivarModoEspecial() {
     nav.style.zIndex = '';
   }
 
-  // 🔥 Restaurar TODAS las animaciones de fondo
+  // 🔥 Quitar la clase primero, y LUEGO en el próximo frame restaurar estilos
   document.body.classList.remove('special-mode');
   reanudarAnimacionesFondo();
 
@@ -316,6 +288,7 @@ function desactivarModoEspecial() {
   console.log('🔇 Modo especial desactivado');
 }
 
+// ===== INIT =====
 function initSpecialMode() {
   if (window.isSpecialMode) return;
   const shouldActivate = Math.random() < SPECIAL_PROBABILITY;
@@ -323,10 +296,20 @@ function initSpecialMode() {
     activarModoEspecial();
   } else {
     console.log('🎵 Modo normal');
+
     const carousel = document.getElementById('bannerCarousel');
     if (carousel) carousel.style.display = 'block';
+
     const specialBanner = document.getElementById('specialBanner');
     if (specialBanner) specialBanner.style.display = 'none';
+
+    // 🔥 Asegurar que el fondo de video es visible y se reproduce
+    const bgVideo = document.getElementById('bg-video');
+    if (bgVideo) {
+      bgVideo.style.opacity = '1';
+      bgVideo.style.visibility = 'visible';
+      bgVideo.play().catch(() => {});
+    }
   }
 }
 
