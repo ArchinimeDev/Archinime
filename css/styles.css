@@ -715,6 +715,31 @@ body {
   100% { transform: scale(0.95); opacity: 0; }
 }
 
+/* ============================================
+   ===== MODO ESPECIAL: OCULTAR ANIMACIONES =====
+   ============================================
+   Cuando body tiene la clase .special-mode,
+   se ocultan las animaciones de fondo (video,
+   partículas, chroma key, cursor) para dar
+   protagonismo total al video del tráiler.
+   ============================================ */
+body.special-mode #bg-video,
+body.special-mode #overlay,
+body.special-mode #particlesCanvas,
+body.special-mode #stageContainer,
+body.special-mode #customCursor {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  animation: none !important;
+  transition: none !important;
+}
+
+/* También ocultamos cualquier spark creado dinámicamente */
+body.special-mode .spark {
+  display: none !important;
+}
+
 /* ===== FILTROS ===== */
 .controls-container {
   padding: 12px 3%;
