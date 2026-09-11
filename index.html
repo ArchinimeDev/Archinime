@@ -69,7 +69,6 @@
 
   <!-- ===== ESTILOS DEL MODAL DE PERFIL (v24.3) ===== -->
   <style>
-    /* Fila completa del selector de color */
     #profileModal .profile-color-row {
       display: flex;
       align-items: center;
@@ -84,8 +83,6 @@
       border-color: rgba(0, 240, 255, 0.45);
       box-shadow: 0 0 20px rgba(0, 240, 255, 0.08);
     }
-
-    /* Círculo sólido — sin icono dentro, solo color puro */
     #profileModal .profile-color-circle {
       width: 54px;
       height: 54px;
@@ -106,8 +103,6 @@
       background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.3), transparent 55%);
       pointer-events: none;
     }
-
-    /* Bloque de información a la derecha del círculo */
     #profileModal .profile-color-info {
       display: flex;
       flex-direction: column;
@@ -134,8 +129,6 @@
       flex-wrap: wrap;
       margin-top: 2px;
     }
-
-    /* Presets (dottos de colores) */
     #profileModal .profile-presets {
       display: flex;
       gap: 6px;
@@ -159,8 +152,6 @@
       transform: scale(1.15);
       box-shadow: 0 0 12px currentColor, 0 0 0 2px rgba(255,255,255,0.3);
     }
-
-    /* Chip HEX — ancho fijo */
     #profileModal .profile-color-hex {
       display: inline-flex;
       align-items: center;
@@ -207,8 +198,6 @@
       letter-spacing: 0;
       text-transform: uppercase;
     }
-
-    /* Paleta nativa visible */
     #profileModal .profile-native-picker {
       display: flex;
       align-items: center;
@@ -275,9 +264,13 @@
 <!-- ===== PARTÍCULAS ===== -->
 <canvas id="particlesCanvas"></canvas>
 
-<!-- ===== FONDO VIDEO ===== -->
-<video id="bg-video" poster="assets/img/galaxia-morado1.avif" autoplay muted loop playsinline preload="metadata" style="position:fixed; inset:0; width:100%; height:100%; object-fit:cover; z-index:-2; opacity:0; transition:opacity 1.2s; filter:brightness(0.5) contrast(1.1);">
-  <source src="assets/videos/galaxia.mp4" type="video/mp4">
+<!-- ===== FONDO VIDEO ===== 
+     - autoplay ELIMINADO: se controla desde JS
+     - preload="none": NO se descarga hasta que JS lo pida
+     - En móvil NO se reproduce, solo se ve el poster
+-->
+<video id="bg-video" poster="assets/img/galaxia-morado1.avif" muted loop playsinline preload="none" style="position:fixed; inset:0; width:100%; height:100%; object-fit:cover; z-index:-2; opacity:0; transition:opacity 1.2s; filter:brightness(0.5) contrast(1.1);">
+  <source src="https://cdn.jsdelivr.net/gh/ArchinimeDev/Archinime@main/assets/videos/galaxia.mp4" type="video/mp4">
 </video>
 <div id="overlay" style="position:fixed; inset:0; z-index:-1; background:radial-gradient(ellipse at 30% 40%, rgba(177,20,255,0.08), rgba(5,7,10,0.9)); pointer-events:none;"></div>
 
@@ -475,7 +468,7 @@
   </div>
 </div>
 
-<!-- ===== MODAL DE PERFIL (v24.3 — círculo sólido + paleta nativa + presets) ===== -->
+<!-- ===== MODAL DE PERFIL (v24.3) ===== -->
 <div id="profileModal" class="profile-modal">
   <div class="profile-card">
     <div class="profile-close" onclick="closeProfileModal()"><i class="fas fa-times"></i></div>
@@ -578,7 +571,6 @@
 </div>
 
 <!-- ===== SCRIPTS ===== -->
-<!-- app-core.js PRIMERO: contiene Firebase, auth, perfil, etc. -->
 <script src="js/core/app-core.js"></script>
 <script src="data/catalogo.js"></script>
 <script src="js/utils/animaciones.js"></script>
@@ -1102,21 +1094,16 @@
   window.startNotificationSequence = function() { log("Notificaciones listas"); };
 
   // ===== SERVICE WORKER =====
-  // Con updateViaCache:'none' + reg.update() en cada carga, SOLO hay que
-  // subir SW_VERSION en sw.js para invalidar todo automáticamente.
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' })
         .then(reg => {
           log('SW registrado:', reg);
-          // Buscar actualización al cargar
           reg.update().catch(() => {});
-          // Y cada 30 min mientras la app esté abierta
           setInterval(() => reg.update().catch(() => {}), 30 * 60 * 1000);
         })
         .catch(err => console.error('SW error:', err));
 
-      // Cuando un SW nuevo tome el control, recargar automáticamente
       let refreshing = false;
       navigator.serviceWorker.addEventListener('controllerchange', () => {
         if (refreshing) return;
@@ -1282,7 +1269,8 @@
     }));
   }
 
-  let allAnimes = [], currentPage = 1, totalPages = 1, itemsPerPage = 36;
+  // ⚡ itemsPerPage reducido de 36 a 24 para menos animaciones CSS por página
+  let allAnimes = [], currentPage = 1, totalPages = 1, itemsPerPage = 24;
   let currentFilters = { search: '', genre: '', demographic: '', rating: '' };
   const grid = document.getElementById('grid');
   const paginationContainer = document.getElementById('pagination');
@@ -1566,7 +1554,12 @@
     });
   }
 
-  // ===== CHROMA KEY =====
+  // ============================================================
+  // ===== CHROMA KEY (OPTIMIZADO) =====
+  // - Solo se inicializa en DESKTOP (en móvil se oculta el contenedor)
+  // - Bucle rAF cancelable con window.stopChroma()
+  // - frameSkip 20 y canvas 160 (antes 12 y 200)
+  // ============================================================
   function randomizeFgPosition() {
     const container = document.getElementById('stageContainer');
     if (!container) return;
@@ -1578,25 +1571,45 @@
   const fgVideo = document.getElementById('fgVideo');
   const fgCanvas = document.getElementById('fgCanvas');
   const fgCtx = fgCanvas.getContext('2d', { willReadFrequently: true });
-  let currentAnim = videoList[Math.floor(Math.random() * videoList.length)];
+
+  const IS_MOBILE_DEVICE = window.matchMedia('(max-width: 768px)').matches;
+  const CHROMA_FRAME_SKIP = 20;        // ⚡ antes 12
+  const CHROMA_CANVAS_WIDTH = 160;     // ⚡ antes 200
+
+  let currentAnim = null;
   let isTransitioning = false;
-  fgVideo.style.display = 'none';
-  fgVideo.src = currentAnim.src;
-  fgVideo.addEventListener('loadedmetadata', () => {
-    const maxW = 200;
-    const ratio = fgVideo.videoWidth / fgVideo.videoHeight;
-    fgCanvas.width = maxW;
-    fgCanvas.height = Math.round(maxW / ratio);
-  });
   let frameCount = 0;
+  let chromaRAF = null;
+  window.chromaPaused = true;
+
+  // Solo inicializamos el chroma si NO es móvil y hay videos
+  if (!IS_MOBILE_DEVICE && videoList.length > 0) {
+    currentAnim = videoList[Math.floor(Math.random() * videoList.length)];
+    fgVideo.style.display = 'none';
+    fgVideo.src = currentAnim.src;
+    fgVideo.addEventListener('loadedmetadata', () => {
+      const ratio = fgVideo.videoWidth / fgVideo.videoHeight;
+      fgCanvas.width = CHROMA_CANVAS_WIDTH;
+      fgCanvas.height = Math.round(CHROMA_CANVAS_WIDTH / ratio);
+    });
+  } else {
+    // En móvil ocultamos el contenedor completo (ya está en CSS igual)
+    const sc = document.getElementById('stageContainer');
+    if (sc) sc.style.display = 'none';
+  }
+
   function processChroma() {
+    if (window.chromaPaused || IS_MOBILE_DEVICE || !currentAnim) {
+      chromaRAF = null;
+      return;
+    }
     if (fgVideo.paused || fgVideo.ended || isTransitioning) {
-      requestAnimationFrame(processChroma);
+      chromaRAF = requestAnimationFrame(processChroma);
       return;
     }
     frameCount++;
-    if (frameCount % 12 !== 0) {
-      requestAnimationFrame(processChroma);
+    if (frameCount % CHROMA_FRAME_SKIP !== 0) {
+      chromaRAF = requestAnimationFrame(processChroma);
       return;
     }
     fgCtx.drawImage(fgVideo, 0, 0, fgCanvas.width, fgCanvas.height);
@@ -1610,15 +1623,51 @@
       else { if (g > r + thresh && g > b + thresh) data[i+3] = 0; }
     }
     fgCtx.putImageData(frame, 0, 0);
-    requestAnimationFrame(processChroma);
+    chromaRAF = requestAnimationFrame(processChroma);
   }
-  fgVideo.addEventListener('play', () => requestAnimationFrame(processChroma));
+
+  // API pública para encender/apagar el bucle rAF del chroma
+  window.startChroma = function() {
+    if (IS_MOBILE_DEVICE || !currentAnim) return;
+    if (chromaRAF !== null) return;
+    window.chromaPaused = false;
+    chromaRAF = requestAnimationFrame(processChroma);
+  };
+
+  window.stopChroma = function() {
+    window.chromaPaused = true;
+    if (chromaRAF !== null) {
+      cancelAnimationFrame(chromaRAF);
+      chromaRAF = null;
+    }
+  };
+
+  if (!IS_MOBILE_DEVICE) {
+    fgVideo.addEventListener('play', () => {
+      if (!window.chromaPaused) window.startChroma();
+    });
+  }
+
+  // ===== INICIO DE MULTIMEDIA =====
+  // Desktop: reproducir bg-video + chroma
+  // Móvil: solo mostrar poster del bg-video (no descargar video, no chroma)
   function startVisualMedia() {
-    document.getElementById('bg-video').play().then(() => document.getElementById('bg-video').style.opacity = '1').catch(()=>{});
-    fgVideo.muted = true;
-    fgVideo.play().catch(()=>{});
+    const bgVideo = document.getElementById('bg-video');
+    if (IS_MOBILE_DEVICE) {
+      if (bgVideo) bgVideo.style.opacity = '1';
+      return;
+    }
+    // Desktop
+    if (bgVideo) {
+      bgVideo.play().then(() => { bgVideo.style.opacity = '1'; }).catch(()=>{});
+    }
+    if (fgVideo) {
+      fgVideo.muted = true;
+      fgVideo.play().catch(()=>{});
+    }
     randomizeFgPosition();
   }
+
   function createSparks(cx, cy) {
     const colors = ['#00f0ff','#b114ff','#ff1a6b','#ffd700'];
     for (let i = 0; i < 40; i++) {
@@ -1637,24 +1686,28 @@
       setTimeout(() => s.remove(), 800);
     }
   }
-  fgContainer.addEventListener('click', (e) => {
-    e.stopPropagation();
-    if (isTransitioning) return;
-    createSparks(e.clientX, e.clientY);
-    isTransitioning = true;
-    fgContainer.classList.add('poof');
-    setTimeout(() => {
-      let newAnim;
-      do { newAnim = videoList[Math.floor(Math.random() * videoList.length)]; } while (newAnim.id === currentAnim.id && videoList.length > 1);
-      currentAnim = newAnim;
-      fgVideo.src = currentAnim.src;
-      fgVideo.play().then(() => {
-        isTransitioning = false;
-        fgContainer.classList.remove('poof');
-        randomizeFgPosition();
-      }).catch(() => { isTransitioning = false; });
-    }, 600);
-  });
+
+  if (fgContainer) {
+    fgContainer.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (IS_MOBILE_DEVICE || isTransitioning || window.chromaPaused || !currentAnim) return;
+      createSparks(e.clientX, e.clientY);
+      isTransitioning = true;
+      fgContainer.classList.add('poof');
+      setTimeout(() => {
+        let newAnim;
+        do { newAnim = videoList[Math.floor(Math.random() * videoList.length)]; } while (newAnim.id === currentAnim.id && videoList.length > 1);
+        currentAnim = newAnim;
+        fgVideo.src = currentAnim.src;
+        fgVideo.play().then(() => {
+          isTransitioning = false;
+          fgContainer.classList.remove('poof');
+          randomizeFgPosition();
+        }).catch(() => { isTransitioning = false; });
+      }, 600);
+    });
+  }
+
   window.addEventListener('DOMContentLoaded', startVisualMedia);
 
   // ===== DETALLE Y EVENTOS =====
@@ -1755,7 +1808,7 @@
         setTimeout(showNextEvent, 300);
         return;
       }
-      console.error('❌ showNextEvent: los elementos del modal NO aparecen. Causa probable: Service Worker sirviendo HTML antiguo. Desregístralo desde DevTools → Application → Service Workers.');
+      console.error('❌ showNextEvent: los elementos del modal NO aparecen. Causa probable: Service Worker sirviendo HTML antiguo.');
       eventQueue = [];
       isEventModalShowing = false;
       showNextEvent._retries = 0;
