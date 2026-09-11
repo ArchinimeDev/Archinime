@@ -727,11 +727,6 @@ body {
 
 /* ============================================
    ===== MODO ESPECIAL: OCULTAR ANIMACIONES =====
-   ============================================
-   Solo ocultamos partículas, chroma key, cursor y sparks.
-   El bg-video y el overlay morado SE MANTIENEN visibles.
-   El chroma key además se DETIENE por completo vía JS
-   (window.stopChroma cancela el requestAnimationFrame).
    ============================================ */
 body.special-mode #particlesCanvas,
 body.special-mode #stageContainer,
@@ -888,7 +883,6 @@ body.special-mode .spark {
   .grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
 }
 
-/* ⚡ will-change eliminado de .card (evita crear 36 capas GPU) */
 .card {
   position: relative;
   border-radius: var(--radius-md);
@@ -904,8 +898,6 @@ body.special-mode .spark {
   animation: cardEntry 0.6s ease forwards;
 }
 
-/* ⚡ En móvil desactivamos la animación de entrada de las cards
-   (36 animaciones CSS simultáneas es lo que más lagea la primera carga) */
 @media (max-width: 768px) {
   .card {
     animation: none;
@@ -2218,7 +2210,17 @@ body.special-mode .spark {
   }
 }
 
-/* ===== NUEVAS REGLAS PARA MÓVIL (BANNER ESPECIAL NORMAL) ===== */
+/* ===================================================================
+   ===== REGLAS MÓVIL BANNER ESPECIAL — AHORA SOLO EN MODO ESPECIAL =====
+   ===================================================================
+   ⚠️ FIX: Antes estas reglas tenían `display: block !important` sin
+   condición. Eso sobrescribía el `display:none` inline del HTML y el
+   `specialBanner.style.display = 'none'` del JS, provocando que en
+   móvil el video del modo especial se viera SIEMPRE (con su primer
+   fotograma) debajo de los banners normales, incluso en modo normal.
+   Ahora están "scopeadas" con `body.special-mode`, así solo aplican
+   cuando el modo especial está activo de verdad.
+   =================================================================== */
 @media (max-width: 768px) {
   #bannerContainer {
     padding: 0 !important;
@@ -2226,7 +2228,9 @@ body.special-mode .spark {
     max-width: 100% !important;
     width: 100% !important;
   }
-  #specialBanner {
+
+  /* Solo cuando el modo especial está activo (body.special-mode) */
+  body.special-mode #specialBanner {
     position: relative !important;
     width: 100% !important;
     height: auto !important;
@@ -2239,7 +2243,8 @@ body.special-mode .spark {
     background: #000 !important;
     display: block !important;
   }
-  #specialVideo {
+
+  body.special-mode #specialVideo {
     width: 100% !important;
     height: auto !important;
     object-fit: contain !important;
