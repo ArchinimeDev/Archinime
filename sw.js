@@ -3,11 +3,16 @@
    🔑 ÚNICO ARCHIVO A EDITAR cuando quieras forzar actualización.
    
    CÓMO USARLO:
-   - Cambia SOLO la constante SW_VERSION de abajo (ej: 'v107' → 'v108')
+   - Cambia SOLO la constante SW_VERSION de abajo (ej: 'v108' → 'v109')
    - Al subir el archivo, TODOS los usuarios recibirán la versión nueva
      automáticamente (el SW borra cachés viejas y recarga la página).
    - Los cambios normales en HTML/CSS/JS se ven al instante porque esos
      archivos van a la red con cache:'no-store'.
+   
+   ⚠️ IMPORTANTE (SEO):
+   - Los bots (Googlebot, Bingbot, etc.) NUNCA pasan por el SW.
+     Van directos a la red para que vean siempre el HTML real.
+   - El HTML de navegación tampoco se cachea.
    ============================================================ */
 
 // ⬇️⬇️⬇️ SOLO ESTA LÍNEA SE CAMBIA ⬇️⬇️⬇️
@@ -18,6 +23,41 @@ const CACHE_STATIC  = `archinime-static-${SW_VERSION}`;
 const CACHE_DYNAMIC = `archinime-dynamic-${SW_VERSION}`;
 const CACHE_IMAGES  = `archinime-images-${SW_VERSION}`;
 const CACHE_FONTS   = `archinime-fonts-${SW_VERSION}`;
+
+// 🤖 User-Agents de bots que NO deben pasar por el SW
+const BOT_UA_PATTERNS = [
+  'googlebot',
+  'google-inspectiontool',
+  'google-site-verification',
+  'bingbot',
+  'bingpreview',
+  'duckduckbot',
+  'yandexbot',
+  'baiduspider',
+  'applebot',
+  'twitterbot',
+  'facebookexternalhit',
+  'linkedinbot',
+  'slackbot',
+  'telegrambot',
+  'whatsapp',
+  'discordbot',
+  'ahrefsbot',
+  'semrushbot',
+  'screaming frog',
+  'lighthouse',
+  'chrome-lighthouse'
+];
+
+function isBot(request) {
+  try {
+    const ua = (request.headers.get('user-agent') || '').toLowerCase();
+    if (!ua) return false;
+    return BOT_UA_PATTERNS.some(p => ua.includes(p));
+  } catch (e) {
+    return false;
+  }
+}
 
 const STATIC_ASSETS = [
   '/',
@@ -72,7 +112,25 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
   const request = event.request;
+
+  // Solo GET
   if (request.method !== 'GET') return;
+
+  // 🤖 FIX SEO CRÍTICO: los bots NUNCA pasan por el SW.
+  // Van directos a la red para que reciban siempre el HTML real.
+  if (isBot(request)) {
+    return; // deja que el navegador/bot haga la petición normal
+  }
+
+  // ✅ No cachear navegación HTML — Googlebot siempre ve HTML fresco
+  if (request.mode === 'navigate') {
+    return; // red directa, sin caché
+  }
+
+  // ✅ No interceptar peticiones Range (streaming de vídeo)
+  if (request.headers.get('range')) {
+    return;
+  }
 
   // Catálogo siempre fresco
   if (url.pathname.endsWith('/data/catalogo.js')) {

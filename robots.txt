@@ -1,4 +1,7 @@
 User-agent: *
 Allow: /
 
+# El archivo de verificación no necesita indexarse
+Disallow: /google6e0ba33278667fee.html
+
 Sitemap: https://archinime.pages.dev/sitemap.xml
