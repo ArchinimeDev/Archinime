@@ -16,7 +16,7 @@
    ============================================================ */
 
 // ⬇️⬇️⬇️ SOLO ESTA LÍNEA SE CAMBIA ⬇️⬇️⬇️
-const SW_VERSION = 'v110';
+const SW_VERSION = 'v111';
 // ⬆️⬆️⬆️ Súbela cuando quieras forzar actualización masiva ⬆️⬆️⬆️
 
 const CACHE_STATIC  = `archinime-static-${SW_VERSION}`;
