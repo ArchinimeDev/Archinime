@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#00fff7">
+  <title>Configuración de Cuenta - ARCHINIME</title>
+  <meta name="description" content="Personaliza tu perfil de ARCHINIME: cambia tu avatar, nombre público y color neón de tu cuenta.">
+  <meta name="robots" content="noindex, nofollow">
+
+  <!-- Favicon -->
+  <link rel="icon" href="https://archinime.pages.dev/assets/img/Logo_Archinime.png" type="image/png" sizes="48x48">
+  <link rel="apple-touch-icon" href="https://archinime.pages.dev/assets/img/Logo_Archinime.png">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Configuración de Cuenta - ARCHINIME">
+  <meta property="og:description" content="Personaliza tu perfil de ARCHINIME: cambia tu avatar, nombre público y color neón de tu cuenta.">
+  <meta property="og:url" content="https://archinime.pages.dev/pages/opciones.html">
+  <meta property="og:image" content="https://archinime.pages.dev/assets/img/Logo_Archinime.avif">
+  <meta property="og:site_name" content="ARCHINIME">
+
+  <!-- Preconnect -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+  <link rel="preconnect" href="https://www.gstatic.com">
+  
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script defer src="../js/core/state.js?v=2025-04-10-v24.0-modular"></script>
+
+  <style>
+    :root {
+      --primary-color: #00fff7;
+      --accent-color: #bc13fe;
+      --dark-bg: #050505;
+      --glass-bg: rgba(10, 12, 16, 0.85);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background-color: var(--dark-bg);
+      background-image: url('../assets/img/galaxia-morado1.avif');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      font-family: 'Poppins', sans-serif;
+      color: white;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      overflow-x: hidden;
+    }
+
+    /* ============================================ */
+    /* ===== CONTENEDOR PRINCIPAL — ANCHO FIJO ==== */
+    /* ============================================ */
+    .options-container {
+      background: var(--glass-bg);
+      border: 1px solid var(--accent-color);
+      border-radius: 20px;
+      padding: 40px;
+      width: 500px !important;
+      min-width: 500px !important;
+      max-width: 500px !important;
+      box-sizing: border-box !important;
+      box-shadow: 0 15px 50px rgba(0,0,0,0.9), 0 0 20px rgba(188, 19, 254, 0.2);
+      backdrop-filter: blur(15px);
+      overflow: hidden !important;
+    }
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #aaa;
+      text-decoration: none;
+      font-weight: 600;
+      margin-bottom: 25px;
+      transition: color 0.2s, transform 0.2s;
+    }
+    .back-btn:hover { color: var(--primary-color); transform: translateX(-5px); }
+    h2 { font-family: 'Orbitron', sans-serif; text-align: center; color: var(--primary-color); margin-bottom: 30px; letter-spacing: 1px;}
+    
+    .form-group { margin-bottom: 22px; }
+    .form-group label { display: block; font-size: 0.9rem; color: #ccc; margin-bottom: 8px; font-weight: 600; }
+    .form-group input[type="text"] {
+      width: 100%; padding: 14px; border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(0,0,0,0.5); color: white; font-family: 'Poppins'; outline: none; transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    .form-group input[type="text"]:focus { border-color: var(--primary-color); box-shadow: 0 0 10px rgba(0,255,247,0.2); }
+    
+    .avatar-preview {
+      display: flex; flex-direction: column;
+      align-items: center; gap: 15px; margin-bottom: 20px;
+    }
+    .avatar-preview img {
+      width: 100px;
+      height: 100px; border-radius: 50%; object-fit: cover;
+      border: 2px solid var(--primary-color); box-shadow: 0 0 15px rgba(0,255,247,0.3);
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    .upload-btn {
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); padding: 8px 20px;
+      border-radius: 20px; color: white; cursor: pointer; transition: background 0.2s, border-color 0.2s; font-size: 0.85rem;
+    }
+    .upload-btn:hover { background: rgba(255,255,255,0.1); border-color: var(--primary-color); }
+
+    /* ============================================ */
+    /* ========== SELECTOR DE COLOR =============== */
+    /* ============================================ */
+    .color-picker-wrapper {
+      display: flex !important;
+      align-items: center;
+      gap: 18px;
+      padding: 16px 18px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, rgba(0,255,247,0.04), rgba(188,19,254,0.06));
+      border: 1px solid rgba(188, 19, 254, 0.25);
+      transition: border-color 0.3s, box-shadow 0.3s;
+      width: 100% !important;
+      box-sizing: border-box !important;
+      overflow: hidden !important;
+    }
+    .color-picker-wrapper:hover {
+      border-color: rgba(0, 255, 247, 0.45);
+      box-shadow: 0 0 22px rgba(0, 255, 247, 0.08);
+    }
+
+    /* Círculo sólido — tamaño fijo, no crece */
+    .color-circle {
+      position: relative;
+      width: 62px !important;
+      height: 62px !important;
+      min-width: 62px !important;
+      max-width: 62px !important;
+      flex: 0 0 62px !important;
+      aspect-ratio: 1 / 1;
+      border-radius: 50%;
+      background: #00fff7;
+      cursor: default;
+      pointer-events: none;
+      transition: box-shadow 0.3s;
+      box-shadow:
+        0 0 0 3px rgba(255,255,255,0.08),
+        0 0 18px #00fff7,
+        0 0 32px #00fff7;
+      overflow: hidden;
+      box-sizing: border-box !important;
+    }
+    .color-circle::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.35), transparent 55%);
+      pointer-events: none;
+    }
+
+    .color-info {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex: 1 1 auto;
+      min-width: 0 !important;
+      width: 100%;
+      overflow: hidden !important;
+    }
+    .color-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 1.5px;
+      font-weight: 700;
+      color: var(--primary-color);
+      text-shadow: 0 0 8px rgba(0, 255, 247, 0.55);
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+    .color-subtitle {
+      font-size: 0.75rem;
+      color: #a8a8b8;
+      line-height: 1.35;
+    }
+
+    /* Fila de presets + chip HEX — layout fijo */
+    .color-bottom-row {
+      display: flex !important;
+      align-items: center;
+      gap: 10px;
+      margin-top: 2px;
+      width: 100% !important;
+      min-width: 0 !important;
+      overflow: hidden !important;
+      flex-wrap: nowrap !important;
+    }
+
+    /* Chips de colores preestablecidos */
+    .color-presets {
+      display: flex;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    .preset-dot {
+      width: 18px !important;
+      height: 18px !important;
+      min-width: 18px !important;
+      max-width: 18px !important;
+      flex: 0 0 18px !important;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid rgba(255,255,255,0.15);
+      padding: 0;
+      transition: transform 0.15s, border-color 0.2s, box-shadow 0.2s;
+      box-shadow: 0 0 6px currentColor;
+      box-sizing: border-box !important;
+    }
+    .preset-dot:hover {
+      transform: scale(1.2);
+      border-color: #fff;
+    }
+    .preset-dot.active {
+      border-color: #fff;
+      transform: scale(1.15);
+      box-shadow: 0 0 12px currentColor, 0 0 0 2px rgba(255,255,255,0.3);
+    }
+
+    /* ============================================ */
+    /* ===== CHIP HEX — ANCHO FIJO E INVIOLABLE === */
+    /* ============================================ */
+    .color-hex {
+      display: inline-flex !important;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-family: 'Courier New', 'Consolas', monospace !important;
+      font-size: 0.72rem !important;
+      font-weight: 700 !important;
+      color: #fff;
+      background: rgba(0,0,0,0.5);
+      padding: 0 !important;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.12);
+      letter-spacing: 1px;
+      transition: none !important;
+      width: 96px !important;
+      min-width: 96px !important;
+      max-width: 96px !important;
+      height: 22px !important;
+      flex: 0 0 96px !important;
+      margin-left: auto;
+      box-sizing: border-box !important;
+      overflow: hidden !important;
+    }
+    .color-hex .dot {
+      width: 6px !important;
+      height: 6px !important;
+      min-width: 6px !important;
+      max-width: 6px !important;
+      flex: 0 0 6px !important;
+      border-radius: 50%;
+      background: var(--primary-color);
+      box-shadow: 0 0 8px var(--primary-color);
+      transition: background 0.2s, box-shadow 0.2s !important;
+    }
+    #colorHexText {
+      display: inline-block !important;
+      width: 62px !important;
+      min-width: 62px !important;
+      max-width: 62px !important;
+      flex: 0 0 62px !important;
+      text-align: center !important;
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      font-family: 'Courier New', 'Consolas', monospace !important;
+      font-variant-numeric: tabular-nums !important;
+      letter-spacing: 0 !important;
+      text-transform: uppercase !important;
+    }
+
+    /* ============================================ */
+    /* ===== PALETA NATIVA — ANCHO FIJO =========== */
+    /* ============================================ */
+    .native-picker-row {
+      display: flex !important;
+      align-items: center;
+      gap: 12px;
+      margin-top: 10px;
+      padding: 10px 14px;
+      border-radius: 12px;
+      background: rgba(0,0,0,0.35);
+      border: 1px solid rgba(255,255,255,0.08);
+      width: 100% !important;
+      box-sizing: border-box !important;
+      overflow: hidden !important;
+      flex-wrap: nowrap !important;
+    }
+    .native-picker-row label {
+      font-size: 0.75rem;
+      color: var(--primary-color);
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      font-family: 'Orbitron', sans-serif;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+      flex: 0 0 auto !important;
+    }
+    .native-picker-row input[type="color"].native-picker {
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      width: 46px !important;
+      min-width: 46px !important;
+      max-width: 46px !important;
+      height: 34px !important;
+      flex: 0 0 46px !important;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      background: none;
+      padding: 0;
+      overflow: hidden;
+      box-sizing: border-box !important;
+    }
+    .native-picker-row input[type="color"].native-picker::-webkit-color-swatch-wrapper { padding: 0; border-radius: 8px; }
+    .native-picker-row input[type="color"].native-picker::-webkit-color-swatch {
+      border: 2px solid rgba(255,255,255,0.15);
+      border-radius: 8px;
+    }
+    .native-picker-row input[type="color"].native-picker::-moz-color-swatch {
+      border: 2px solid rgba(255,255,255,0.15);
+      border-radius: 8px;
+    }
+    .native-picker-hint {
+      font-size: 0.72rem;
+      color: #888;
+      margin-left: auto;
+      white-space: nowrap;
+      flex: 0 1 auto !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+    }
+
+    .save-btn {
+      width: 100%; background: var(--primary-color); color: #000; border: none;
+      padding: 16px; border-radius: 10px;
+      font-weight: 900; font-family: 'Orbitron'; letter-spacing: 1px; cursor: pointer; transition: background 0.3s, box-shadow 0.3s, transform 0.3s; margin-top: 10px;
+    }
+    .save-btn:hover { background: #fff; box-shadow: 0 0 20px rgba(0,243,255,0.5); transform: translateY(-2px); }
+    .save-btn:disabled { background: #555; cursor: not-allowed; box-shadow: none; transform: none; }
+    
+    #statusMsg {
+      text-align: center;
+      margin-top: 15px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      min-height: 24px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      transition: background 0.3s, border-color 0.3s, box-shadow 0.3s;
+      word-break: break-word;
+    }
+    #statusMsg:not(:empty) {
+      background: rgba(0,0,0,0.6);
+      border: 1px solid currentColor;
+      box-shadow: 0 0 15px currentColor;
+    }
+
+    /* ============================================ */
+    /* ===== RESPONSIVE — ANCHO 100% MÓVIL ======== */
+    /* ============================================ */
+    @media (max-width: 560px) {
+      .options-container {
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        padding: 26px 20px;
+      }
+      .color-circle {
+        width: 54px !important;
+        height: 54px !important;
+        min-width: 54px !important;
+        max-width: 54px !important;
+        flex: 0 0 54px !important;
+      }
+      .color-picker-wrapper { gap: 14px; padding: 14px; }
+      .color-title { font-size: 0.68rem; }
+      .color-subtitle { font-size: 0.7rem; }
+      .preset-dot {
+        width: 16px !important;
+        height: 16px !important;
+        min-width: 16px !important;
+        max-width: 16px !important;
+        flex: 0 0 16px !important;
+      }
+      .color-hex {
+        width: 88px !important;
+        min-width: 88px !important;
+        max-width: 88px !important;
+        flex: 0 0 88px !important;
+      }
+      #colorHexText {
+        width: 58px !important;
+        min-width: 58px !important;
+        max-width: 58px !important;
+        flex: 0 0 58px !important;
+      }
+      .native-picker-hint { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="options-container">
+    <a href="../index.html" class="back-btn"><i class="fas fa-arrow-left"></i> Volver a inicio</a>
+    <h2>CONFIGURACIÓN</h2>
+
+    <div class="avatar-preview">
+      <img id="avatarImg" src="../assets/img/invitado.avif" alt="Avatar">
+      <label class="upload-btn" for="avatarInput">
+        <i class="fas fa-upload"></i> Subir nuevo avatar
+      </label>
+      <input type="file" id="avatarInput" accept="image/*" style="display: none;">
+    </div>
+
+    <div class="form-group">
+      <label>ID Único de Cuenta</label>
+      <div style="display: flex; gap: 10px;">
+        <input type="text" id="userUid" readonly style="color: #aaa; background: rgba(0,0,0,0.6); cursor: not-allowed; border-color: rgba(255,255,255,0.1);">
+        <button class="upload-btn" onclick="copiarUID()" style="margin: 0; padding: 0 15px; font-size: 1rem; border-radius: 10px;" title="Copiar ID"><i class="fas fa-copy"></i></button>
+      </div>
+      <span style="font-size: 0.8rem; color: #888; margin-top: 5px; display: inline-block;">Este ID es único y no puede cambiarse.</span>
+    </div>
+
+    <div class="form-group">
+      <label>Nombre Público</label>
+      <input type="text" id="displayName" placeholder="Ej: CyberNinja99">
+    </div>
+
+    <div class="form-group">
+      <label>Color de Nombre</label>
+      <div class="color-picker-wrapper">
+        <div class="color-circle" id="colorCircle" title="Color actual"></div>
+        <div class="color-info">
+          <span class="color-title"><i class="fas fa-bolt"></i> Tu Neón</span>
+          <span class="color-subtitle">Afecta tu nombre en comentarios y tu avatar</span>
+          <div class="color-bottom-row">
+            <div class="color-presets" id="colorPresets"></div>
+            <span class="color-hex">
+              <span class="dot" id="colorDot"></span>
+              <span id="colorHexText">#00FFF7</span>
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="native-picker-row">
+        <label for="nameColor"><i class="fas fa-palette"></i> Paleta:</label>
+        <input type="color" id="nameColor" value="#00fff7" class="native-picker">
+        <span class="native-picker-hint">Clic para elegir cualquier color</span>
+      </div>
+    </div>
+
+    <button id="saveBtn" class="save-btn" onclick="guardarCambios()">GUARDAR CAMBIOS</button>
+    <div id="statusMsg"></div>
+  </div>
+
+  <script>
+    // ========== CONFIG FIREBASE ==========
+    const firebaseConfig = {
+      apiKey: "AIzaSyBpzYARIxaJijLbbL-2S6F9MWecbAbvK_I",
+      authDomain: "login-admin-archinime.firebaseapp.com",
+      projectId: "login-admin-archinime",
+      storageBucket: "login-admin-archinime.firebasestorage.app",
+      messagingSenderId: "938164660242",
+      appId: "1:938164660242:web:648e0dce0e0d18dd78d0cb"
+    };
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    const CLOUDINARY_URL = 'https://api.cloudinary.com/v1_1/dbcqcai1q/upload';
+    const CLOUDINARY_PRESET = 'stickers_archinime';
+    let currentUser = null;
+    let newAvatarUrl = null;
+    let lastProfileUpdate = 0;
+    let userReady = false;
+
+    const PRESET_COLORS = ['#00fff7', '#bc13fe', '#ff0055', '#00ff33', '#ffaa00', '#00aaff'];
+
+    function getNeonColorByString(str) {
+      const neonColors = ['#00fff7', '#ff0055', '#bc13fe', '#00ff33', '#ffff00', '#ffaa00', '#ff00aa', '#00aaff'];
+      let hash = 0;
+      for (let i = 0; i < (str || '').length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
+      return neonColors[Math.abs(hash) % neonColors.length];
+    }
+
+    function setStatus(msg, color) {
+      const statusMsg = document.getElementById('statusMsg');
+      statusMsg.style.color = color || '#fff';
+      statusMsg.innerText = msg;
+      console.log('[opciones] status:', msg);
+    }
+
+    function renderPresets(activeColor) {
+      const container = document.getElementById('colorPresets');
+      if (!container) return;
+      container.innerHTML = '';
+      PRESET_COLORS.forEach(color => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'preset-dot' + (color.toLowerCase() === (activeColor || '').toLowerCase() ? ' active' : '');
+        btn.style.background = color;
+        btn.style.color = color;
+        btn.dataset.color = color;
+        btn.title = color.toUpperCase();
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          document.getElementById('nameColor').value = color;
+          updateColorPreview(color);
+        });
+        container.appendChild(btn);
+      });
+    }
+
+    // ========== Actualizar vista previa del color ==========
+    function updateColorPreview(color) {
+      const circle = document.getElementById('colorCircle');
+      if (circle) {
+        circle.style.background = color;
+        circle.style.boxShadow = `0 0 0 3px rgba(255,255,255,0.08), 0 0 18px ${color}, 0 0 32px ${color}`;
+      }
+      const dot = document.getElementById('colorDot');
+      if (dot) {
+        dot.style.background = color;
+        dot.style.boxShadow = `0 0 10px ${color}, 0 0 18px ${color}80`;
+      }
+      const hexText = document.getElementById('colorHexText');
+      if (hexText) {
+        hexText.textContent = (color || '#00FFF7').toUpperCase();
+      }
+      const avatarImg = document.getElementById('avatarImg');
+      if (avatarImg) {
+        avatarImg.style.borderColor = color;
+        avatarImg.style.boxShadow = `0 0 20px ${color}80, 0 0 35px ${color}40`;
+      }
+      document.querySelectorAll('.preset-dot').forEach(el => {
+        if (el.dataset.color.toLowerCase() === (color || '').toLowerCase()) {
+          el.classList.add('active');
+        } else {
+          el.classList.remove('active');
+        }
+      });
+    }
+
+    document.getElementById('nameColor').addEventListener('input', (e) => {
+      updateColorPreview(e.target.value);
+    });
+    document.getElementById('nameColor').addEventListener('change', (e) => {
+      updateColorPreview(e.target.value);
+    });
+
+    renderPresets('#00fff7');
+
+    function syncWithGlobalState(user) {
+      if (window.ArchinimeState) {
+        ArchinimeState.set('currentUser', user);
+        if (user) {
+          db.collection('users').doc(user.uid).get().then(doc => {
+            if (doc.exists && doc.data().customColor) {
+              ArchinimeState.set('currentUserColor', doc.data().customColor);
+            }
+          }).catch(e => console.warn(e));
+        } else {
+          ArchinimeState.set('currentUserColor', null);
+        }
+      }
+    }
+
+    auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        currentUser = user;
+        window.currentUser = user;
+        userReady = true;
+        console.log('✅ Usuario autenticado en opciones.html:', user.uid);
+        await cargarDatosUsuario(user);
+        syncWithGlobalState(user);
+      } else {
+        console.warn('⚠️ Sin usuario autenticado, redirigiendo a index...');
+        window.location.href = '../index.html';
+      }
+    });
+
+    async function cargarDatosUsuario(user) {
+      try {
+        document.getElementById('userUid').value = user.uid;
+        document.getElementById('displayName').value = user.displayName || (user.email ? user.email.split('@')[0] : 'Usuario');
+        document.getElementById('avatarImg').src = user.photoURL || '../assets/img/invitado.avif';
+        newAvatarUrl = user.photoURL || null;
+
+        const doc = await db.collection('users').doc(user.uid).get();
+        let color;
+        if (doc.exists) {
+          const data = doc.data();
+          if (data.customColor) {
+            color = data.customColor;
+          } else {
+            color = getNeonColorByString(user.uid || user.displayName || user.email || 'user');
+          }
+          if (data.lastProfileUpdate) {
+            lastProfileUpdate = data.lastProfileUpdate.toMillis
+              ? data.lastProfileUpdate.toMillis()
+              : (data.lastProfileUpdate.seconds ? data.lastProfileUpdate.seconds * 1000 : 0);
+          }
+          console.log('📅 lastProfileUpdate cargado:', new Date(lastProfileUpdate));
+        } else {
+          color = getNeonColorByString(user.uid || user.displayName || user.email || 'user');
+        }
+
+        document.getElementById('nameColor').value = color;
+        updateColorPreview(color);
+      } catch(e) { 
+        console.error("Error obteniendo datos: ", e); 
+      }
+    }
+
+    function copiarUID() {
+      const uidInput = document.getElementById('userUid');
+      if (uidInput.value) {
+        navigator.clipboard.writeText(uidInput.value);
+        setStatus('¡ID copiado al portapapeles!', '#00fff7');
+        setTimeout(() => {
+          const s = document.getElementById('statusMsg');
+          if (s.innerText.includes('copiado')) s.innerText = '';
+        }, 3000);
+      }
+    }
+
+    document.getElementById('avatarInput').addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      if (file.size > 2 * 1024 * 1024) {
+        alert('La imagen es muy pesada. El tamaño máximo permitido es 2 MB.');
+        e.target.value = '';
+        return;
+      }
+      
+      const btnLabel = document.querySelector('.upload-btn');
+      btnLabel.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Subiendo...';
+      
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('upload_preset', CLOUDINARY_PRESET);
+        
+        const res = await fetch(CLOUDINARY_URL, { method: 'POST', body: formData });
+        const data = await res.json();
+        
+        if (data.secure_url) {
+          newAvatarUrl = data.secure_url;
+          document.getElementById('avatarImg').src = newAvatarUrl;
+          setStatus('Avatar subido. Pulsa GUARDAR para aplicar.', '#00fff7');
+        }
+      } catch (err) {
+        alert("Error subiendo la imagen.");
+      } finally {
+        btnLabel.innerHTML = '<i class="fas fa-upload"></i> Subir nuevo avatar';
+      }
+    });
+
+    async function guardarCambios() {
+      const saveBtn = document.getElementById('saveBtn');
+
+      console.log('🟡 guardarCambios invocado. userReady=', userReady, 'currentUser=', currentUser);
+
+      if (!userReady || !currentUser) {
+        setStatus('⚠️ Esperando datos del usuario... intenta de nuevo en un momento.', '#ff0055');
+        console.warn('guardarCambios: currentUser es null. userReady =', userReady);
+        return;
+      }
+
+      const newName = document.getElementById('displayName').value.trim();
+      const newColor = document.getElementById('nameColor').value;
+
+      if (!newName) {
+        setStatus('El nombre no puede estar vacío.', '#ff0055');
+        return;
+      }
+
+      const isAdmin = currentUser.email === 'archinime12@gmail.com';
+      const now = Date.now();
+      const fiveDaysMs = 5 * 24 * 60 * 60 * 1000;
+      if (!isAdmin && lastProfileUpdate > 0 && (now - lastProfileUpdate < fiveDaysMs)) {
+        const msLeft = fiveDaysMs - (now - lastProfileUpdate);
+        const daysLeft = Math.ceil(msLeft / (1000 * 60 * 60 * 24));
+        setStatus(`⏳ Has cambiado tu perfil recientemente. Vuelve a intentarlo en ${daysLeft} días.`, '#ff0055');
+        return;
+      }
+
+      saveBtn.disabled = true;
+      saveBtn.innerText = 'GUARDANDO...';
+      setStatus('Guardando cambios...', '#fff');
+
+      try {
+        const profileUpdates = { displayName: newName };
+        if (newAvatarUrl && typeof newAvatarUrl === 'string' && newAvatarUrl.startsWith('http')) {
+          profileUpdates.photoURL = newAvatarUrl;
+        }
+        console.log('📝 profileUpdates:', profileUpdates);
+        await currentUser.updateProfile(profileUpdates);
+        console.log('✅ updateProfile OK');
+
+        await db.collection('users').doc(currentUser.uid).set({
+          customColor: newColor,
+          lastProfileUpdate: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+        console.log('✅ Firestore set OK');
+
+        setStatus('Actualizando comentarios históricos...', '#fff');
+
+        try {
+          const commentsRef = db.collection('comments').where('userId', '==', currentUser.uid);
+          const snapshot = await commentsRef.get();
+          const batch = db.batch();
+          let ops = 0;
+
+          snapshot.forEach(doc => {
+            batch.update(doc.ref, {
+              userName: newName,
+              userAvatar: newAvatarUrl || currentUser.photoURL || '../assets/img/invitado.avif',
+              customColor: newColor
+            });
+            ops++;
+          });
+          if (ops > 0) {
+            await batch.commit();
+            console.log('✅ Comentarios actualizados:', ops);
+          }
+        } catch (commentsErr) {
+          console.warn('⚠️ No se pudieron actualizar comentarios históricos:', commentsErr);
+        }
+
+        syncWithGlobalState(currentUser);
+
+        lastProfileUpdate = Date.now();
+        setStatus('✅ ¡Cambios guardados exitosamente!', '#00fff7');
+
+        currentUser.displayName = newName;
+        if (profileUpdates.photoURL) currentUser.photoURL = profileUpdates.photoURL;
+
+      } catch (err) {
+        console.error('❌ Error al guardar:', err);
+        setStatus('Error al guardar: ' + (err.message || 'desconocido'), '#ff0055');
+      } finally {
+        saveBtn.disabled = false;
+        saveBtn.innerText = 'GUARDAR CAMBIOS';
+      }
+    }
+
+    window.copiarUID = copiarUID;
+    window.guardarCambios = guardarCambios;
+  </script>
+</body>
+</html>

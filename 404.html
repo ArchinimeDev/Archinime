@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#ff1a6b">
+  <title>404 · Señal Perdida - ARCHINIME</title>
+  <meta name="description" content="La página que buscas se ha perdido en el hiperespacio. Vuelve al inicio de ARCHINIME.">
+  <meta name="robots" content="noindex, nofollow">
+
+  <!-- Favicon -->
+  <link rel="icon" href="https://archinime.pages.dev/assets/img/Logo_Archinime.png" type="image/png" sizes="48x48">
+  <link rel="apple-touch-icon" href="https://archinime.pages.dev/assets/img/Logo_Archinime.png">
+
+  <!-- Fuentes -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --neon-blue: #00f0ff;
+      --neon-purple: #b114ff;
+      --neon-pink: #ff1a6b;
+      --neon-gold: #ffd700;
+      --bg-deep: #05070a;
+      --text-secondary: #8a90a0;
+    }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Poppins', sans-serif;
+      background: var(--bg-deep);
+      color: #fff;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* ===== CANVAS MATRIX ===== */
+    #matrixCanvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.35;
+    }
+
+    /* ===== OVERLAY GRADIENTE ===== */
+    #overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      background: radial-gradient(ellipse at center,
+        rgba(177, 20, 255, 0.10) 0%,
+        rgba(5, 7, 10, 0.75) 60%,
+        rgba(5, 7, 10, 0.95) 100%);
+      pointer-events: none;
+    }
+
+    /* ===== SCANLINES ===== */
+    #scanlines {
+      position: fixed;
+      inset: 0;
+      z-index: 2;
+      background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.08) 0px,
+        rgba(0, 0, 0, 0.08) 1px,
+        transparent 1px,
+        transparent 4px
+      );
+      pointer-events: none;
+      opacity: 0.4;
+    }
+
+    /* ===== CONTENEDOR PRINCIPAL ===== */
+    .error-container {
+      position: relative;
+      z-index: 10;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      text-align: center;
+    }
+
+    /* ===== LOGO ===== */
+    .error-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 40px;
+      text-decoration: none;
+      animation: fadeInDown 0.8s ease;
+    }
+    .error-logo img {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      object-fit: cover;
+      box-shadow: 0 0 25px var(--neon-purple);
+    }
+    .error-logo span {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 900;
+      font-size: 1.4rem;
+      letter-spacing: 3px;
+      background: linear-gradient(135deg, #fff, var(--neon-blue), var(--neon-purple));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* ===== CÓDIGO 404 CON GLITCH ===== */
+    .error-code {
+      position: relative;
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 900;
+      font-size: clamp(6rem, 20vw, 14rem);
+      line-height: 1;
+      letter-spacing: 8px;
+      color: #fff;
+      margin-bottom: 20px;
+      text-shadow:
+        0 0 10px var(--neon-blue),
+        0 0 30px var(--neon-blue),
+        0 0 60px var(--neon-purple);
+      animation: glitch 3s infinite;
+      will-change: transform;
+    }
+    .error-code::before,
+    .error-code::after {
+      content: '404';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--bg-deep);
+      overflow: hidden;
+      pointer-events: none;
+    }
+    .error-code::before {
+      color: var(--neon-pink);
+      animation: glitchTop 2s infinite linear alternate-reverse;
+      clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
+      text-shadow: -2px 0 var(--neon-pink);
+    }
+    .error-code::after {
+      color: var(--neon-blue);
+      animation: glitchBottom 1.5s infinite linear alternate-reverse;
+      clip-path: polygon(0 55%, 100% 55%, 100% 100%, 0 100%);
+      text-shadow: 2px 0 var(--neon-blue);
+    }
+    @keyframes glitchTop {
+      0%, 90%, 100% { transform: translate(0, 0); }
+      92% { transform: translate(-4px, -2px); }
+      94% { transform: translate(4px, 2px); }
+      96% { transform: translate(-3px, 1px); }
+      98% { transform: translate(3px, -1px); }
+    }
+    @keyframes glitchBottom {
+      0%, 88%, 100% { transform: translate(0, 0); }
+      90% { transform: translate(4px, 2px); }
+      92% { transform: translate(-4px, -2px); }
+      94% { transform: translate(3px, -1px); }
+      96% { transform: translate(-3px, 1px); }
+    }
+    @keyframes glitch {
+      0%, 100% { transform: translate(0, 0); }
+      92% { transform: skewX(0deg); }
+      94% { transform: skewX(2deg); }
+      96% { transform: skewX(-2deg); }
+    }
+
+    /* ===== TÍTULO Y MENSAJE ===== */
+    .error-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(1.1rem, 3vw, 1.6rem);
+      font-weight: 700;
+      letter-spacing: 4px;
+      color: var(--neon-pink);
+      text-shadow: 0 0 15px var(--neon-pink);
+      margin-bottom: 16px;
+      animation: fadeInUp 0.8s ease 0.3s both;
+    }
+    .error-message {
+      font-size: clamp(0.9rem, 2vw, 1.05rem);
+      color: var(--text-secondary);
+      max-width: 500px;
+      margin-bottom: 30px;
+      line-height: 1.6;
+      animation: fadeInUp 0.8s ease 0.5s both;
+    }
+
+    /* ===== BUSCADOR ===== */
+    .search-box {
+      position: relative;
+      width: 100%;
+      max-width: 420px;
+      margin-bottom: 30px;
+      animation: fadeInUp 0.8s ease 0.7s both;
+    }
+    .search-box input {
+      width: 100%;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(0, 240, 255, 0.3);
+      border-radius: 60px;
+      padding: 14px 50px 14px 46px;
+      color: #fff;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.3s, box-shadow 0.3s, background 0.3s;
+    }
+    .search-box input:focus {
+      border-color: var(--neon-blue);
+      background: rgba(255,255,255,0.08);
+      box-shadow: 0 0 25px rgba(0, 240, 255, 0.15);
+    }
+    .search-box input::placeholder {
+      color: rgba(138, 144, 160, 0.7);
+    }
+    .search-box .icon-left {
+      position: absolute;
+      left: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--neon-blue);
+      pointer-events: none;
+    }
+    .search-box .icon-right {
+      position: absolute;
+      right: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--neon-blue);
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    .search-box .icon-right:hover {
+      color: #fff;
+    }
+
+    /* ===== BOTONES ===== */
+    .error-actions {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 30px;
+      animation: fadeInUp 0.8s ease 0.9s both;
+    }
+    .error-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 26px;
+      border-radius: 40px;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 700;
+      font-size: 0.9rem;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 0.3s, border-color 0.3s, color 0.3s, box-shadow 0.3s, transform 0.3s;
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+    .error-btn.primary {
+      background: var(--neon-blue);
+      color: #000;
+      border-color: var(--neon-blue);
+      box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
+    }
+    .error-btn.primary:hover {
+      background: #fff;
+      box-shadow: 0 0 35px var(--neon-blue);
+      transform: translateY(-3px);
+    }
+    .error-btn.secondary {
+      background: rgba(255,255,255,0.04);
+      color: var(--neon-blue);
+      border-color: rgba(0, 240, 255, 0.3);
+    }
+    .error-btn.secondary:hover {
+      background: rgba(0, 240, 255, 0.1);
+      border-color: var(--neon-blue);
+      box-shadow: 0 0 20px rgba(0, 240, 255, 0.2);
+      transform: translateY(-3px);
+    }
+
+    /* ===== CUENTA REGRESIVA ===== */
+    .countdown {
+      font-family: 'Orbitron', monospace;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      letter-spacing: 2px;
+      margin-bottom: 20px;
+      animation: fadeInUp 0.8s ease 1.1s both;
+    }
+    .countdown span#countdownValue {
+      color: var(--neon-pink);
+      font-weight: 900;
+      text-shadow: 0 0 10px var(--neon-pink);
+      font-size: 1rem;
+    }
+
+    /* ===== SUGERENCIAS (GÉNEROS) ===== */
+    .suggestions {
+      animation: fadeInUp 0.8s ease 1.3s both;
+    }
+    .suggestions-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.7rem;
+      letter-spacing: 3px;
+      color: var(--text-secondary);
+      margin-bottom: 14px;
+      text-transform: uppercase;
+    }
+    .suggestions-grid {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .suggestion-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 30px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+      font-weight: 500;
+      text-decoration: none;
+      transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.2s;
+      cursor: pointer;
+    }
+    .suggestion-chip:hover {
+      background: rgba(177, 20, 255, 0.12);
+      border-color: var(--neon-purple);
+      color: #fff;
+      transform: translateY(-2px);
+    }
+    .suggestion-chip i {
+      color: var(--neon-pink);
+      font-size: 0.75rem;
+    }
+
+    /* ===== ANIMACIONES DE ENTRADA ===== */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 480px) {
+      .error-code { letter-spacing: 4px; }
+      .error-logo { margin-bottom: 24px; }
+      .error-logo img { width: 38px; height: 38px; }
+      .error-logo span { font-size: 1.1rem; letter-spacing: 2px; }
+      .error-actions { gap: 10px; }
+      .error-btn { padding: 10px 20px; font-size: 0.82rem; }
+      .suggestions-grid { gap: 8px; }
+      .suggestion-chip { padding: 6px 12px; font-size: 0.75rem; }
+    }
+
+    /* ===== REDUCED MOTION ===== */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+      .error-code::before,
+      .error-code::after {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- CANVAS MATRIX -->
+<canvas id="matrixCanvas"></canvas>
+<div id="overlay"></div>
+<div id="scanlines"></div>
+
+<!-- CONTENIDO -->
+<div class="error-container">
+
+  <!-- LOGO -->
+  <a href="/" class="error-logo">
+    <img src="https://archinime.pages.dev/assets/img/Logo_Archinime.avif" alt="ARCHINIME" onerror="this.src='https://archinime.pages.dev/assets/img/Logo_Archinime.png'">
+    <span>ARCHINIME</span>
+  </a>
+
+  <!-- CÓDIGO 404 -->
+  <div class="error-code">404</div>
+
+  <!-- TÍTULO -->
+  <h1 class="error-title">SEÑAL PERDIDA</h1>
+
+  <!-- MENSAJE -->
+  <p class="error-message">
+    La página que buscas se ha desvanecido en el hiperespacio. Puede que el enlace esté roto, o que el anime haya sido movido a otra dimensión.
+  </p>
+
+  <!-- BUSCADOR -->
+  <form class="search-box" onsubmit="buscarAnime(event)">
+    <i class="fas fa-search icon-left"></i>
+    <input type="text" id="search404" placeholder="Busca un anime para volver al ruedo..." autocomplete="off" maxlength="60">
+    <i class="fas fa-arrow-right icon-right" onclick="buscarAnime(event)"></i>
+  </form>
+
+  <!-- BOTONES -->
+  <div class="error-actions">
+    <a href="/" class="error-btn primary">
+      <i class="fas fa-home"></i> Volver al Inicio
+    </a>
+    <button type="button" class="error-btn secondary" onclick="history.back()">
+      <i class="fas fa-arrow-left"></i> Página Anterior
+    </button>
+  </div>
+
+  <!-- CUENTA REGRESIVA -->
+  <div class="countdown">
+    REDIRIGIENDO AL INICIO EN <span id="countdownValue">8</span>s
+    <span style="color:var(--text-secondary); font-weight:400; font-size:0.7rem; cursor:pointer; margin-left:8px;" onclick="cancelarRedireccion()">[cancelar]</span>
+  </div>
+
+  <!-- EXPLORAR POR GÉNERO -->
+  <div class="suggestions">
+    <div class="suggestions-title">🎯 Explora por género</div>
+    <div class="suggestions-grid">
+      <a href="/?genre=Acción" class="suggestion-chip"><i class="fas fa-bolt"></i> Acción</a>
+      <a href="/?genre=Romance" class="suggestion-chip"><i class="fas fa-heart"></i> Romance</a>
+      <a href="/?genre=Isekai" class="suggestion-chip"><i class="fas fa-dragon"></i> Isekai</a>
+      <a href="/?genre=Shōnen" class="suggestion-chip"><i class="fas fa-fist-raised"></i> Shōnen</a>
+      <a href="/?genre=Comedia" class="suggestion-chip"><i class="fas fa-laugh-beam"></i> Comedia</a>
+      <a href="/?genre=Terror" class="suggestion-chip"><i class="fas fa-ghost"></i> Terror</a>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // ============================================
+  // MATRIX RAIN (optimizado para bajo CPU)
+  // ============================================
+  (function initMatrix() {
+    const canvas = document.getElementById('matrixCanvas');
+    if (!canvas) return;
+
+    // En móvil: menos columnas y letras más pequeñas para rendimiento
+    const isMobile = window.matchMedia('(max-width: 768px)').matches;
+    const fontSize = isMobile ? 12 : 16;
+    const chars = 'アカサタナハマヤラワ0123456789ABCDEF<>/\\|=+-*';
+    const charsArray = chars.split('');
+
+    const ctx = canvas.getContext('2d');
+    let columns = 0;
+    let drops = [];
+    let animationId = null;
+    let lastFrameTime = 0;
+    const FRAME_INTERVAL = isMobile ? 80 : 50; // ms entre frames (más lento en móvil)
+
+    function resize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      columns = Math.floor(canvas.width / fontSize);
+      drops = new Array(columns).fill(1);
+    }
+
+    function draw(timestamp) {
+      animationId = requestAnimationFrame(draw);
+
+      // Throttle: no dibujar más rápido de FRAME_INTERVAL
+      if (timestamp - lastFrameTime < FRAME_INTERVAL) return;
+      lastFrameTime = timestamp;
+
+      ctx.fillStyle = 'rgba(5, 7, 10, 0.08)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.font = `${fontSize}px 'Courier New', monospace`;
+
+      for (let i = 0; i < drops.length; i++) {
+        const text = charsArray[Math.floor(Math.random() * charsArray.length)];
+        const x = i * fontSize;
+        const y = drops[i] * fontSize;
+
+        // Color: cyan/rosa según posición aleatoria
+        ctx.fillStyle = Math.random() > 0.85
+          ? 'rgba(255, 26, 107, 0.7)'
+          : 'rgba(0, 240, 255, 0.55)';
+
+        ctx.fillText(text, x, y);
+
+        // Reiniciar columna cuando llega abajo
+        if (y > canvas.height && Math.random() > 0.975) {
+          drops[i] = 0;
+        }
+        drops[i]++;
+      }
+    }
+
+    // Pausar cuando la pestaña no está visible (ahorra batería)
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        if (animationId) { cancelAnimationFrame(animationId); animationId = null; }
+      } else {
+        if (!animationId) {
+          lastFrameTime = 0;
+          animationId = requestAnimationFrame(draw);
+        }
+      }
+    });
+
+    window.addEventListener('resize', resize, { passive: true });
+
+    resize();
+    animationId = requestAnimationFrame(draw);
+  })();
+
+  // ============================================
+  // CUENTA REGRESIVA
+  // ============================================
+  let countdownValue = 8;
+  let countdownInterval = null;
+  let redirectCancelled = false;
+
+  function startCountdown() {
+    countdownInterval = setInterval(() => {
+      if (redirectCancelled) {
+        clearInterval(countdownInterval);
+        return;
+      }
+      countdownValue--;
+      const el = document.getElementById('countdownValue');
+      if (el) el.textContent = countdownValue;
+
+      if (countdownValue <= 0) {
+        clearInterval(countdownInterval);
+        window.location.href = '/';
+      }
+    }, 1000);
+  }
+
+  function cancelarRedireccion() {
+    redirectCancelled = true;
+    if (countdownInterval) clearInterval(countdownInterval);
+    const countdown = document.querySelector('.countdown');
+    if (countdown) {
+      countdown.innerHTML = '<span style="color:var(--neon-blue);">REDIRECCIÓN CANCELADA</span>';
+    }
+  }
+
+  // ============================================
+  // BUSCADOR
+  // ============================================
+  function buscarAnime(e) {
+    if (e) e.preventDefault();
+    const input = document.getElementById('search404');
+    const query = input.value.trim();
+    if (!query) {
+      input.focus();
+      return;
+    }
+    // Redirige al index con el query como parámetro de búsqueda
+    window.location.href = `/?q=${encodeURIComponent(query)}`;
+  }
+
+  // ============================================
+  // INICIALIZACIÓN
+  // ============================================
+  document.addEventListener('DOMContentLoaded', () => {
+    // Iniciar cuenta regresiva
+    startCountdown();
+
+    // Focus automático en el buscador (después de 1.5s para no molestar)
+    setTimeout(() => {
+      const input = document.getElementById('search404');
+      if (input && !redirectCancelled) input.focus({ preventScroll: true });
+    }, 1500);
+
+    // Escape cancela redirección
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') cancelarRedireccion();
+    });
+  });
+</script>
+
+</body>
+</html>

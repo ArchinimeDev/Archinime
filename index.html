@@ -10,6 +10,8 @@
   <title>ARCHINIME · La Nueva Era del Anime</title>
   <meta name="description" content="La interfaz más inmersiva para ver anime. Efectos visuales, comunidad y calidad HD.">
   <link rel="canonical" href="https://archinime.pages.dev/">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#00f0ff">
 
   <!-- Theme-color dinámico -->
   <script>
@@ -242,10 +244,54 @@
       border: 2px solid rgba(255,255,255,0.15);
       border-radius: 8px;
     }
+
+    /* ===== SCROLL TO TOP ===== */
+    #scrollToTop {
+      position: fixed;
+      bottom: 24px;
+      left: 24px;
+      z-index: 999;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: rgba(11, 14, 20, 0.9);
+      border: 1px solid var(--neon-blue);
+      color: var(--neon-blue);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      cursor: pointer;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(20px) scale(0.9);
+      transition: opacity 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 0 20px rgba(0, 240, 255, 0.15);
+    }
+    #scrollToTop.visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0) scale(1);
+    }
+    #scrollToTop:hover {
+      background: var(--neon-blue);
+      color: #000;
+      box-shadow: 0 0 30px var(--neon-blue);
+      transform: translateY(-3px) scale(1.05);
+    }
+    @media (max-width: 768px) {
+      #scrollToTop {
+        width: 42px;
+        height: 42px;
+        bottom: 72px;
+        left: 16px;
+        font-size: 1rem;
+      }
+    }
   </style>
 
   <!-- ===== DATOS ESTRUCTURADOS PARA GOOGLE (SCHEMA.ORG) ===== -->
-  <!-- Esto le dice a Google que tu sitio se llama ARCHINIME -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -289,20 +335,13 @@
 <canvas id="particlesCanvas"></canvas>
 
 <!-- ===== FONDO VIDEO =====
-     ✅ FIX v3:
-       - preload="auto" (ya estaba)
-       - Añadido webkit-playsinline para iOS antiguo
-       - brightness subido de 0.5 → 0.6 para que la galaxia respire
-     El JS (startVisualMedia) fuerza opacity=1 sin esperar a play()
+     ✅ v4: preload="metadata" — ya no descarga el video completo al inicio.
 -->
-<video id="bg-video" poster="https://cdn.jsdelivr.net/gh/ArchinimeDev/Archinime@main/assets/img/galaxia-morado1.avif" muted loop playsinline webkit-playsinline preload="auto" style="position:fixed; inset:0; width:100%; height:100%; object-fit:cover; z-index:-2; opacity:0; transition:opacity 1.2s; filter:brightness(0.6) contrast(1.1);">
+<video id="bg-video" poster="https://cdn.jsdelivr.net/gh/ArchinimeDev/Archinime@main/assets/img/galaxia-morado1.avif" muted loop playsinline webkit-playsinline preload="metadata" style="position:fixed; inset:0; width:100%; height:100%; object-fit:cover; z-index:-2; opacity:0; transition:opacity 1.2s; filter:brightness(0.6) contrast(1.1);">
   <source src="https://cdn.jsdelivr.net/gh/ArchinimeDev/Archinime@main/assets/videos/galaxia.mp4" type="video/mp4">
 </video>
 
-<!-- ===== OVERLAY =====
-     ✅ FIX v3: gradiente suavizado (antes el borde era 90% opaco y
-     tapaba la galaxia por completo). Ahora 0.55 → 0.75.
--->
+<!-- ===== OVERLAY ===== -->
 <div id="overlay" style="position:fixed; inset:0; z-index:-1;
   background: radial-gradient(ellipse at 30% 40%,
     rgba(177,20,255,0.10) 0%,
@@ -353,9 +392,7 @@
   </div>
 </div>
 
-<!-- ===== MODO ESPECIAL =====
-     ✅ Sin poster: el CSS pone la galaxia de fallback en el ::before.
--->
+<!-- ===== MODO ESPECIAL ===== -->
 <div id="specialBanner" style="display:none;" class="banner-special">
   <video id="specialVideo" muted loop playsinline preload="metadata">
     <source src="assets/videos/atrevete.mp4" type="video/mp4">
@@ -405,6 +442,11 @@
   <div class="grid" id="grid"></div>
   <div id="pagination" class="pagination-container"></div>
 </main>
+
+<!-- ===== SCROLL TO TOP ===== -->
+<button id="scrollToTop" title="Volver arriba" aria-label="Volver arriba">
+  <i class="fas fa-chevron-up"></i>
+</button>
 
 <!-- ===== FOOTER ===== -->
 <footer class="footer">
@@ -626,6 +668,41 @@
   const DEBUG = false;
   const log = (...args) => { if (DEBUG) console.log(...args); };
   const warn = (...args) => { if (DEBUG) console.warn(...args); };
+
+  // ============================================
+  // ⭐ ESTADO GLOBAL DE FILTROS (FIX v24.4)
+  // Declarado ANTES de cualquier uso para evitar
+  // "ReferenceError: currentFilters is not defined".
+  // ============================================
+  let currentFilters = {
+    search: '',
+    genre: '',
+    demographic: '',
+    rating: ''
+  };
+
+  // ============================================
+  // SCROLL TO TOP
+  // ============================================
+  (function initScrollToTop() {
+    const btn = document.getElementById('scrollToTop');
+    if (!btn) return;
+    let ticking = false;
+    function updateVisibility() {
+      if (window.scrollY > 400) btn.classList.add('visible');
+      else btn.classList.remove('visible');
+      ticking = false;
+    }
+    window.addEventListener('scroll', () => {
+      if (!ticking) {
+        requestAnimationFrame(updateVisibility);
+        ticking = true;
+      }
+    }, { passive: true });
+    btn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  })();
 
   // ============================================
   // SISTEMA DE STICKERS
@@ -1297,6 +1374,9 @@
 
   let baseAnimes = [];
   let searchableIndex = [];
+
+  // ⭐ NOTA: currentFilters se declaró arriba (fix v24.4)
+
   function buildSearchableIndex(animes) {
     return animes.map(a => ({
       id: a.id,
@@ -1307,9 +1387,45 @@
     }));
   }
 
-  // ⚡ itemsPerPage reducido de 36 a 24 para menos animaciones CSS por página
-  let allAnimes = [], currentPage = 1, totalPages = 1, itemsPerPage = 24;
-  let currentFilters = { search: '', genre: '', demographic: '', rating: '' };
+  // ============================================
+  // ⭐ PAGINACIÓN DINÁMICA (v2 — sin huecos)
+  // ============================================
+  let allAnimes = [], currentPage = 1, totalPages = 1;
+  let itemsPerPage = 24; // valor de respaldo (se recalcula al iniciar)
+
+  function contarColumnasGrid() {
+    const gridEl = document.getElementById('grid');
+    if (!gridEl) return 0;
+    const styles = window.getComputedStyle(gridEl);
+    const template = styles.gridTemplateColumns || '';
+    const cols = template.split(' ').filter(s => s && s.trim() !== 'none').length;
+    return cols > 0 ? cols : 0;
+  }
+
+  function calcularItemsPerPage() {
+    const FILAS_POR_PAGINA = 5;
+    const cols = contarColumnasGrid();
+    if (cols < 1) {
+      return 24;
+    }
+    return cols * FILAS_POR_PAGINA;
+  }
+
+  function recalcularPaginacion(forzarReset = false) {
+    const nuevo = calcularItemsPerPage();
+    if (nuevo !== itemsPerPage || forzarReset) {
+      const cambio = nuevo !== itemsPerPage;
+      itemsPerPage = nuevo;
+      if (cambio) {
+        currentPage = 1;
+        log('📐 itemsPerPage recalculado →', itemsPerPage, '(columnas detectadas)');
+      }
+      if (typeof cargarDatosYMostrar === 'function' && baseAnimes.length > 0) {
+        cargarDatosYMostrar();
+      }
+    }
+  }
+
   const grid = document.getElementById('grid');
   const paginationContainer = document.getElementById('pagination');
   const searchInput = document.getElementById('search');
@@ -1439,6 +1555,7 @@
       const card = document.createElement('div');
       card.className = 'card';
       card.dataset.id = anime.id;
+      card.style.setProperty('--i', i);
       card.setAttribute('onclick', `openDetail('${anime.id}')`);
       const rating = getDisplayRating(anime);
       const img = anime.img || 'assets/img/placeholder.webp';
@@ -1608,20 +1725,14 @@
   const fgCtx = fgCanvas.getContext('2d', { willReadFrequently: true });
 
   const IS_MOBILE_DEVICE = window.matchMedia('(max-width: 768px)').matches;
-  // ⚡ En móvil procesamos menos frames
   const CHROMA_FRAME_SKIP = IS_MOBILE_DEVICE ? 28 : 20;
 
-  // ✅ FIX BLUR v1: el canvas se resuelve a partir del tamaño REAL
-  // renderizado en pantalla × devicePixelRatio (cap 2x), no un valor fijo.
-  // Antes: canvas 110-160px estirado a 220px → borroso.
-  // Ahora: canvas ~440px en desktop / ~280px en móvil → nítido.
   function getChromaCanvasWidth() {
     const stage = document.getElementById('stageContainer');
     const cssWidth = stage
       ? stage.getBoundingClientRect().width
       : (IS_MOBILE_DEVICE ? 140 : 220);
-    const dpr = Math.min(window.devicePixelRatio || 1, 2); // cap 2x
-    // Nunca menos de 240px ni más de 520px (equilibrio nitidez/CPU)
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
     return Math.min(520, Math.max(240, Math.round(cssWidth * dpr)));
   }
 
@@ -1630,12 +1741,8 @@
   let frameCount = 0;
   let chromaRAF = null;
 
-  // ✅ Arranca ACTIVO (antes estaba en true y nunca se iniciaba en modo normal)
   window.chromaPaused = false;
 
-  // ✅ Redimensiona el canvas respetando aspect ratio del video,
-  //    resolución real en pantalla y DPR. Nunca upscalea por encima
-  //    de la resolución nativa del video fuente.
   function resizeChromaCanvas() {
     if (!fgVideo.videoWidth || !fgVideo.videoHeight) return;
     const ratio = fgVideo.videoWidth / fgVideo.videoHeight || 1;
@@ -1646,14 +1753,12 @@
     fgCanvas.height = Math.round(w / ratio);
   }
 
-  // ✅ Inicializamos en TODOS los dispositivos
   if (videoList.length > 0) {
     currentAnim = videoList[Math.floor(Math.random() * videoList.length)];
     fgVideo.style.display = 'none';
     fgVideo.src = currentAnim.src;
     fgVideo.load();
     fgVideo.addEventListener('loadedmetadata', resizeChromaCanvas);
-    // Reajustar si rotan el móvil o cambian tamaño de ventana
     window.addEventListener('resize', resizeChromaCanvas);
   } else {
     const sc = document.getElementById('stageContainer');
@@ -1703,20 +1808,14 @@
     }
   };
 
-  // ✅ Listener registrado SIEMPRE (mobile + desktop)
   fgVideo.addEventListener('play', () => {
     if (!window.chromaPaused) window.startChroma();
   });
 
   // ===== INICIO DE MULTIMEDIA =====
-  // ✅ FIX v3: forzamos opacity=1 de inmediato (antes solo se hacía
-  //    dentro de play(), y si la promesa quedaba pending → video invisible).
-  //    Ahora el poster/la galaxia se ven SÍ o SÍ, y el autoplay se
-  //    intenta por múltiples vías (loadedmetadata/canplay/timeout + gesto).
   function startVisualMedia() {
     const bgVideo = document.getElementById('bg-video');
 
-    // ===== bg-video (galaxia) =====
     if (bgVideo) {
       bgVideo.muted = true;
       bgVideo.playsInline = true;
@@ -1724,9 +1823,6 @@
       bgVideo.setAttribute('playsinline', '');
       bgVideo.setAttribute('webkit-playsinline', '');
 
-      // ✅ FIX CLAVE: mostrar SIEMPRE el video (o su poster) de inmediato,
-      // sin esperar a play(). Antes quedaba opacity:0 para siempre si la
-      // promesa nunca se resolvía o rechazaba.
       bgVideo.style.opacity = '1';
 
       const tryPlayBg = () => {
@@ -1754,25 +1850,21 @@
         }
       };
 
-      // Intentar reproducir en cuanto haya datos suficientes (varios eventos)
       ['loadedmetadata', 'loadeddata', 'canplay', 'canplaythrough'].forEach(ev =>
         bgVideo.addEventListener(ev, tryPlayBg, { once: true })
       );
 
       if (bgVideo.readyState >= 2) tryPlayBg();
 
-      // Reintentos de seguridad por si los eventos no disparan a tiempo
       setTimeout(tryPlayBg, 800);
       setTimeout(tryPlayBg, 2500);
 
-      // Si hay error de red, dejamos el poster visible igual
       bgVideo.addEventListener('error', () => {
         console.warn('❌ bg-video falló al cargar — se muestra el poster');
         bgVideo.style.opacity = '1';
       }, { once: true });
     }
 
-    // ===== fgVideo (chroma key) — mismo comportamiento que antes =====
     if (fgVideo && currentAnim) {
       fgVideo.muted = true;
       const tryPlay = () => {
@@ -2016,12 +2108,16 @@
     if (typeof catalogoArray !== 'undefined' && Array.isArray(catalogoArray)) {
       baseAnimes = shuffleArray([...catalogoArray]);
       searchableIndex = buildSearchableIndex(baseAnimes);
-      log('📚 Catálogo cargado:', baseAnimes.length, 'animes |', Math.ceil(baseAnimes.length / itemsPerPage), 'páginas');
+      log('📚 Catálogo cargado:', baseAnimes.length, 'animes');
     } else {
       console.error('❌ catalogoArray no encontrado');
       baseAnimes = [];
       searchableIndex = [];
     }
+
+    // ⭐ calcular itemsPerPage ANTES de renderizar
+    await new Promise(resolve => requestAnimationFrame(() => resolve()));
+    recalcularPaginacion(true);
 
     cargarDatosYMostrar();
 
@@ -2029,6 +2125,39 @@
       try { checkForNewAnimes(); } catch (e) { console.warn(e); }
     }, 3000);
   }
+
+  // ===== LEER PARÁMETROS DE URL (?q= y ?genre=) =====
+  (function applyUrlParams() {
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const q = urlParams.get('q');
+      const genre = urlParams.get('genre');
+      
+      if (q) {
+        const searchEl = document.getElementById('search');
+        if (searchEl) searchEl.value = q;
+        currentFilters.search = q;
+      }
+      if (genre) {
+        const genreEl = document.getElementById('genre-select');
+        if (genreEl) {
+          const option = Array.from(genreEl.options).find(o => 
+            o.textContent.trim() === genre || o.value === genre
+          );
+          if (option) {
+            genreEl.value = option.value;
+            currentFilters.genre = option.value;
+            const trigger = genreEl.previousElementSibling;
+            if (trigger && trigger.classList.contains('custom-select-trigger')) {
+              trigger.textContent = option.textContent;
+            }
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('Error leyendo parámetros de URL:', e);
+    }
+  })();
 
   initCatalog();
 
@@ -2090,6 +2219,17 @@
     }
     window.addEventListener('resize', resize);
     resize();
+  })();
+
+  // ===== RECÁLCULO DE PAGINACIÓN AL REDIMENSIONAR =====
+  (function setupPaginationResize() {
+    let resizeTimer = null;
+    window.addEventListener('resize', () => {
+      if (resizeTimer) clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        recalcularPaginacion(false);
+      }, 300);
+    }, { passive: true });
   })();
 
   log('🚀 Archinime cargado correctamente.');

@@ -1,26 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
-  <!-- Página principal -->
+  <!-- ===== PÁGINA PRINCIPAL ===== -->
   <url>
     <loc>https://archinime.pages.dev/</loc>
+    <lastmod>2025-04-10</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
   </url>
 
-  <!-- Páginas dentro de /pages/ -->
+  <!-- ===== PÁGINAS DE NAVEGACIÓN ===== -->
+  <!-- Detalle del anime: cambia frecuentemente al añadir animes nuevos -->
   <url>
     <loc>https://archinime.pages.dev/pages/anime-detail.html</loc>
+    <lastmod>2025-04-10</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
   </url>
 
+  <!-- Reproductor: contenido dinámico por query strings (?anime=X&s=Y&e=Z) -->
   <url>
     <loc>https://archinime.pages.dev/pages/video-player.html</loc>
+    <lastmod>2025-04-10</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
   </url>
 
+  <!-- Configuración de cuenta: página de bajo tráfico orgánico -->
   <url>
     <loc>https://archinime.pages.dev/pages/opciones.html</loc>
-  </url>
-
-  <url>
-    <loc>https://archinime.pages.dev/pages/carga.html</loc>
+    <lastmod>2025-04-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
   </url>
 
 </urlset>

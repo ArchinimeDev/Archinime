@@ -79,10 +79,58 @@ body {
   #particlesCanvas { display: none; }
 }
 
-/* ===== SCROLLBAR ===== */
-::-webkit-scrollbar { width: 4px; }
+/* ===== SCROLLBAR (v4: 8px en desktop, 4px en móvil) ===== */
+::-webkit-scrollbar { width: 8px; }
 ::-webkit-scrollbar-track { background: var(--bg-deep); }
 ::-webkit-scrollbar-thumb { background: var(--neon-blue); border-radius: 10px; box-shadow: 0 0 15px var(--neon-blue); }
+@media (max-width: 768px) {
+  ::-webkit-scrollbar { width: 4px; }
+}
+
+/* ===== SCROLL TO TOP ===== */
+#scrollToTop {
+  position: fixed;
+  bottom: 24px;
+  left: 24px;
+  z-index: 999;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(11, 14, 20, 0.9);
+  border: 1px solid var(--neon-blue);
+  color: var(--neon-blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(20px) scale(0.9);
+  transition: opacity 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.15);
+}
+#scrollToTop.visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0) scale(1);
+}
+#scrollToTop:hover {
+  background: var(--neon-blue);
+  color: #000;
+  box-shadow: 0 0 30px var(--neon-blue);
+  transform: translateY(-3px) scale(1.05);
+}
+@media (max-width: 768px) {
+  #scrollToTop {
+    width: 42px;
+    height: 42px;
+    bottom: 72px;
+    left: 16px;
+    font-size: 1rem;
+  }
+}
 
 /* ===== LOADER ===== */
 #loadingScreen {
@@ -274,9 +322,8 @@ body {
 .nav-logo img {
   height: 40px;
   width: 40px;
-  /* 🔑 CAMBIOS APLICADOS AQUÍ: */
-  object-fit: cover;    /* Recorta el espacio vacío y llena todo el contenedor */
-  border-radius: 50%;   /* Lo hace un círculo perfecto como los avatares */
+  object-fit: cover;
+  border-radius: 50%;
   box-shadow: 0 0 20px rgba(177, 20, 255, 0.4);
 }
 .nav-logo-text {
@@ -313,7 +360,7 @@ body {
   padding: 10px 20px 10px 46px;
   color: #fff;
   outline: none;
-  transition: all 0.3s ease;
+  transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
   font-family: 'Poppins', sans-serif;
   font-size: 0.9rem;
 }
@@ -354,7 +401,7 @@ body {
   gap: 18px;
   padding: 12px 16px;
   cursor: pointer;
-  transition: 0.15s ease;
+  transition: background 0.15s ease;
   border-bottom: 1px solid rgba(255,255,255,0.02);
 }
 .suggestion-item:last-child { border-bottom: none; }
@@ -425,7 +472,7 @@ body {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
   font-size: 1rem;
   backdrop-filter: blur(4px);
   flex-shrink: 0;
@@ -451,7 +498,7 @@ body {
   object-fit: cover;
   border: 2px solid var(--neon-blue);
   cursor: pointer;
-  transition: 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s;
   background: #111;
 }
 #userAvatarBtn:hover { transform: scale(1.06); box-shadow: 0 0 20px var(--neon-blue); }
@@ -470,7 +517,7 @@ body {
   opacity: 0;
   pointer-events: none;
   transform: translateY(-8px) scale(0.96);
-  transition: all 0.25s ease;
+  transition: opacity 0.25s ease, transform 0.25s ease;
   z-index: 2000;
   transform-origin: top right;
   min-width: 220px;
@@ -487,7 +534,7 @@ body {
   align-items: center;
   gap: 12px;
   cursor: pointer;
-  transition: 0.2s;
+  transition: background 0.2s;
   border-radius: var(--radius-md) var(--radius-md) 0 0;
 }
 .user-dropdown-header:hover { background: rgba(177, 20, 255, 0.05); }
@@ -500,7 +547,7 @@ body {
 .user-dropdown-item {
   padding: 12px 16px;
   cursor: pointer;
-  transition: 0.2s;
+  transition: background 0.2s, color 0.2s, padding-left 0.2s;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -569,7 +616,7 @@ body {
   gap: 12px;
   padding: 12px 16px;
   border-bottom: 1px solid rgba(255,255,255,0.03);
-  transition: 0.15s;
+  transition: background 0.15s;
   cursor: pointer;
   align-items: center;
   max-width: 100%;
@@ -624,7 +671,7 @@ body {
   height: 280px;
   box-shadow: 0 10px 40px rgba(0,0,0,0.7);
   border: 1px solid rgba(0, 240, 255, 0.05);
-  transition: all 0.5s ease;
+  transition: height 0.5s ease, border-radius 0.5s ease;
 }
 .banner-slide {
   position: absolute;
@@ -673,7 +720,7 @@ body {
   border-radius: 50%;
   background: rgba(255,255,255,0.2);
   cursor: pointer;
-  transition: 0.3s;
+  transition: background 0.3s, box-shadow 0.3s;
   border: none;
 }
 .banner-dot.active { background: var(--neon-blue); box-shadow: 0 0 15px var(--neon-blue); }
@@ -686,10 +733,6 @@ body {
 
 /* =========================================================
    ===== MODO ESPECIAL =====
-   =========================================================
-   ✅ FIX v3: El background-image vive en un ::before con
-   z-index: 0. El video tiene position:relative + z-index:1
-   → SIEMPRE queda encima, garantizado.
    ========================================================= */
 .banner-special {
   display: none;
@@ -784,7 +827,7 @@ body.special-mode .spark {
   border: 1px solid rgba(255,255,255,0.05);
   border-radius: 40px;
   cursor: pointer;
-  transition: all 0.25s ease;
+  transition: background 0.25s ease, border-color 0.25s ease, color 0.25s ease;
   white-space: nowrap;
   position: relative;
   min-width: 120px;
@@ -827,7 +870,7 @@ body.special-mode .spark {
   font-size: 0.8rem;
   font-family: 'Poppins', sans-serif;
   cursor: pointer;
-  transition: 0.15s;
+  transition: background 0.15s, color 0.15s;
   white-space: nowrap;
 }
 .custom-select-option:hover {
@@ -845,7 +888,7 @@ body.special-mode .spark {
   justify-content: center;
   opacity: 0;
   visibility: hidden;
-  transition: 0.2s;
+  transition: opacity 0.2s, visibility 0.2s;
 }
 .select-popup-overlay.active { opacity: 1; visibility: visible; }
 .select-popup {
@@ -876,7 +919,7 @@ body.special-mode .spark {
   color: var(--text-secondary);
   font-size: 0.85rem;
   cursor: pointer;
-  transition: 0.2s;
+  transition: background 0.2s, color 0.2s;
   text-align: center;
   border-bottom: 1px solid rgba(255,255,255,0.02);
 }
@@ -887,7 +930,7 @@ body.special-mode .spark {
 }
 @keyframes dropFade { from { opacity: 0; transform: scaleY(0.92); } to { opacity: 1; transform: scaleY(1); } }
 
-/* ===== GRID ===== */
+/* ===== GRID (v4: auto-fill responsive) ===== */
 .container {
   max-width: 1600px;
   margin: 0 auto;
@@ -895,11 +938,11 @@ body.special-mode .spark {
 }
 .grid {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 24px;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 20px;
 }
-@media (max-width: 1023px) {
-  .grid { grid-template-columns: repeat(3, 1fr); gap: 18px; }
+@media (min-width: 1600px) {
+  .grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
 }
 @media (max-width: 767px) {
   .grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
@@ -913,11 +956,13 @@ body.special-mode .spark {
   cursor: pointer;
   background: var(--bg-card);
   box-shadow: 0 8px 24px rgba(0,0,0,0.5);
-  transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.4s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.4s ease;
   border: 1px solid rgba(255,255,255,0.03);
   transform: translateY(30px);
   opacity: 0;
+  /* v4: delay dinámico basado en --i (0.04s por item, máx 0.96s) */
   animation: cardEntry 0.6s ease forwards;
+  animation-delay: calc(var(--i, 0) * 0.04s);
 }
 
 @media (max-width: 768px) {
@@ -928,46 +973,31 @@ body.special-mode .spark {
   }
 }
 
-.card:nth-child(1) { animation-delay: 0.02s; }
-.card:nth-child(2) { animation-delay: 0.06s; }
-.card:nth-child(3) { animation-delay: 0.10s; }
-.card:nth-child(4) { animation-delay: 0.14s; }
-.card:nth-child(5) { animation-delay: 0.18s; }
-.card:nth-child(6) { animation-delay: 0.22s; }
-.card:nth-child(7) { animation-delay: 0.26s; }
-.card:nth-child(8) { animation-delay: 0.30s; }
-.card:nth-child(9) { animation-delay: 0.34s; }
-.card:nth-child(10) { animation-delay: 0.38s; }
-.card:nth-child(11) { animation-delay: 0.42s; }
-.card:nth-child(12) { animation-delay: 0.46s; }
-.card:nth-child(13) { animation-delay: 0.50s; }
-.card:nth-child(14) { animation-delay: 0.54s; }
-.card:nth-child(15) { animation-delay: 0.58s; }
-.card:nth-child(16) { animation-delay: 0.62s; }
-.card:nth-child(17) { animation-delay: 0.66s; }
-.card:nth-child(18) { animation-delay: 0.70s; }
-.card:nth-child(19) { animation-delay: 0.74s; }
-.card:nth-child(20) { animation-delay: 0.78s; }
-.card:nth-child(21) { animation-delay: 0.82s; }
-.card:nth-child(22) { animation-delay: 0.86s; }
-.card:nth-child(23) { animation-delay: 0.90s; }
-.card:nth-child(24) { animation-delay: 0.94s; }
-.card:nth-child(25) { animation-delay: 0.98s; }
-.card:nth-child(26) { animation-delay: 1.02s; }
-.card:nth-child(27) { animation-delay: 1.06s; }
-.card:nth-child(28) { animation-delay: 1.10s; }
-.card:nth-child(29) { animation-delay: 1.14s; }
-.card:nth-child(30) { animation-delay: 1.18s; }
-.card:nth-child(31) { animation-delay: 1.22s; }
-.card:nth-child(32) { animation-delay: 1.26s; }
-.card:nth-child(33) { animation-delay: 1.30s; }
-.card:nth-child(34) { animation-delay: 1.34s; }
-.card:nth-child(35) { animation-delay: 1.38s; }
-.card:nth-child(36) { animation-delay: 1.42s; }
-
 @keyframes cardEntry {
   from { opacity: 0; transform: translateY(30px) scale(0.96); }
   to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ===== SKELETON LOADER (nuevo) ===== */
+.card.skeleton {
+  animation: none;
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: none;
+  background: linear-gradient(90deg, #0b0e14 0%, #141822 50%, #0b0e14 100%);
+  background-size: 200% 100%;
+  animation: skeletonShimmer 1.4s ease-in-out infinite;
+}
+.card.skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(11, 14, 20, 0.9) 0%, transparent 60%);
+  pointer-events: none;
+}
+@keyframes skeletonShimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 
 .card::before {
@@ -1050,6 +1080,9 @@ body.special-mode .spark {
 .card-ad {
   cursor: default;
   border: 1px solid rgba(255,255,255,0.03);
+  animation: none;
+  opacity: 1;
+  transform: translateY(0);
 }
 .card-ad > div {
   width: 100% !important;
@@ -1089,7 +1122,7 @@ body.special-mode .spark {
   padding: 8px 28px;
   border-radius: 40px;
   cursor: pointer;
-  transition: 0.25s;
+  transition: background 0.25s, box-shadow 0.25s;
   font-weight: 600;
 }
 .cyber-no-results button:hover {
@@ -1116,7 +1149,7 @@ body.special-mode .spark {
   font-weight: 600;
   font-size: 0.75rem;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
   backdrop-filter: blur(4px);
   min-width: 36px;
   text-align: center;
@@ -1187,7 +1220,7 @@ body.special-mode .spark {
   font-size: 1.1rem;
   cursor: pointer;
   color: var(--text-secondary);
-  transition: 0.2s;
+  transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.2s, box-shadow 0.2s;
   border: 1px solid transparent;
   z-index: 10;
 }
@@ -1220,7 +1253,7 @@ body.special-mode .spark {
   color: var(--text-secondary);
   cursor: pointer;
   border-bottom: 2px solid transparent;
-  transition: 0.2s;
+  transition: color 0.2s, border-color 0.2s;
   font-size: 0.9rem;
 }
 .auth-tab.active { color: var(--neon-blue); border-bottom-color: var(--neon-blue); }
@@ -1238,7 +1271,7 @@ body.special-mode .spark {
   border-radius: 12px;
   color: #fff;
   font-size: 0.9rem;
-  transition: 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s;
   font-family: 'Poppins', sans-serif;
 }
 .auth-form input:focus {
@@ -1255,7 +1288,7 @@ body.special-mode .spark {
   border-radius: 40px;
   font-weight: 800;
   cursor: pointer;
-  transition: 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s;
   font-size: 0.95rem;
 }
 .auth-form button:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0, 240, 255, 0.3); }
@@ -1276,7 +1309,7 @@ body.special-mode .spark {
   justify-content: center;
   gap: 12px;
   cursor: pointer;
-  transition: 0.2s;
+  transition: background 0.2s, border-color 0.2s, transform 0.2s;
   color: var(--text-primary);
   font-weight: 600;
   font-size: 0.9rem;
@@ -1315,7 +1348,7 @@ body.special-mode .spark {
   border-radius: 30px;
   color: var(--text-secondary);
   cursor: pointer;
-  transition: 0.2s;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
   font-size: 0.75rem;
 }
 .profile-upload-btn:hover {
@@ -1340,7 +1373,7 @@ body.special-mode .spark {
   background: rgba(255,255,255,0.03);
   color: #fff;
   font-family: 'Poppins', sans-serif;
-  transition: 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 .profile-field input[type="text"]:focus {
   border-color: var(--neon-blue);
@@ -1375,7 +1408,7 @@ body.special-mode .spark {
   font-family: 'Orbitron', sans-serif;
   letter-spacing: 1px;
   cursor: pointer;
-  transition: 0.25s;
+  transition: background 0.25s, box-shadow 0.25s, transform 0.25s;
   margin-top: 6px;
   font-size: 0.85rem;
 }
@@ -1453,7 +1486,7 @@ body.special-mode .spark {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  transition: 0.2s;
+  transition: background 0.2s, border-color 0.2s;
   white-space: nowrap;
 }
 .content-chip i { color: var(--neon-blue); font-size: 0.8rem; }
@@ -1470,7 +1503,7 @@ body.special-mode .spark {
   border: none;
   font-weight: 700;
   cursor: pointer;
-  transition: 0.25s;
+  transition: box-shadow 0.25s, transform 0.25s, background 0.25s;
   font-family: 'Poppins', sans-serif;
 }
 .btn-primary {
@@ -1501,7 +1534,7 @@ body.special-mode .spark {
   align-items: center;
   opacity: 0;
   pointer-events: none;
-  transition: 0.4s;
+  transition: opacity 0.4s;
   padding: 20px;
   will-change: opacity;
 }
@@ -1540,7 +1573,7 @@ body.special-mode .spark {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: 0.3s;
+  transition: background 0.3s, border-color 0.3s, transform 0.3s, box-shadow 0.3s;
   font-size: 1.3rem;
   will-change: transform;
 }
@@ -1639,7 +1672,7 @@ body.special-mode .spark {
   font-weight: 900;
   font-family: 'Orbitron';
   cursor: pointer;
-  transition: 0.2s;
+  transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1683,7 +1716,7 @@ body.special-mode .spark {
   color: var(--text-secondary);
   font-size: 1.4rem;
   cursor: pointer;
-  transition: 0.2s;
+  transition: color 0.2s, transform 0.2s;
   padding: 4px 8px;
 }
 .side-panel .panel-close:hover { color: var(--neon-pink); transform: rotate(90deg); }
@@ -1771,7 +1804,7 @@ body.special-mode .spark {
   font-size: 0.7rem;
   padding: 2px 6px;
   border-radius: 4px;
-  transition: 0.2s;
+  transition: background 0.2s;
   margin-left: 6px;
 }
 .chat-delete-msg:hover { background: rgba(255,0,85,0.15); }
@@ -1815,7 +1848,7 @@ body.special-mode .spark {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: 0.3s;
+  transition: background 0.3s, border-color 0.3s, color 0.3s;
   font-size: 1rem;
   flex-shrink: 0;
 }
@@ -1833,7 +1866,7 @@ body.special-mode .spark {
   color: #000;
   font-size: 1.1rem;
   cursor: pointer;
-  transition: 0.2s;
+  transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1868,7 +1901,7 @@ body.special-mode .spark {
   border-radius: 30px;
   font-weight: 700;
   cursor: pointer;
-  transition: 0.2s;
+  transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
   font-size: 0.85rem;
   white-space: nowrap;
   font-family: 'Poppins', sans-serif;
@@ -1945,7 +1978,7 @@ body.special-mode .spark {
   font-weight: 600;
   font-size: 0.8rem;
   border-radius: 20px;
-  transition: 0.2s;
+  transition: background 0.2s, color 0.2s;
 }
 #chatStickerPanelPanel .sticker-tab.active {
   background: rgba(0,243,255,0.15);
@@ -1963,7 +1996,7 @@ body.special-mode .spark {
   border-radius: 8px;
   padding: 4px;
   cursor: pointer;
-  transition: 0.2s;
+  transition: background 0.2s, transform 0.2s;
   position: relative;
   background: #111;
 }
@@ -2020,7 +2053,7 @@ body.special-mode .spark {
   cursor: pointer;
   font-weight: 600;
   font-size: 0.8rem;
-  transition: 0.2s;
+  transition: background 0.2s, color 0.2s;
 }
 .add-sticker-container .upload-sticker-label:hover {
   background: var(--neon-blue);
@@ -2054,7 +2087,7 @@ body.special-mode .spark {
   font-size: 1.6rem;
   box-shadow: 0 0 30px rgba(177, 20, 255, 0.4);
   cursor: pointer;
-  transition: 0.3s;
+  transition: transform 0.3s, box-shadow 0.3s;
   border: none;
 }
 .chat-float:hover { transform: scale(1.1); box-shadow: 0 0 50px rgba(177, 20, 255, 0.6); }
@@ -2092,7 +2125,7 @@ body.special-mode .spark {
 .footer .socials a {
   color: var(--text-secondary);
   font-size: 1.2rem;
-  transition: 0.2s;
+  transition: color 0.2s, transform 0.2s;
 }
 .footer .socials a:hover { color: var(--neon-blue); transform: translateY(-3px); }
 .footer .credit { opacity: 0.5; }
@@ -2153,11 +2186,7 @@ body.special-mode .spark {
 }
 
 /* ===================================================================
-   ===== CHROMA KEY EN MÓVIL (AHORA SÍ SE MUESTRA) =====
-   ===================================================================
-   ⚠️ ANTES: `display: none !important` ocultaba el chroma en móvil.
-   ✅ AHORA: se muestra con tamaño reducido para que no tape
-      el chat flotante ni los controles.
+   ===== CHROMA KEY EN MÓVIL =====
    =================================================================== */
 @media (max-width: 768px) {
   #stageContainer {
@@ -2243,12 +2272,7 @@ body.special-mode .spark {
 }
 
 /* ===================================================================
-   ===== REGLAS MÓVIL BANNER ESPECIAL — SOLO EN MODO ESPECIAL =====
-   ===================================================================
-   ⚠️ FIX v1: Reglas scoped a body.special-mode (no se ve en modo normal).
-   ✅ FIX v2: El background-image está en el ::before base del
-      .banner-special, así que no hay que duplicarlo aquí. Solo
-      se ajustan las dimensiones móviles.
+   ===== REGLAS MÓVIL BANNER ESPECIAL =====
    =================================================================== */
 @media (max-width: 768px) {
   #bannerContainer {
@@ -2258,7 +2282,6 @@ body.special-mode .spark {
     width: 100% !important;
   }
 
-  /* Solo cuando el modo especial está activo (body.special-mode) */
   body.special-mode #specialBanner {
     position: relative !important;
     width: 100% !important;
