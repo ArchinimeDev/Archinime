@@ -3,8 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#00fff7">
   <title>Reproductor - Archinime</title>
-  <link rel="icon" href="../assets/img/Logo_Archinime.png" type="image/png">
+  <link rel="icon" href="https://archinime.pages.dev/assets/img/Logo_Archinime.png" type="image/png" sizes="48x48">
+  <link rel="apple-touch-icon" href="https://archinime.pages.dev/assets/img/Logo_Archinime.png">
 
   <!-- Tema dinámico -->
   <script>
@@ -70,7 +73,7 @@
   <script src="../js/core/app-core.js"></script>
 
   <style>
-    /* ===== ESTILOS OPTIMIZADOS (sin cambios) ===== */
+    /* ===== ESTILOS OPTIMIZADOS ===== */
     :root {
       --primary-color: #00fff7;
       --accent-color: #ff0055;
@@ -250,7 +253,7 @@
       padding: 8px 18px;
       border-radius: 50px;
       border: 1px solid rgba(0, 255, 247, 0.3);
-      transition: all 0.3s;
+      transition: background 0.3s, border-color 0.3s, color 0.3s, box-shadow 0.3s, transform 0.3s;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
       flex-shrink: 0;
     }
@@ -338,7 +341,10 @@
       pointer-events: auto;
       border-top-left-radius: var(--radius);
       border-top-right-radius: var(--radius);
+      opacity: 0;
+      animation: fadeInBlocker 0.5s ease 1.2s forwards;
     }
+    @keyframes fadeInBlocker { to { opacity: 1; } }
     body.is-mobile .logo-blocker { backdrop-filter: blur(2px); }
 
     .logo-blocker::after {
@@ -411,7 +417,7 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
-      transition: all 0.3s;
+      transition: background 0.3s, border-color 0.3s, box-shadow 0.3s, transform 0.3s;
       backdrop-filter: blur(4px);
       font-weight: 600;
       min-width: 100px;
@@ -484,7 +490,7 @@
       align-items: center;
       gap: 8px;
       margin-top: 15px;
-      transition: 0.2s;
+      transition: background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s;
     }
     .login-link-btn:hover {
       background: var(--primary-color);
@@ -530,7 +536,7 @@
       font-size: 1rem;
       resize: vertical;
       min-height: 100px;
-      transition: all 0.3s;
+      transition: border-color 0.3s, background 0.3s, box-shadow 0.3s;
     }
     .comentario-input-wrapper textarea:focus {
       outline: none;
@@ -546,7 +552,7 @@
       padding: 15px 20px;
       cursor: pointer;
       font-size: 1.5rem;
-      transition: all 0.3s;
+      transition: background 0.3s, border-color 0.3s, color 0.3s, transform 0.3s;
       color: white;
       display: flex;
       align-items: center;
@@ -572,7 +578,7 @@
       display: inline-flex;
       align-items: center;
       gap: 10px;
-      transition: all 0.3s;
+      transition: background 0.3s, transform 0.3s, box-shadow 0.3s;
       text-transform: uppercase;
       box-shadow: 0 0 20px rgba(0, 243, 255, 0.4);
     }
@@ -613,7 +619,7 @@
       color: #aaa;
       cursor: pointer;
       font-weight: 600;
-      transition: 0.3s;
+      transition: background 0.3s, color 0.3s, border-color 0.3s;
     }
     .sticker-tab.active {
       color: var(--primary-color);
@@ -693,7 +699,7 @@
       display: inline-flex;
       align-items: center;
       gap: 10px;
-      transition: 0.3s;
+      transition: background 0.3s, color 0.3s, box-shadow 0.3s, transform 0.3s;
     }
     .upload-sticker-label:hover {
       background: var(--primary-color);
@@ -717,7 +723,7 @@
       align-items: center;
       opacity: 0;
       pointer-events: none;
-      transition: 0.3s;
+      transition: opacity 0.3s;
       padding: 20px;
     }
     body.is-mobile .auth-modal { backdrop-filter: blur(3px); }
@@ -739,7 +745,7 @@
       font-size: 1.8rem;
       cursor: pointer;
       color: #888;
-      transition: 0.2s;
+      transition: color 0.2s, transform 0.2s;
     }
     .auth-close:hover { color: var(--accent-color); transform: rotate(90deg); }
     .auth-tabs {
@@ -754,7 +760,7 @@
       font-weight: 800;
       color: #aaa;
       border-bottom: 2px solid transparent;
-      transition: 0.3s;
+      transition: color 0.3s, border-color 0.3s;
     }
     .auth-tab.active {
       color: var(--primary-color);
@@ -781,7 +787,7 @@
       border-radius: 10px;
       font-weight: 900;
       cursor: pointer;
-      transition: 0.2s;
+      transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
       font-family: 'Poppins';
       letter-spacing: 1px;
     }
@@ -803,7 +809,7 @@
       cursor: pointer;
       color: white;
       font-weight: 600;
-      transition: 0.2s;
+      transition: background 0.2s, border-color 0.2s;
     }
     .provider-btn:hover {
       background: rgba(255, 255, 255, 0.1);
@@ -866,7 +872,7 @@
       align-items: center;
       justify-content: center;
       box-shadow: 0 0 8px rgba(255,0,85,0.6);
-      transition: transform 0.2s;
+      transition: transform 0.2s, background 0.2s;
     }
     .remove-sticker-btn:hover { transform: scale(1.1); background: #ff3366; }
 

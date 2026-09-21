@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <title>Cargando Anime... - Archinime OS</title>
   <meta name="description" content="Sumérgete en la experiencia definitiva de anime. Interfaz Cyberpunk, sonido envolvente y la mejor calidad.">
+  <meta name="color-scheme" content="dark">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -72,7 +73,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
-    /* ===== ESTILOS OPTIMIZADOS (sin cambios) ===== */
+    /* ===== ESTILOS OPTIMIZADOS ===== */
     * {
       margin: 0;
       padding: 0;
@@ -245,7 +246,11 @@
       96% { opacity: 0.8; transform: skewX(6deg); text-shadow: 2px 0 var(--neon-pink), -2px 0 var(--neon-cyan); }
       98% { opacity: 0.9; transform: skewX(-6deg); text-shadow: -2px 0 var(--neon-pink), 2px 0 var(--neon-cyan); }
     }
-    @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    /* ✅ @keyframes fadeInUp: solo UNA declaración (eliminado el duplicado) */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
 
     .container {
       position: relative;
@@ -259,13 +264,9 @@
       border-radius: 24px;
       border: 1px solid rgba(0, 243, 255, 0.2);
       box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-      transition: all 0.3s ease;
+      transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
       animation: fadeInUp 0.6s var(--transition-smooth);
       transform: translateZ(0);
-    }
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(30px); }
-      to { opacity: 1; transform: translateY(0); }
     }
 
     .top-buttons {
@@ -294,7 +295,7 @@
       font-weight: 600;
       font-size: 0.9rem;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
       text-decoration: none;
       white-space: nowrap;
       will-change: transform;
@@ -319,7 +320,7 @@
       color: white;
       font-size: 0.85rem;
       outline: none;
-      transition: 0.2s;
+      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
     }
     .search-container input:focus {
       border-color: var(--neon-cyan);
@@ -474,7 +475,7 @@
       font-size: 2rem;
       cursor: pointer;
       color: #444;
-      transition: all 0.2s;
+      transition: color 0.2s, text-shadow 0.2s, transform 0.2s;
     }
     .star.hover, .star.selected {
       color: #facc15;
@@ -497,7 +498,7 @@
       border: 1px solid rgba(188, 19, 254, 0.25);
       border-radius: var(--radius);
       overflow: hidden;
-      transition: 0.2s;
+      transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
     }
     details[open] {
       background: rgba(15, 15, 25, 0.6);
@@ -542,7 +543,7 @@
       color: #ddd;
       font-size: 0.8rem;
       font-weight: 500;
-      transition: all 0.2s;
+      transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.2s, box-shadow 0.2s;
       position: relative;
       display: flex;
       flex-direction: column;
@@ -574,7 +575,7 @@
       color: #00ff9d;
       cursor: pointer;
       opacity: 0;
-      transition: 0.2s;
+      transition: opacity 0.2s;
     }
     .ep-btn:hover .ep-action-btn { opacity: 1; }
     .recommendations {
@@ -608,7 +609,7 @@
       background: rgba(0,0,0,0.35);
       border-radius: 12px;
       overflow: hidden;
-      transition: 0.2s;
+      transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
       cursor: pointer;
       border: 1px solid rgba(188,19,254,0.15);
       display: flex;
@@ -616,6 +617,7 @@
       aspect-ratio: 2/3;
       width: 100%;
       will-change: transform;
+      position: relative;
     }
     .rec-card:hover {
       transform: translateY(-5px);
@@ -627,6 +629,8 @@
       height: 100%;
       object-fit: cover;
       flex-shrink: 0;
+      position: relative;
+      z-index: 1;
     }
     .rec-card p {
       padding: 25px 8px 8px;
@@ -644,15 +648,6 @@
       bottom: 0;
       left: 0;
       right: 0;
-    }
-    .rec-card {
-      position: relative;
-    }
-    .rec-card img {
-      position: relative;
-      z-index: 1;
-    }
-    .rec-card p {
       z-index: 2;
     }
 

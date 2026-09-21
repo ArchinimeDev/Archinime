@@ -2,8 +2,30 @@
 <html lang="es">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Opciones de Cuenta - Archinime</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#00fff7">
+  <title>Configuración de Cuenta - ARCHINIME</title>
+  <meta name="description" content="Personaliza tu perfil de ARCHINIME: cambia tu avatar, nombre público y color neón de tu cuenta.">
+  <meta name="robots" content="noindex, nofollow">
+
+  <!-- Favicon -->
+  <link rel="icon" href="https://archinime.pages.dev/assets/img/Logo_Archinime.png" type="image/png" sizes="48x48">
+  <link rel="apple-touch-icon" href="https://archinime.pages.dev/assets/img/Logo_Archinime.png">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Configuración de Cuenta - ARCHINIME">
+  <meta property="og:description" content="Personaliza tu perfil de ARCHINIME: cambia tu avatar, nombre público y color neón de tu cuenta.">
+  <meta property="og:url" content="https://archinime.pages.dev/pages/opciones.html">
+  <meta property="og:image" content="https://archinime.pages.dev/assets/img/Logo_Archinime.avif">
+  <meta property="og:site_name" content="ARCHINIME">
+
+  <!-- Preconnect -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+  <link rel="preconnect" href="https://www.gstatic.com">
   
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -11,7 +33,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-  <script src="../js/core/state.js?v=2025-04-10-v24.0-modular"></script>
+  <script defer src="../js/core/state.js?v=2025-04-10-v24.0-modular"></script>
 
   <style>
     :root {
@@ -61,7 +83,7 @@
       text-decoration: none;
       font-weight: 600;
       margin-bottom: 25px;
-      transition: 0.2s;
+      transition: color 0.2s, transform 0.2s;
     }
     .back-btn:hover { color: var(--primary-color); transform: translateX(-5px); }
     h2 { font-family: 'Orbitron', sans-serif; text-align: center; color: var(--primary-color); margin-bottom: 30px; letter-spacing: 1px;}
@@ -71,7 +93,7 @@
     .form-group input[type="text"] {
       width: 100%; padding: 14px; border-radius: 10px;
       border: 1px solid rgba(255,255,255,0.1);
-      background: rgba(0,0,0,0.5); color: white; font-family: 'Poppins'; outline: none; transition: 0.3s;
+      background: rgba(0,0,0,0.5); color: white; font-family: 'Poppins'; outline: none; transition: border-color 0.3s, box-shadow 0.3s;
     }
     .form-group input[type="text"]:focus { border-color: var(--primary-color); box-shadow: 0 0 10px rgba(0,255,247,0.2); }
     
@@ -83,11 +105,11 @@
       width: 100px;
       height: 100px; border-radius: 50%; object-fit: cover;
       border: 2px solid var(--primary-color); box-shadow: 0 0 15px rgba(0,255,247,0.3);
-      transition: 0.3s;
+      transition: border-color 0.3s, box-shadow 0.3s;
     }
     .upload-btn {
       background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); padding: 8px 20px;
-      border-radius: 20px; color: white; cursor: pointer; transition: 0.2s; font-size: 0.85rem;
+      border-radius: 20px; color: white; cursor: pointer; transition: background 0.2s, border-color 0.2s; font-size: 0.85rem;
     }
     .upload-btn:hover { background: rgba(255,255,255,0.1); border-color: var(--primary-color); }
 
@@ -333,7 +355,7 @@
     .save-btn {
       width: 100%; background: var(--primary-color); color: #000; border: none;
       padding: 16px; border-radius: 10px;
-      font-weight: 900; font-family: 'Orbitron'; letter-spacing: 1px; cursor: pointer; transition: 0.3s; margin-top: 10px;
+      font-weight: 900; font-family: 'Orbitron'; letter-spacing: 1px; cursor: pointer; transition: background 0.3s, box-shadow 0.3s, transform 0.3s; margin-top: 10px;
     }
     .save-btn:hover { background: #fff; box-shadow: 0 0 20px rgba(0,243,255,0.5); transform: translateY(-2px); }
     .save-btn:disabled { background: #555; cursor: not-allowed; box-shadow: none; transform: none; }
@@ -346,7 +368,7 @@
       min-height: 24px;
       padding: 10px 12px;
       border-radius: 8px;
-      transition: 0.3s;
+      transition: background 0.3s, border-color 0.3s, box-shadow 0.3s;
       word-break: break-word;
     }
     #statusMsg:not(:empty) {
@@ -512,7 +534,6 @@
     }
 
     // ========== Actualizar vista previa del color ==========
-    // Solo cambia el TEXTO del chip hex, NO toca width ni estilos
     function updateColorPreview(color) {
       const circle = document.getElementById('colorCircle');
       if (circle) {
