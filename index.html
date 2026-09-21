@@ -47,7 +47,10 @@
   <meta name="twitter:description" content="La experiencia definitiva de anime con interfaz de próxima generación.">
   <meta name="twitter:image" content="https://archinime.pages.dev/assets/img/Logo_Archinime.avif">
 
-  <link rel="icon" href="assets/img/Logo_Archinime.png" type="image/png">
+  <!-- 🔑 FAVICON ACTUALIZADO (URL absoluta y tamaño para Google) -->
+  <link rel="icon" href="https://archinime.pages.dev/assets/img/Logo_Archinime.png" type="image/png" sizes="48x48">
+  <link rel="apple-touch-icon" href="https://archinime.pages.dev/assets/img/Logo_Archinime.png">
+  
   <link rel="manifest" href="manifest.json">
   <meta name="google-adsense-account" content="ca-pub-3917033517052949">
 
@@ -240,6 +243,27 @@
       border-radius: 8px;
     }
   </style>
+
+  <!-- ===== DATOS ESTRUCTURADOS PARA GOOGLE (SCHEMA.ORG) ===== -->
+  <!-- Esto le dice a Google que tu sitio se llama ARCHINIME -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "name": "ARCHINIME",
+        "url": "https://archinime.pages.dev/"
+      },
+      {
+        "@type": "Organization",
+        "name": "ARCHINIME",
+        "url": "https://archinime.pages.dev/",
+        "logo": "https://archinime.pages.dev/assets/img/Logo_Archinime.png"
+      }
+    ]
+  }
+  </script>
 </head>
 <body>
 
