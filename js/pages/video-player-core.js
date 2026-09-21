@@ -2,7 +2,7 @@
 // CORREGIDO: Ruta de proxy.html, avatar invitado.avif, y otros detalles
 // MEJORADO: Descarga única, barra de progreso, soporte múltiples partes
 // SOPORTE: Múltiples opciones, selección automática, títulos dinámicos
-// NUEVO: Prioridad máxima para hubu.cloud
+// v4: Feedback visual en botón de descarga + meta description dinámica
 
 class VideoPlayer {
   constructor() {
@@ -36,6 +36,7 @@ class VideoPlayer {
     this.lastLoadedProxyUrl = null;
     this.isRetrying = false;
     this.isPixelDrain = false;
+    this._downloadBtnOriginalHTML = null; // v4: guarda el HTML original del botón
     
     window.comentariosAnimeId = this.animeId;
     window.comentariosSeason = this.season;
@@ -410,7 +411,6 @@ class VideoPlayer {
         if (!proxy) return;
         this.lastOpenedProxyUrl = proxy;
 
-        // ✅ RUTA CORREGIDA: proxy.html en lugar de ejem.html
         const instruccionesUrl = `proxy.html?url=${encodeURIComponent(proxy)}`;
 
         const fallbackOpen = (url) => {
@@ -678,6 +678,51 @@ class VideoPlayer {
     }
   }
 
+  // ✅ v4: Feedback visual en el botón de descarga
+  setDownloadButtonState(state, message = '') {
+    const downloadBtn = document.getElementById('downloadBtn');
+    if (!downloadBtn) return;
+    if (!this._downloadBtnOriginalHTML) {
+      this._downloadBtnOriginalHTML = downloadBtn.innerHTML;
+    }
+    switch (state) {
+      case 'loading':
+        downloadBtn.disabled = true;
+        downloadBtn.style.opacity = '0.6';
+        downloadBtn.style.cursor = 'not-allowed';
+        downloadBtn.style.borderColor = 'rgba(0, 243, 255, 0.5)';
+        downloadBtn.style.background = 'rgba(0, 243, 255, 0.08)';
+        downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Descargando...';
+        break;
+      case 'success':
+        downloadBtn.disabled = false;
+        downloadBtn.style.opacity = '1';
+        downloadBtn.style.cursor = 'pointer';
+        downloadBtn.style.borderColor = 'rgba(0, 255, 157, 0.6)';
+        downloadBtn.style.background = 'rgba(0, 255, 157, 0.12)';
+        downloadBtn.style.color = '#00ff9d';
+        downloadBtn.innerHTML = '<i class="fas fa-check-circle"></i> ¡Listo!';
+        break;
+      case 'error':
+        downloadBtn.disabled = false;
+        downloadBtn.style.opacity = '1';
+        downloadBtn.style.cursor = 'pointer';
+        downloadBtn.style.borderColor = 'rgba(255, 0, 85, 0.6)';
+        downloadBtn.style.background = 'rgba(255, 0, 85, 0.12)';
+        downloadBtn.style.color = '#ff0055';
+        downloadBtn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Error';
+        break;
+      default:
+        downloadBtn.disabled = false;
+        downloadBtn.style.opacity = '1';
+        downloadBtn.style.cursor = 'pointer';
+        downloadBtn.style.borderColor = '';
+        downloadBtn.style.background = '';
+        downloadBtn.style.color = '';
+        downloadBtn.innerHTML = this._downloadBtnOriginalHTML;
+    }
+  }
+
   async handleDownloadClick() {
     if (this.isDownloading) {
       console.log('Descarga en curso, espera a que termine');
@@ -717,13 +762,7 @@ class VideoPlayer {
     baseFilename = baseFilename.replace(/[^a-z0-9ñáéíóúü \-_]/gi, '').replace(/\s+/g, '_');
 
     this.isDownloading = true;
-    const downloadBtn = document.getElementById('downloadBtn');
-    if (downloadBtn) {
-      downloadBtn.disabled = true;
-      downloadBtn.style.opacity = '0.6';
-      downloadBtn.style.cursor = 'not-allowed';
-      downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Descargando...';
-    }
+    this.setDownloadButtonState('loading');
 
     try {
       for (let i = 0; i < urlsToDownload.length; i++) {
@@ -757,14 +796,16 @@ class VideoPlayer {
           await new Promise(r => setTimeout(r, 500));
         }
       }
+      // ✅ v4: Éxito — feedback verde y restauración tras 2.5s
+      this.setDownloadButtonState('success');
+      setTimeout(() => this.setDownloadButtonState('default'), 2500);
+    } catch (err) {
+      console.error('Error en descarga:', err);
+      // ✅ v4: Error — feedback rojo y restauración tras 3s
+      this.setDownloadButtonState('error');
+      setTimeout(() => this.setDownloadButtonState('default'), 3000);
     } finally {
       this.isDownloading = false;
-      if (downloadBtn) {
-        downloadBtn.disabled = false;
-        downloadBtn.style.opacity = '1';
-        downloadBtn.style.cursor = 'pointer';
-        downloadBtn.innerHTML = '⬇ Descargar';
-      }
       this.hideProgressBar();
     }
   }
@@ -1017,6 +1058,44 @@ class VideoPlayer {
     return `${animeTitle} - ${seasonName} - ${episodeTitle}`;
   }
 
+  // ✅ v4: Actualiza meta description y og tags para SEO de cada episodio
+  updateMetaTags(animeTitle, seasonName, episodeTitle) {
+    try {
+      const fullTitle = `${episodeTitle} | ${animeTitle} - ARCHINIME`;
+      const description = `Disfruta de ${episodeTitle} de ${animeTitle} (${seasonName}) online en HD gratis en ARCHINIME. La mejor calidad de anime con interfaz Cyberpunk.`;
+      
+      // Title
+      document.title = fullTitle;
+      
+      // Meta description
+      let metaDesc = document.querySelector('meta[name="description"]');
+      if (!metaDesc) {
+        metaDesc = document.createElement('meta');
+        metaDesc.name = 'description';
+        document.head.appendChild(metaDesc);
+      }
+      metaDesc.setAttribute('content', description);
+      
+      // OG tags
+      const ogTags = {
+        'og:title': fullTitle,
+        'og:description': description,
+        'og:url': window.location.href
+      };
+      Object.entries(ogTags).forEach(([prop, content]) => {
+        let tag = document.querySelector(`meta[property="${prop}"]`);
+        if (!tag) {
+          tag = document.createElement('meta');
+          tag.setAttribute('property', prop);
+          document.head.appendChild(tag);
+        }
+        tag.setAttribute('content', content);
+      });
+    } catch (e) {
+      console.warn('No se pudieron actualizar las meta tags:', e);
+    }
+  }
+
   normalizeUrls(urls) {
     if (!urls) return [];
     if (Array.isArray(urls)) return urls.filter(u => u && u.trim() !== '');
@@ -1222,7 +1301,6 @@ class VideoPlayer {
       if (loginMsg) loginMsg.style.display = 'none';
       if (form) {
         form.style.display = 'block';
-        // ✅ RUTA CORREGIDA: avatar por defecto
         if (avatar) avatar.src = user.photoURL || '../assets/img/invitado.avif';
         if (nameSpan) nameSpan.innerText = user.displayName || user.email?.split('@')[0] || 'Usuario';
       }
@@ -1295,8 +1373,14 @@ class VideoPlayer {
       
       this.currentEpisodeData = episodeData;
       const formattedTitle = this.formatEpisodeTitle(season, parseInt(this.episode), episodeData);
-      document.title = `Ver ${formattedTitle} - Archinime`;
       document.getElementById('epTitle').innerText = formattedTitle;
+
+      // ✅ v4: Meta tags dinámicas para SEO
+      this.updateMetaTags(
+        this.animeData.title || 'Anime',
+        season.name || `Temporada ${season.num}`,
+        episodeData.title || `Episodio ${this.episode}`
+      );
       
       let options = [
         { label: 'Latino', key: 'link', urls: this.normalizeUrls(episodeData.link) },

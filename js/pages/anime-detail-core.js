@@ -2,6 +2,7 @@
 // MEJORADO: Carga más rápida, mejor manejo de errores, 12 sugerencias
 // INCLUYE: Búsqueda rápida, votaciones, historial de visualización
 // CORREGIDO: Ruta de música ahora usa ../assets/music/
+// v4: volumen de música a 1.0 (100%)
 
 function escapeHtml(text) {
   if (!text) return text;
@@ -64,7 +65,8 @@ function playTrack(idx) {
   // ✅ RUTA CORREGIDA: usar ../assets/music/
   const fullUrl = track.startsWith('http') ? track : `../assets/music/${track}`;
   currentAudio = new Audio(fullUrl);
-  currentAudio.volume = 0.3;
+  // ✅ v4: volumen al 100%
+  currentAudio.volume = 1.0;
   currentAudio.loop = false;
   currentAudio.onended = () => {
     currentTrackIndex = (currentTrackIndex + 1) % playlist.length;
