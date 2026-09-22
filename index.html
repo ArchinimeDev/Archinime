@@ -104,7 +104,6 @@ html {
   min-height: 100%;
 }
 body {
-  /* ✅ FIX: transparente para que los fondos con z-index negativo se vean */
   background: transparent;
   color: var(--text-main);
   font-family: var(--font-body);
@@ -162,7 +161,6 @@ body.cursor-hover .cursor-ring {
   background: color-mix(in srgb, var(--neon-3) 8%, transparent);
   backdrop-filter: blur(4px);
 }
-/* ✅ FIX: cursor nativo SOLO en dispositivos táctiles */
 @media (hover: none), (pointer: coarse) {
   .cursor-dot, .cursor-ring { display: none !important; }
   body, button, a, input, textarea, select, [data-hover] { cursor: auto !important; }
@@ -177,7 +175,6 @@ body.cursor-hover .cursor-ring {
   z-index: -3;
   pointer-events: none;
   overflow: hidden;
-  /* ✅ FIX: forzar capa de pintado propia */
   transform: translateZ(0);
   will-change: transform;
 }
@@ -187,7 +184,6 @@ body.cursor-hover .cursor-ring {
   filter: blur(90px);
   opacity: 0.5;
   will-change: transform;
-  /* ✅ FIX: rendimiento móvil */
   backface-visibility: hidden;
 }
 .aurora.a1 { width: 55vw; height: 55vw; background: radial-gradient(circle, var(--neon-2), transparent 65%); top: -20%; left: -10%; animation: aurora1 22s ease-in-out infinite; }
@@ -355,7 +351,6 @@ body.cursor-hover .cursor-ring {
   font-size: 0.85rem;
   transition: border-color 0.3s, background 0.3s, box-shadow 0.3s;
   cursor: none;
-  /* ✅ FIX: iOS no hace zoom si font-size >= 16px */
 }
 @media (max-width: 600px) {
   .search-input { font-size: 16px; padding: 10px 16px 10px 40px; }
@@ -915,6 +910,286 @@ section {
 }
 .marquee-item:hover { color: var(--neon-1); }
 .marquee-item::before { content: '◆'; color: var(--neon-1); font-size: 0.7rem; opacity: 0.6; }
+
+/* ============================================
+   MOTION SECTION — v3 con controles nativos
+   ============================================ */
+.motion-section {
+  padding-top: 80px;
+  padding-bottom: 80px;
+}
+.motion-player {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  background: #000;
+  border: 1px solid var(--line);
+  box-shadow:
+    0 30px 80px rgba(0,0,0,0.7),
+    0 0 60px color-mix(in srgb, var(--neon-1) 8%, transparent),
+    inset 0 0 0 1px color-mix(in srgb, var(--neon-1) 5%, transparent);
+  isolation: isolate;
+}
+.motion-player::before {
+  content: '';
+  position: absolute; inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--neon-1) 60%, transparent),
+    transparent 40%,
+    transparent 60%,
+    color-mix(in srgb, var(--neon-2) 60%, transparent));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+          mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  pointer-events: none;
+  z-index: 4;
+  opacity: 0.8;
+}
+
+/* Video con controles nativos */
+.motion-video-el {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  background: #000;
+  /* Refuerza dark mode de controles nativos */
+  color-scheme: dark;
+}
+.motion-video-el::-webkit-media-controls-panel {
+  background: linear-gradient(to top, rgba(0,0,0,0.85), transparent);
+}
+
+/* Overlay: SOLO decorativo, sin capturar clicks fuera de botones */
+.motion-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 20px;
+  background: linear-gradient(to bottom,
+    rgba(0,0,0,0.55) 0%,
+    transparent 22%,
+    transparent 100%);
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 0.35s ease;
+}
+.motion-overlay > * { pointer-events: auto; }
+
+.motion-player.controls-hidden .motion-overlay {
+  opacity: 0;
+}
+.motion-player.controls-hidden .motion-overlay > * { pointer-events: none; }
+
+/* Topbar: badge + índice */
+.motion-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.motion-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 100px;
+  background: color-mix(in srgb, var(--neon-3) 15%, transparent);
+  border: 1px solid color-mix(in srgb, var(--neon-3) 40%, transparent);
+  color: var(--neon-3);
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  backdrop-filter: blur(10px);
+}
+.motion-badge .live-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--neon-3);
+  box-shadow: 0 0 10px var(--neon-3);
+  animation: pulseDot 1.4s ease-in-out infinite;
+}
+.motion-index {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #fff;
+  background: rgba(0,0,0,0.5);
+  padding: 6px 14px;
+  border-radius: 100px;
+  border: 1px solid rgba(255,255,255,0.15);
+  backdrop-filter: blur(10px);
+}
+.motion-index .sep { color: var(--text-dim); margin: 0 4px; }
+.motion-index .total { color: var(--text-soft); }
+
+/* Título — ahora arriba, debajo del topbar */
+.motion-title-wrap {
+  position: absolute;
+  left: 20px;
+  top: 70px;
+  max-width: 60%;
+  pointer-events: none;
+}
+.motion-title-wrap .motion-caption {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--neon-1);
+  margin-bottom: 4px;
+  opacity: 0.9;
+}
+.motion-title-wrap .motion-title {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(1rem, 2.4vw, 1.8rem);
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+  color: #fff;
+  text-shadow: 0 4px 20px rgba(0,0,0,0.9);
+  margin: 0;
+}
+
+/* Botones prev/next — flotantes a los lados */
+.motion-nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: rgba(10, 12, 20, 0.7);
+  border: 1px solid rgba(255,255,255,0.15);
+  backdrop-filter: blur(16px) saturate(1.4);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  cursor: none;
+  transition: all 0.3s var(--ease-out-expo);
+  z-index: 5;
+  opacity: 0.6;
+  pointer-events: auto;
+}
+.motion-nav-btn:hover {
+  opacity: 1;
+  background: color-mix(in srgb, var(--neon-1) 20%, rgba(10,12,20,0.9));
+  border-color: var(--neon-1);
+  color: var(--neon-1);
+  transform: translateY(-50%) scale(1.1);
+  box-shadow: 0 0 25px color-mix(in srgb, var(--neon-1) 40%, transparent);
+}
+.motion-nav-btn.prev { left: 20px; }
+.motion-nav-btn.next { right: 20px; }
+
+/* Dots laterales */
+.motion-dots {
+  position: absolute;
+  top: 50%;
+  right: 90px;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 5;
+  pointer-events: auto;
+}
+.motion-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.3);
+  border: none;
+  cursor: none;
+  transition: all 0.3s var(--ease-out-expo);
+  padding: 0;
+}
+.motion-dot:hover {
+  background: rgba(255,255,255,0.7);
+  transform: scale(1.3);
+}
+.motion-dot.active {
+  background: var(--neon-1);
+  box-shadow: 0 0 14px var(--neon-1);
+  transform: scale(1.4);
+  height: 24px;
+  border-radius: 100px;
+}
+
+/* Aviso de audio (fuera del overlay para que no se oculte) */
+.motion-audio-notice {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.8);
+  border: 1px solid color-mix(in srgb, var(--neon-1) 40%, transparent);
+  color: var(--neon-1);
+  padding: 8px 18px;
+  border-radius: 100px;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  z-index: 8;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s;
+  backdrop-filter: blur(10px);
+  white-space: nowrap;
+}
+.motion-audio-notice.show { opacity: 1; }
+.motion-audio-notice i { margin-right: 6px; color: var(--neon-2); }
+
+/* Responsive del reproductor */
+@media (max-width: 768px) {
+  .motion-section { padding-top: 60px; padding-bottom: 60px; }
+  .motion-player { border-radius: 20px; }
+  .motion-overlay { padding: 14px; }
+  .motion-title-wrap { left: 14px; top: 56px; max-width: 75%; }
+  .motion-title-wrap .motion-title { font-size: 1rem; }
+  .motion-title-wrap .motion-caption { font-size: 0.55rem; }
+  .motion-nav-btn { width: 42px; height: 42px; font-size: 0.85rem; }
+  .motion-nav-btn.prev { left: 12px; }
+  .motion-nav-btn.next { right: 12px; }
+  .motion-dots { right: 70px; gap: 8px; }
+  .motion-dot { width: 7px; height: 7px; }
+  .motion-index { font-size: 0.62rem; padding: 5px 10px; }
+  .motion-badge { font-size: 0.58rem; padding: 5px 10px; letter-spacing: 1.5px; }
+}
+
+@media (max-width: 480px) {
+  .motion-badge .txt-full { display: none; }
+  .motion-nav-btn { width: 36px; height: 36px; font-size: 0.75rem; opacity: 0.85; }
+  .motion-nav-btn.prev { left: 8px; }
+  .motion-nav-btn.next { right: 8px; }
+  .motion-dots { right: 56px; gap: 6px; }
+  .motion-dot { width: 6px; height: 6px; }
+  .motion-dot.active { height: 18px; }
+  .motion-index { font-size: 0.58rem; padding: 4px 9px; }
+  .motion-title-wrap { top: 50px; max-width: 80%; }
+}
+
+/* En móvil: los controles nativos siempre visibles porque son táctiles */
+@media (hover: none) {
+  .motion-overlay { opacity: 1 !important; }
+  .motion-nav-btn { opacity: 0.9; }
+}
 
 /* ============================================
    CATÁLOGO
@@ -2589,16 +2864,14 @@ section {
 }
 
 /* ============================================
-   📱 RESPONSIVE — MÓVILES Y TABLETS
+   📱 RESPONSIVE
    ============================================ */
 
-/* ---------- TABLETS (≤1024px) ---------- */
 @media (max-width: 1024px) {
   .hero-chips { display: none; }
   .footer-inner { grid-template-columns: 2fr 1fr 1fr; }
 }
 
-/* ---------- NAV (≤900px) ---------- */
 @media (max-width: 900px) {
   .nav {
     padding: calc(14px + var(--safe-top)) calc(16px + var(--safe-right)) 14px calc(16px + var(--safe-left));
@@ -2630,9 +2903,7 @@ section {
   .side-panel.open { right: 0; }
 }
 
-/* ---------- MÓVILES (≤768px) ---------- */
 @media (max-width: 768px) {
-  /* Optimizaciones de rendimiento de fondos */
   .aurora { filter: blur(55px); opacity: 0.4; }
   .aurora.a1 { width: 85vw; height: 85vw; top: -25%; left: -25%; }
   .aurora.a2 { width: 75vw; height: 75vw; top: 10%; right: -25%; }
@@ -2645,7 +2916,6 @@ section {
   .noise { opacity: 0.025; }
   #particles { opacity: 0.55; }
 
-  /* Layout principal */
   section { padding: 70px 16px; }
   .hero {
     padding: calc(110px + var(--safe-top)) 16px calc(60px + var(--safe-bottom));
@@ -2670,7 +2940,6 @@ section {
   .stat-value { font-size: clamp(1.8rem, 7vw, 2.6rem); }
   .stat-label { font-size: 0.6rem; letter-spacing: 2px; }
 
-  /* Bento */
   .bento { grid-template-columns: 1fr; grid-auto-rows: auto; gap: 14px; }
   .bento-item {
     grid-column: span 1 !important;
@@ -2683,7 +2952,6 @@ section {
   .bento-num { margin-bottom: 14px; font-size: 0.62rem; }
   .bento-visual { width: 130px; height: 130px; right: -30px; bottom: -30px; }
 
-  /* Catálogo */
   .anime-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 12px;
@@ -2694,7 +2962,6 @@ section {
   .pagination-container { margin-top: 40px; gap: 6px; }
   .pagination-btn { padding: 6px 12px; min-width: 36px; font-size: 0.7rem; }
 
-  /* Modales */
   .auth-card, .profile-card, .detail-card { max-width: 100%; border-radius: 20px; }
   .profile-card { padding: 24px 18px; }
   .detail-cover { height: 300px; }
@@ -2704,7 +2971,6 @@ section {
   .event-visuals { height: 240px; }
   .event-title { font-size: 1.35rem; }
 
-  /* Dock */
   .dock {
     bottom: calc(16px + var(--safe-bottom));
     right: calc(16px + var(--safe-right));
@@ -2715,7 +2981,6 @@ section {
   .dock button:nth-child(n+5) { display: none; }
   .dock-sep { display: none; }
 
-  /* Chat float */
   .chat-float {
     width: 50px; height: 50px;
     font-size: 1.3rem;
@@ -2723,18 +2988,15 @@ section {
     right: calc(16px + var(--safe-right));
   }
 
-  /* Side panel */
   .side-panel {
     padding: calc(16px + var(--safe-top)) 14px calc(14px + var(--safe-bottom));
   }
 
-  /* Notification dropdown */
   .notif-dropdown {
     width: calc(100vw - 32px);
     right: -8px;
   }
 
-  /* Footer */
   .footer { padding: 40px 16px calc(80px + var(--safe-bottom)); }
   .footer-inner { grid-template-columns: 1fr 1fr; gap: 24px; }
   .footer-bottom {
@@ -2744,11 +3006,9 @@ section {
     margin-top: 40px;
   }
 
-  /* Mobile menu */
   .mobile-menu a { font-size: 1.5rem; letter-spacing: 3px; padding: 10px 20px; }
 }
 
-/* ---------- MÓVILES PEQUEÑOS (≤480px) ---------- */
 @media (max-width: 480px) {
   .nav-logo .txt { font-size: 0.8rem; letter-spacing: 2px; }
   .nav-logo .dot { width: 8px; height: 8px; }
@@ -2814,7 +3074,6 @@ section {
   .cmd-item-shortcut { display: none; }
 }
 
-/* ---------- MÓVILES MUY PEQUEÑOS (≤360px) ---------- */
 @media (max-width: 360px) {
   .nav-logo .txt { font-size: 0.72rem; }
   .hero-title { font-size: 1.6rem; }
@@ -2825,7 +3084,6 @@ section {
   .stat-label { font-size: 0.55rem; }
 }
 
-/* ---------- ORIENTACIÓN HORIZONTAL EN MÓVIL ---------- */
 @media (max-height: 500px) and (orientation: landscape) {
   .hero {
     min-height: auto;
@@ -2835,7 +3093,6 @@ section {
   .mobile-menu a { font-size: 1.2rem; padding: 6px 16px; }
 }
 
-/* ---------- TOUCH: feedback táctil ---------- */
 @media (hover: none) {
   .anime-card:active,
   .community-msg:active,
@@ -2848,7 +3105,8 @@ section {
   .pagination-btn:active { transform: scale(0.94); }
   .filter-trigger:active { transform: scale(0.96); }
   .dock button:active { transform: scale(0.9); }
-  /* Mejora tamaño táctil mínimo 44px */
+  .motion-nav-btn:active { transform: translateY(-50%) scale(0.9); }
+  .motion-dot:active { transform: scale(0.85); }
   .cyber-btn-icon { min-width: 36px; min-height: 36px; }
   .theme-dot { width: 18px; height: 18px; }
   .chat-btn-icon { min-width: 38px; min-height: 38px; }
@@ -2900,6 +3158,7 @@ section {
 <div class="progress-bar" id="progressBar"></div>
 
 <div class="mobile-menu" id="mobileMenu">
+  <a href="#motion" data-close>Motion</a>
   <a href="#catalog" data-close>Catálogo</a>
   <a href="#features" data-close>Features</a>
   <a href="#community" data-close>Comunidad</a>
@@ -3025,6 +3284,69 @@ section {
     <span class="marquee-item">Slice of Life</span>
   </div>
 </div>
+
+<!-- ============================================
+     MOTION — VIDEOS DESTACADOS EN SECUENCIA
+     Con controles nativos + pausa de música
+     ============================================ -->
+<section class="motion-section" id="motion">
+  <div class="section-head reveal">
+    <div>
+      <div class="section-tag">00.5 · Motion</div>
+      <h2 class="section-title">En <span class="accent">movimiento.</span></h2>
+    </div>
+    <p class="section-desc">Trailers, aberturas y momentos que definen la experiencia. Reproducción automática en orden.</p>
+  </div>
+
+  <div class="motion-player reveal" id="motionPlayer">
+    <!-- Video con controles nativos -->
+    <video
+      id="motionVideo"
+      class="motion-video-el"
+      playsinline
+      muted
+      controls
+      preload="metadata"
+      poster="assets/img/placeholder.webp"
+    ></video>
+
+    <!-- Overlay decorativo (badge, título, dots, prev/next) -->
+    <div class="motion-overlay" id="motionOverlay">
+      <div class="motion-topbar">
+        <div class="motion-badge">
+          <span class="live-dot"></span>
+          <span class="txt-full">NOW PLAYING</span>
+        </div>
+        <div class="motion-index" id="motionIndex">
+          <span class="current">01</span>
+          <span class="sep">/</span>
+          <span class="total">01</span>
+        </div>
+      </div>
+
+      <div class="motion-title-wrap">
+        <div class="motion-caption">— Archinime Motion</div>
+        <h3 class="motion-title" id="motionTitle">Cargando...</h3>
+      </div>
+
+      <!-- Botón anterior -->
+      <button class="motion-nav-btn prev" id="motionPrev" aria-label="Anterior" title="Video anterior">
+        <i class="fas fa-backward"></i>
+      </button>
+
+      <!-- Botón siguiente -->
+      <button class="motion-nav-btn next" id="motionNext" aria-label="Siguiente" title="Video siguiente">
+        <i class="fas fa-forward"></i>
+      </button>
+
+      <!-- Dots para navegar -->
+      <div class="motion-dots" id="motionDots" aria-label="Seleccionar video"></div>
+    </div>
+
+    <!-- Aviso de audio (fuera del overlay para que no se oculte) -->
+    <div class="motion-audio-notice" id="motionAudioNotice"></div>
+  </div>
+</section>
 
 <!-- CATÁLOGO -->
 <section class="catalog-section" id="catalog">
@@ -3341,6 +3663,7 @@ section {
 
 <div class="dock">
   <button data-label="Inicio" data-hover onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fas fa-house"></i></button>
+  <button data-label="Motion" data-hover onclick="document.getElementById('motion').scrollIntoView({behavior:'smooth'})"><i class="fas fa-clapperboard"></i></button>
   <button data-label="Catálogo" data-hover onclick="document.getElementById('catalog').scrollIntoView({behavior:'smooth'})"><i class="fas fa-film"></i></button>
   <button data-label="Chat" data-hover onclick="abrirChatPanel()"><i class="fas fa-comments"></i></button>
   <div class="dock-sep"></div>
@@ -3356,6 +3679,7 @@ section {
     </div>
     <div class="cmd-list" id="cmdList">
       <div class="cmd-item" data-cmd="inicio"><div class="cmd-item-icon"><i class="fas fa-house"></i></div><div class="cmd-item-text"><div class="cmd-item-title">Ir a Inicio</div><div class="cmd-item-desc">Volver al top</div></div><span class="cmd-item-shortcut">H</span></div>
+      <div class="cmd-item" data-cmd="motion"><div class="cmd-item-icon"><i class="fas fa-clapperboard"></i></div><div class="cmd-item-text"><div class="cmd-item-title">Ver Motion</div><div class="cmd-item-desc">Videos destacados</div></div><span class="cmd-item-shortcut">V</span></div>
       <div class="cmd-item" data-cmd="catalog"><div class="cmd-item-icon"><i class="fas fa-film"></i></div><div class="cmd-item-text"><div class="cmd-item-title">Ver Catálogo</div><div class="cmd-item-desc">Explorar todos los animes</div></div><span class="cmd-item-shortcut">C</span></div>
       <div class="cmd-item" data-cmd="features"><div class="cmd-item-icon"><i class="fas fa-cube"></i></div><div class="cmd-item-text"><div class="cmd-item-title">Ver Features</div><div class="cmd-item-desc">Características de la plataforma</div></div><span class="cmd-item-shortcut">F</span></div>
       <div class="cmd-item" data-cmd="community"><div class="cmd-item-icon"><i class="fas fa-users"></i></div><div class="cmd-item-text"><div class="cmd-item-title">Ver Comunidad</div><div class="cmd-item-desc">Últimos mensajes del chat</div></div><span class="cmd-item-shortcut">O</span></div>
@@ -3484,6 +3808,7 @@ section {
 
 <script src="js/core/app-core.js"></script>
 <script src="data/catalogo.js"></script>
+<script src="data/videos.js"></script>
 <script src="js/utils/animaciones.js"></script>
 <script src="js/utils/musica_fondo.js"></script>
 <script src="js/components/special-mode.js"></script>
@@ -3555,11 +3880,11 @@ section {
       requestAnimationFrame(loop);
     })();
     document.addEventListener('mouseover', e => {
-      if (e.target.closest('[data-hover], a, button, input, .bento-item, .anime-card, .community-msg, .faq-q, .filter-trigger'))
+      if (e.target.closest('[data-hover], a, button, input, .bento-item, .anime-card, .community-msg, .faq-q, .filter-trigger, .motion-player'))
         document.body.classList.add('cursor-hover');
     });
     document.addEventListener('mouseout', e => {
-      if (e.target.closest('[data-hover], a, button, input, .bento-item, .anime-card, .community-msg, .faq-q, .filter-trigger'))
+      if (e.target.closest('[data-hover], a, button, input, .bento-item, .anime-card, .community-msg, .faq-q, .filter-trigger, .motion-player'))
         document.body.classList.remove('cursor-hover');
     });
   }
@@ -3609,7 +3934,7 @@ section {
     revealIO.observe(el);
   });
 
-  // BENTO TILT (solo escritorio)
+  // BENTO TILT
   if (!isTouch && !prefersReduced) {
     $$('.bento-item').forEach(card => {
       card.addEventListener('mousemove', e => {
@@ -3631,7 +3956,7 @@ section {
     });
   }
 
-  // MAGNETIC (solo escritorio)
+  // MAGNETIC
   if (!isTouch && !prefersReduced) {
     $$('.magnetic').forEach(btn => {
       btn.addEventListener('mousemove', e => {
@@ -3674,7 +3999,7 @@ section {
     $$('[data-scramble]').forEach(el => scramble(el, el.dataset.scramble, 1400));
   }, 1600);
 
-  // PARTÍCULAS (optimizado móvil)
+  // PARTÍCULAS
   if (!prefersReduced) {
     const canvas = $('#particles');
     if (canvas) {
@@ -3797,6 +4122,7 @@ section {
     setTimeout(() => {
       switch (name) {
         case 'inicio': window.scrollTo({ top: 0, behavior: 'smooth' }); break;
+        case 'motion': document.getElementById('motion')?.scrollIntoView({ behavior: 'smooth' }); break;
         case 'catalog': document.getElementById('catalog').scrollIntoView({ behavior: 'smooth' }); break;
         case 'features': document.getElementById('features').scrollIntoView({ behavior: 'smooth' }); break;
         case 'community': document.getElementById('community').scrollIntoView({ behavior: 'smooth' }); break;
@@ -4298,7 +4624,6 @@ section {
   function calcularItemsPerPage() {
     const cols = contarColumnasGrid();
     if (cols < 1) return 24;
-    // En móvil reducimos filas para menos scroll
     const isMobileView = window.matchMedia('(max-width: 768px)').matches;
     return cols * (isMobileView ? 4 : 5);
   }
@@ -4510,7 +4835,7 @@ section {
       cargarDatosYMostrar();
       const catalog = document.getElementById('catalog');
       if (catalog) catalog.scrollIntoView({ behavior: 'smooth' });
-      if (e.target.blur) e.target.blur(); // cerrar teclado móvil
+      if (e.target.blur) e.target.blur();
     }
     if (e.key === 'Escape') hideAllSuggestions();
   }
@@ -4962,7 +5287,6 @@ section {
       if (resizeTimer) clearTimeout(resizeTimer);
       resizeTimer = setTimeout(() => recalcularPaginacion(false), 300);
     }, { passive: true });
-    // Reposicionar al cambiar orientación
     window.addEventListener('orientationchange', () => {
       setTimeout(() => recalcularPaginacion(true), 400);
     });
@@ -4980,6 +5304,356 @@ section {
 
   log('🚀 Archinime NEXT cargado');
   console.log('%cARCHINIME · NEXT v3 · Cmd+K para consola', 'color:#00f0ff;font-family:monospace;font-size:14px;font-weight:bold;');
+})();
+
+/* ============================================================
+   MOTION PLAYER v3 — Controles nativos + Pausa de música real
+   ============================================================ */
+(function() {
+  'use strict';
+
+  const $ = (s, p = document) => p.querySelector(s);
+
+  const player = $('#motionPlayer');
+  const video = $('#motionVideo');
+  const overlay = $('#motionOverlay');
+  const titleEl = $('#motionTitle');
+  const indexCurrent = $('#motionIndex .current');
+  const indexTotal = $('#motionIndex .total');
+  const btnPrev = $('#motionPrev');
+  const btnNext = $('#motionNext');
+  const dotsContainer = $('#motionDots');
+  const audioNotice = $('#motionAudioNotice');
+
+  if (!player || !video) return;
+
+  const videos = Array.isArray(window.videosDestacados) ? window.videosDestacados.filter(Boolean) : [];
+  const titulos = Array.isArray(window.videosDestacadosTitulos) ? window.videosDestacadosTitulos : [];
+
+  if (videos.length === 0) {
+    player.style.display = 'none';
+    console.warn('⚠️ No hay videos en window.videosDestacados');
+    return;
+  }
+
+  let currentIndex = 0;
+  let audioNoticeTimer = null;
+
+  // ============================================
+  // SISTEMA AGRESIVO DE PAUSA/REANUDACIÓN DE MÚSICA
+  // ============================================
+  // Guardamos qué audios pausamos nosotros para reanudarlos después
+  const musicState = {
+    pausedByUs: new Set(),
+    pausedFnsCalled: false,
+    monitorInterval: null
+  };
+
+  // Detecta si el video tiene sonido activo
+  function videoTieneSonido() {
+    return !video.muted && video.volume > 0;
+  }
+  function videoEstaReproduciendo() {
+    return !video.paused && !video.ended && video.readyState > 2;
+  }
+  function videoSuenaAhora() {
+    return videoTieneSonido() && videoEstaReproduciendo();
+  }
+
+  // Pausa TODA la música posible (audios + APIs globales)
+  function pausarTodaLaMusica() {
+    let pausadoAlgo = false;
+
+    // 1) Todos los <audio> que estén sonando
+    document.querySelectorAll('audio').forEach(a => {
+      try {
+        if (!a.paused && a.volume > 0) {
+          a.pause();
+          musicState.pausedByUs.add(a);
+          pausadoAlgo = true;
+        }
+      } catch(e) {}
+    });
+
+    // 2) Cualquier <video> que no sea el motionVideo y esté sonando
+    document.querySelectorAll('video').forEach(v => {
+      try {
+        if (v.id !== 'motionVideo' && !v.paused && !v.muted && v.volume > 0) {
+          v.pause();
+          musicState.pausedByUs.add(v);
+          pausadoAlgo = true;
+        }
+      } catch(e) {}
+    });
+
+    // 3) Objetos globales tipo musicaFondo, bgMusic, etc.
+    const musicObjs = ['musicaFondo', 'backgroundMusic', 'bgMusic', 'musicPlayer', 'audioPlayer', 'playerMusica'];
+    musicObjs.forEach(objName => {
+      const o = window[objName];
+      if (!o) return;
+      try {
+        if (typeof o.pause === 'function') { o.pause(); pausadoAlgo = true; }
+        else if (typeof o.pausar === 'function') { o.pausar(); pausadoAlgo = true; }
+        else if (typeof o.stop === 'function') { o.stop(); pausadoAlgo = true; }
+        else if (o.audio && typeof o.audio.pause === 'function') { o.audio.pause(); pausadoAlgo = true; }
+        else if (o.element && typeof o.element.pause === 'function') { o.element.pause(); pausadoAlgo = true; }
+      } catch(e) {}
+    });
+
+    // 4) Funciones globales conocidas
+    const pauseFns = [
+      'pausarMusica', 'pausarMusicaFondo', 'pauseMusic',
+      'pauseBackgroundMusic', 'stopMusic', 'stopMusicaFondo', 'detenerMusica'
+    ];
+    pauseFns.forEach(fn => {
+      if (typeof window[fn] === 'function') {
+        try { window[fn](); pausadoAlgo = true; } catch(e) {}
+      }
+    });
+
+    // 5) Evento custom por si tu sistema lo escucha
+    try {
+      window.dispatchEvent(new CustomEvent('archinime:pause-music'));
+    } catch(e) {}
+
+    return pausadoAlgo;
+  }
+
+  // Reanuda SOLO lo que nosotros pausamos
+  function reanudarTodaLaMusica() {
+    // 1) Reanudar elementos HTML que pausamos
+    musicState.pausedByUs.forEach(el => {
+      try {
+        const p = el.play();
+        if (p && p.catch) p.catch(() => {});
+      } catch(e) {}
+    });
+    musicState.pausedByUs.clear();
+
+    // 2) Objetos globales
+    const musicObjs = ['musicaFondo', 'backgroundMusic', 'bgMusic', 'musicPlayer', 'audioPlayer', 'playerMusica'];
+    musicObjs.forEach(objName => {
+      const o = window[objName];
+      if (!o) return;
+      try {
+        if (typeof o.play === 'function') { const p = o.play(); if (p && p.catch) p.catch(() => {}); }
+        else if (typeof o.reanudar === 'function') { o.reanudar(); }
+        else if (typeof o.resume === 'function') { o.resume(); }
+        else if (o.audio && typeof o.audio.play === 'function') { o.audio.play().catch(() => {}); }
+      } catch(e) {}
+    });
+
+    // 3) Funciones globales conocidas
+    const resumeFns = [
+      'reanudarMusica', 'reanudarMusicaFondo', 'resumeMusic',
+      'resumeBackgroundMusic', 'playMusic', 'reproducirMusica', 'iniciarMusicaFondo'
+    ];
+    resumeFns.forEach(fn => {
+      if (typeof window[fn] === 'function') {
+        try { window[fn](); } catch(e) {}
+      }
+    });
+
+    // 4) Evento custom
+    try {
+      window.dispatchEvent(new CustomEvent('archinime:resume-music'));
+    } catch(e) {}
+  }
+
+  // API pública
+  window.pausarMusicaFondo = pausarTodaLaMusica;
+  window.reanudarMusicaFondo = reanudarTodaLaMusica;
+
+  // Monitor: cada 1s, si el video suena, forzamos pausa de música.
+  // Esto evita que la música se reinicie sola (autoplay policies, reanudadores automáticos, etc.)
+  function startMusicMonitor() {
+    if (musicState.monitorInterval) return;
+    musicState.monitorInterval = setInterval(() => {
+      if (videoSuenaAhora()) {
+        // Verificar si hay audios sonando
+        let hayAudioSonando = false;
+        document.querySelectorAll('audio').forEach(a => {
+          if (!a.paused && a.volume > 0) hayAudioSonando = true;
+        });
+        if (hayAudioSonando) {
+          pausarTodaLaMusica();
+        }
+      }
+    }, 1000);
+  }
+
+  // ============================================
+  // UI
+  // ============================================
+  function pad2(n) { return String(n).padStart(2, '0'); }
+
+  function updateIndexUI() {
+    if (indexCurrent) indexCurrent.textContent = pad2(currentIndex + 1);
+    if (indexTotal) indexTotal.textContent = pad2(videos.length);
+  }
+
+  function updateTitleUI() {
+    if (!titleEl) return;
+    const titulo = titulos[currentIndex] || `Motion ${pad2(currentIndex + 1)}`;
+    titleEl.textContent = titulo;
+  }
+
+  function showAudioNotice(text, duration = 2400) {
+    if (!audioNotice) return;
+    audioNotice.innerHTML = text;
+    audioNotice.classList.add('show');
+    if (audioNoticeTimer) clearTimeout(audioNoticeTimer);
+    audioNoticeTimer = setTimeout(() => audioNotice.classList.remove('show'), duration);
+  }
+
+  function buildDots() {
+    if (!dotsContainer) return;
+    dotsContainer.innerHTML = '';
+    videos.forEach((_, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'motion-dot' + (i === 0 ? ' active' : '');
+      btn.setAttribute('aria-label', `Ir al video ${i + 1}`);
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        goTo(i);
+      });
+      dotsContainer.appendChild(btn);
+    });
+  }
+
+  function updateDotsUI() {
+    if (!dotsContainer) return;
+    dotsContainer.querySelectorAll('.motion-dot').forEach((d, i) => {
+      d.classList.toggle('active', i === currentIndex);
+    });
+  }
+
+  // ============================================
+  // CARGA Y REPRODUCCIÓN
+  // ============================================
+  function loadCurrentVideo() {
+    const src = videos[currentIndex];
+    if (!src) return;
+    video.src = src;
+    video.load();
+    updateIndexUI();
+    updateTitleUI();
+    updateDotsUI();
+  }
+
+  function tryPlay() {
+    const p = video.play();
+    if (p && typeof p.catch === 'function') {
+      p.catch(() => {
+        // Si autoplay falla, forzamos mute y reintentamos
+        if (!video.muted) {
+          video.muted = true;
+          video.play().catch(() => {});
+        }
+      });
+    }
+  }
+
+  function goTo(i) {
+    if (i < 0) i = videos.length - 1;
+    if (i >= videos.length) i = 0;
+    currentIndex = i;
+    loadCurrentVideo();
+    tryPlay();
+  }
+
+  function nextVideo() { goTo(currentIndex + 1); }
+  function prevVideo() { goTo(currentIndex - 1); }
+
+  // ============================================
+  // APLICAR ESTADO DE AUDIO ↔ MÚSICA
+  // ============================================
+  function applyAudioState() {
+    if (videoSuenaAhora()) {
+      pausarTodaLaMusica();
+    } else {
+      reanudarTodaLaMusica();
+    }
+  }
+
+  // ============================================
+  // EVENTOS DEL VIDEO
+  // ============================================
+  video.addEventListener('ended', () => {
+    nextVideo();
+  });
+
+  video.addEventListener('play', () => {
+    applyAudioState();
+  });
+
+  video.addEventListener('pause', () => {
+    // Cuando el video se pausa, reanudamos la música
+    reanudarTodaLaMusica();
+  });
+
+  video.addEventListener('volumechange', () => {
+    applyAudioState();
+  });
+
+  // ============================================
+  // EVENTOS DE NAV
+  // ============================================
+  if (btnNext) btnNext.addEventListener('click', (e) => { e.stopPropagation(); nextVideo(); });
+  if (btnPrev) btnPrev.addEventListener('click', (e) => { e.stopPropagation(); prevVideo(); });
+
+  // ============================================
+  // INTERSECTION OBSERVER — solo autoplay, NO pausa
+  // ============================================
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        // Solo intenta reproducir al entrar; NO pausa al salir
+        if (video.paused) tryPlay();
+      }
+    });
+  }, { threshold: 0.35 });
+
+  io.observe(player);
+
+  // ============================================
+  // INICIALIZACIÓN
+  // ============================================
+  buildDots();
+  loadCurrentVideo();
+  startMusicMonitor();
+
+  // Cuando el usuario pausa/reproduce con los controles nativos,
+  // el navegador dispara play/pause, que ya escuchamos.
+
+  // Al cambiar de pestaña, pausamos video y música (buena práctica)
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      if (!video.paused) video.pause();
+      reanudarTodaLaMusica();
+    }
+  });
+
+  // API pública
+  window.motionPlayer = {
+    next: nextVideo,
+    prev: prevVideo,
+    goto: goTo,
+    getState: () => ({
+      index: currentIndex,
+      total: videos.length,
+      playing: !video.paused,
+      muted: video.muted,
+      volume: video.volume,
+      hasSound: videoSuenaAhora()
+    }),
+    pause: () => video.pause(),
+    play: () => tryPlay(),
+    mute: () => { video.muted = true; },
+    unmute: () => { video.muted = false; }
+  };
+
+  console.log('%c🎬 Motion Player v3 listo · ' + videos.length + ' videos · controles nativos', 'color:#b114ff;font-family:monospace;font-weight:bold;');
 })();
 </script>
 
