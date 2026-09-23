@@ -83,7 +83,7 @@
   --safe-left: env(safe-area-inset-left, 0px);
   --safe-right: env(safe-area-inset-right, 0px);
 }
-/* ⚡ Los temas ahora se aplican vía variables inline desde js/themes.js */
+/* ⚡ Los temas ahora se aplican vía variables inline desde js/core/themes.js */
 
 /* RESET */
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -556,20 +556,196 @@ section { padding: 120px 48px; position: relative; max-width: 1600px; margin: 0 
 .cta-btn:hover::before { transform: translateX(100%); }
 .cta-btn i, .cta-btn span { position: relative; z-index: 1; }
 
-.footer { padding: 60px 48px calc(100px + var(--safe-bottom)); border-top: 1px solid var(--line); position: relative; }
-.footer-inner { max-width: 1600px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px; }
-.footer-brand h3 { font-family: var(--font-display); font-weight: 900; letter-spacing: 4px; font-size: 1.1rem; margin-bottom: 14px; background: linear-gradient(135deg, #fff, var(--neon-1)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
-.footer-brand p { color: var(--text-soft); font-size: 0.85rem; line-height: 1.7; max-width: 340px; }
-.footer-col h4 { font-family: var(--font-mono); font-size: 0.68rem; font-weight: 700; letter-spacing: 3px; color: var(--neon-1); margin-bottom: 18px; text-transform: uppercase; }
-.footer-col ul { display: flex; flex-direction: column; gap: 10px; }
-.footer-col a { color: var(--text-soft); font-size: 0.85rem; transition: color 0.3s; display: inline-flex; align-items: center; gap: 8px; cursor: none; }
-.footer-col a::before { content: ''; width: 0; height: 1px; background: var(--neon-1); transition: width 0.3s; box-shadow: 0 0 8px var(--neon-1); }
+/* ============================================================
+   FOOTER — v27 · REDISEÑO PROFESIONAL
+   ============================================================ */
+.footer {
+  padding: 90px 48px calc(40px + var(--safe-bottom));
+  border-top: 1px solid var(--line);
+  position: relative;
+  background:
+    radial-gradient(ellipse at 50% 0%, color-mix(in srgb, var(--neon-1) 5%, transparent) 0%, transparent 55%),
+    linear-gradient(180deg, transparent 0%, color-mix(in srgb, var(--bg-panel) 40%, transparent) 100%);
+}
+.footer::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 50%;
+  transform: translateX(-50%);
+  width: min(90%, 700px);
+  height: 1px;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--neon-1) 60%, transparent), transparent);
+  box-shadow: 0 0 20px color-mix(in srgb, var(--neon-1) 40%, transparent);
+  pointer-events: none;
+}
+
+.footer-inner {
+  max-width: 1600px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1.7fr 1fr 1fr 1fr;
+  gap: 64px;
+  align-items: start;
+}
+
+.footer-brand h3 {
+  font-family: var(--font-display);
+  font-weight: 900;
+  letter-spacing: 4px;
+  font-size: 1.15rem;
+  margin-bottom: 14px;
+  background: linear-gradient(135deg, #fff, var(--neon-1));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+}
+.footer-brand p {
+  color: var(--text-soft);
+  font-size: 0.85rem;
+  line-height: 1.75;
+  max-width: 340px;
+}
+
+.footer-col h4 {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: var(--neon-1);
+  margin-bottom: 20px;
+  text-transform: uppercase;
+}
+.footer-col ul {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.footer-col a {
+  color: var(--text-soft);
+  font-size: 0.85rem;
+  transition: color 0.3s, transform 0.3s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: none;
+  width: fit-content;
+  position: relative;
+  padding-left: 0;
+}
+.footer-col a::before {
+  content: '';
+  width: 0;
+  height: 1px;
+  background: var(--neon-1);
+  transition: width 0.3s;
+  box-shadow: 0 0 8px var(--neon-1);
+  flex-shrink: 0;
+}
 .footer-col a:hover { color: #fff; }
 .footer-col a:hover::before { width: 16px; }
-.footer-bottom { max-width: 1600px; margin: 60px auto 0; padding-top: 24px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 2px; color: var(--text-dim); text-transform: uppercase; }
-.footer-socials { display: flex; gap: 12px; }
-.footer-socials a { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line); display: flex; align-items: center; justify-content: center; color: var(--text-soft); font-size: 0.85rem; transition: all 0.3s var(--ease-out-expo); }
-.footer-socials a:hover { border-color: var(--neon-1); color: var(--neon-1); transform: translateY(-3px) rotate(-6deg); box-shadow: 0 10px 20px color-mix(in srgb, var(--neon-1) 15%, transparent); }
+
+.footer-bottom {
+  max-width: 1600px;
+  margin: 64px auto 0;
+  padding-top: 28px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 2px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+.footer-copy { white-space: nowrap; }
+.footer-socials {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+.footer-socials a {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-soft);
+  font-size: 0.85rem;
+  transition: all 0.3s var(--ease-out-expo);
+  flex-shrink: 0;
+}
+.footer-socials a:hover {
+  border-color: var(--neon-1);
+  color: var(--neon-1);
+  transform: translateY(-3px) rotate(-6deg);
+  box-shadow: 0 10px 20px color-mix(in srgb, var(--neon-1) 15%, transparent);
+}
+
+/* Footer responsive — tablet */
+@media (max-width: 900px) {
+  .footer { padding: 70px 24px calc(36px + var(--safe-bottom)); }
+  .footer-inner {
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 40px 28px;
+  }
+  .footer-brand {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding-bottom: 12px;
+    border-bottom: 1px dashed var(--line);
+    margin-bottom: 8px;
+  }
+  .footer-brand p { max-width: 100%; margin: 0 auto; }
+  .footer-bottom { margin-top: 48px; }
+}
+
+/* Footer responsive — móvil */
+@media (max-width: 600px) {
+  .footer { padding: 60px 20px calc(32px + var(--safe-bottom)); }
+  .footer-inner {
+    grid-template-columns: 1fr 1fr;
+    gap: 32px 20px;
+    text-align: center;
+  }
+  .footer-brand {
+    padding-bottom: 16px;
+    margin-bottom: 4px;
+  }
+  .footer-brand h3 { font-size: 1.05rem; letter-spacing: 3.5px; }
+  .footer-col h4 { margin-bottom: 14px; }
+  .footer-col ul { align-items: center; gap: 10px; }
+  .footer-col a { justify-content: center; }
+  .footer-col a::before { display: none; }
+  .footer-bottom {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 18px;
+    margin-top: 40px;
+    padding-top: 24px;
+  }
+  .footer-copy {
+    white-space: normal;
+    letter-spacing: 1.5px;
+    font-size: 0.65rem;
+  }
+  .footer-socials { justify-content: center; gap: 10px; }
+  .footer-socials a { width: 36px; height: 36px; }
+}
+
+@media (max-width: 380px) {
+  .footer-inner { grid-template-columns: 1fr; gap: 28px; }
+  .footer-brand { padding-bottom: 18px; }
+  .footer-col ul { gap: 9px; }
+  .footer-socials a { width: 34px; height: 34px; font-size: 0.78rem; }
+}
 
 .dock { position: fixed; bottom: calc(24px + var(--safe-bottom)); right: calc(24px + var(--safe-right)); z-index: 900; display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 100px; background: color-mix(in srgb, var(--bg-panel) 85%, transparent); backdrop-filter: blur(14px) saturate(1.4); -webkit-backdrop-filter: blur(14px) saturate(1.4); border: 1px solid var(--line); box-shadow: 0 15px 40px rgba(0,0,0,0.5); animation: dockIn 0.8s var(--ease-out-expo) 1.4s both; }
 @keyframes dockIn { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
@@ -856,7 +1032,7 @@ section { padding: 120px 48px; position: relative; max-width: 1600px; margin: 0 
 }
 
 /* RESPONSIVE */
-@media (max-width: 1024px) { .hero-chips { display: none; } .footer-inner { grid-template-columns: 2fr 1fr 1fr; } }
+@media (max-width: 1024px) { .hero-chips { display: none; } .footer-inner { grid-template-columns: 1.6fr 1fr 1fr; } }
 @media (max-width: 900px) {
   .nav { padding: calc(14px + var(--safe-top)) calc(16px + var(--safe-right)) 14px calc(16px + var(--safe-left)); gap: 8px; }
   .nav.scrolled { padding: calc(10px + var(--safe-top)) calc(16px + var(--safe-right)) 10px calc(16px + var(--safe-left)); }
@@ -869,8 +1045,6 @@ section { padding: 120px 48px; position: relative; max-width: 1600px; margin: 0 
   .scroll-indicator { left: 20px; bottom: calc(20px + var(--safe-bottom)); }
   .stats { padding: 60px 20px; }
   .cta { padding: 100px 20px; }
-  .footer { padding: 40px 20px calc(80px + var(--safe-bottom)); }
-  .footer-inner { grid-template-columns: 1fr 1fr; gap: 32px; }
   .section-head { margin-bottom: 40px; }
   .community-feed { grid-template-columns: 1fr; gap: 14px; }
   .community-actions { gap: 16px; }
@@ -924,15 +1098,8 @@ section { padding: 120px 48px; position: relative; max-width: 1600px; margin: 0 
   .event-card { border-radius: 24px; max-width: 100%; }
   .event-visuals { height: 240px; }
   .event-title { font-size: 1.35rem; }
-  .dock { bottom: calc(16px + var(--safe-bottom)); right: calc(16px + var(--safe-right)); padding: 8px; gap: 6px; }
-  .dock button { width: 40px; height: 40px; font-size: 0.9rem; }
-  .dock button:nth-child(n+5) { display: none; }
-  .dock-sep { display: none; }
   .chat-float { width: 50px; height: 50px; font-size: 1.3rem; bottom: calc(80px + var(--safe-bottom)); right: calc(16px + var(--safe-right)); }
   .side-panel { padding: calc(16px + var(--safe-top)) 14px calc(14px + var(--safe-bottom)); }
-  .footer { padding: 40px 16px calc(80px + var(--safe-bottom)); }
-  .footer-inner { grid-template-columns: 1fr 1fr; gap: 24px; }
-  .footer-bottom { flex-direction: column; align-items: flex-start; gap: 12px; margin-top: 40px; }
   .mobile-menu a { font-size: 1.5rem; letter-spacing: 3px; padding: 10px 20px; }
   .nav-logo .logo-img { width: 30px; height: 30px; }
 }
@@ -965,9 +1132,6 @@ section { padding: 120px 48px; position: relative; max-width: 1600px; margin: 0 
   .cta h2 { font-size: clamp(1.6rem, 7vw, 2.4rem); }
   .cta p { font-size: 0.9rem; margin-bottom: 32px; }
   .cta-btn { padding: 16px 28px; font-size: 0.78rem; letter-spacing: 2px; }
-  .footer-inner { grid-template-columns: 1fr; }
-  .footer-socials { gap: 8px; }
-  .footer-socials a { width: 32px; height: 32px; font-size: 0.78rem; }
   .user-dropdown { min-width: 200px; right: -4px; }
   .detail-cover { height: 240px; }
   .detail-body { padding: 14px 16px 20px; }
@@ -978,7 +1142,6 @@ section { padding: 120px 48px; position: relative; max-width: 1600px; margin: 0 
   .event-info { padding: 20px; }
   .event-title { font-size: 1.2rem; }
   .event-desc { font-size: 0.82rem; margin-bottom: 18px; }
-  .dock button { width: 36px; height: 36px; font-size: 0.85rem; }
   .chat-float { width: 46px; height: 46px; font-size: 1.1rem; }
   .cmd-panel { border-radius: 12px; }
   .cmd-input-wrap { padding: 14px 16px; }
@@ -996,7 +1159,6 @@ section { padding: 120px 48px; position: relative; max-width: 1600px; margin: 0 
   .cyber-btn-icon:active { transform: scale(0.92); }
   .pagination-btn:active { transform: scale(0.94); }
   .filter-trigger:active { transform: scale(0.96); }
-  .dock button:active { transform: scale(0.9); }
   .motion-nav-btn:active { transform: translateY(-50%) scale(0.9); }
   .motion-dot:active { transform: scale(0.85); }
   .cyber-btn-icon { min-width: 36px; min-height: 36px; }
@@ -1342,7 +1504,7 @@ html[data-chroma="on"] #stageContainer { display: block !important; }
 
   <div class="nav-actions">
     <button id="searchToggleMobile" class="cyber-btn-icon" title="Buscar" aria-label="Buscar"><i class="fas fa-search"></i></button>
-    <!-- ⚡ Los dots de tema se generan dinámicamente desde js/themes.js -->
+    <!-- ⚡ Los dots de tema se generan dinámicamente desde js/core/themes.js -->
     <div class="theme-dots" role="group" aria-label="Cambiar tema de color"></div>
     <button id="configBtn" class="config-nav-btn" title="Configuración" aria-label="Configuración"><i class="fas fa-sliders-h"></i></button>
     <div class="notif-wrapper">
@@ -1584,18 +1746,42 @@ html[data-chroma="on"] #stageContainer { display: block !important; }
 
 <footer class="footer">
   <div class="footer-inner">
-    <div class="footer-brand"><h3>ARCHINIME</h3><p>La plataforma que redefine la manera de ver anime. Diseñada por fans, para fans.</p></div>
-    <div class="footer-col"><h4>Plataforma</h4><ul><li><a href="#catalog">Explorar</a></li><li><a href="#community">Comunidad</a></li><li><a href="#faq">FAQ</a></li></ul></div>
-    <div class="footer-col"><h4>Recursos</h4><ul><li><a href="#">Soporte</a></li><li><a href="#">Estado</a></li><li><a href="#">Contacto</a></li></ul></div>
-    <div class="footer-col"><h4>Legal</h4><ul><li><a href="#">Privacidad</a></li><li><a href="#">Términos</a></li><li><a href="#">Cookies</a></li></ul></div>
+    <div class="footer-brand">
+      <h3>ARCHINIME</h3>
+      <p>La plataforma que redefine la manera de ver anime. Diseñada por fans, para fans.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Plataforma</h4>
+      <ul>
+        <li><a href="#catalog" data-hover>Explorar</a></li>
+        <li><a href="#community" data-hover>Comunidad</a></li>
+        <li><a href="#faq" data-hover>FAQ</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Recursos</h4>
+      <ul>
+        <li><a href="#" data-hover>Soporte</a></li>
+        <li><a href="#" data-hover>Estado</a></li>
+        <li><a href="#" data-hover>Contacto</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Legal</h4>
+      <ul>
+        <li><a href="#" data-hover>Privacidad</a></li>
+        <li><a href="#" data-hover>Términos</a></li>
+        <li><a href="#" data-hover>Cookies</a></li>
+      </ul>
+    </div>
   </div>
   <div class="footer-bottom">
-    <span>© 2025 ARCHINIME · NEXT v27</span>
+    <span class="footer-copy">© 2025 ARCHINIME · NEXT v27</span>
     <div class="footer-socials">
-      <a href="#" data-hover><i class="fab fa-twitter"></i></a>
-      <a href="#" data-hover><i class="fab fa-discord"></i></a>
-      <a href="#" data-hover><i class="fab fa-youtube"></i></a>
-      <a href="#" data-hover><i class="fab fa-github"></i></a>
+      <a href="#" data-hover aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+      <a href="#" data-hover aria-label="Discord"><i class="fab fa-discord"></i></a>
+      <a href="#" data-hover aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+      <a href="#" data-hover aria-label="GitHub"><i class="fab fa-github"></i></a>
     </div>
   </div>
 </footer>
@@ -1687,7 +1873,7 @@ html[data-chroma="on"] #stageContainer { display: block !important; }
 
     <div class="config-group">
       <div class="config-group-label">Color de tema</div>
-      <!-- ⚡ Los dots se generan dinámicamente desde js/themes.js -->
+      <!-- ⚡ Los dots se generan dinámicamente desde js/core/themes.js -->
       <div class="config-theme-dots"></div>
     </div>
 
@@ -1721,16 +1907,6 @@ html[data-chroma="on"] #stageContainer { display: block !important; }
 
     <button class="config-save" onclick="saveConfigAndClose()"><i class="fas fa-check"></i> Guardar y recargar</button>
   </div>
-</div>
-
-<div class="dock">
-  <button data-label="Inicio" data-hover onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fas fa-house"></i></button>
-  <button data-label="Motion" data-hover onclick="document.getElementById('motion').scrollIntoView({behavior:'smooth'})"><i class="fas fa-clapperboard"></i></button>
-  <button data-label="Catálogo" data-hover onclick="document.getElementById('catalog').scrollIntoView({behavior:'smooth'})"><i class="fas fa-film"></i></button>
-  <button data-label="Chat" data-hover onclick="abrirChatPanel()"><i class="fas fa-comments"></i></button>
-  <div class="dock-sep"></div>
-  <button data-label="Consola" data-hover data-cmd-open><i class="fas fa-terminal"></i></button>
-  <button data-label="Perfil" data-hover id="dockProfileBtn"><i class="fas fa-user"></i></button>
 </div>
 
 <div class="cmd-overlay" id="cmdOverlay">
@@ -1857,7 +2033,7 @@ html[data-chroma="on"] #stageContainer { display: block !important; }
   </div>
 </div>
 
-<!-- ⚡ Añadido themes.js ANTES del script inline de configuración -->
+<!-- ⚡ themes.js movido a js/core/ (mejor organización) -->
 <script src="js/core/themes.js"></script>
 
 <script src="js/core/app-core.js"></script>
@@ -1907,7 +2083,7 @@ html[data-chroma="on"] #stageContainer { display: block !important; }
 
   const STORAGE_KEY = 'archinime_config_v27';
 
-  // ⚡ El manejo de TEMAS ahora vive en js/themes.js
+  // ⚡ El manejo de TEMAS ahora vive en js/core/themes.js
   // window.cambiarTema() y window.ArchinimeThemes están disponibles globalmente.
 
   // ⚡ CALIDAD — MÓVIL SIEMPRE FLUIDA POR DEFECTO
