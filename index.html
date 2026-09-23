@@ -83,8 +83,7 @@
   --safe-left: env(safe-area-inset-left, 0px);
   --safe-right: env(safe-area-inset-right, 0px);
 }
-[data-theme="magenta"] { --neon-1: #ff1a6b; --neon-2: #ff9a00; --neon-3: #b114ff; --neon-4: #ffd700; --bg-deep: #0a050a; }
-[data-theme="emerald"] { --neon-1: #7dff5c; --neon-2: #00f0ff; --neon-3: #00ff9d; --neon-4: #ffd700; --bg-deep: #030806; }
+/* ⚡ Los temas ahora se aplican vía variables inline desde js/themes.js */
 
 /* RESET */
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -229,9 +228,6 @@ html.low-end .scanlines { display: none; }
 .theme-dots { display: flex; gap: 8px; padding: 6px 10px; border-radius: 100px; border: 1px solid var(--line); background: rgba(255,255,255,0.03); position: relative; }
 .theme-dots::before { content: 'TEMA'; position: absolute; top: -8px; left: 10px; padding: 0 4px; background: var(--bg-deep); font-family: var(--font-mono); font-size: 0.5rem; color: var(--text-dim); letter-spacing: 1px; }
 .theme-dot { width: 16px; height: 16px; border-radius: 50%; cursor: none; border: 2px solid transparent; transition: transform 0.25s var(--ease-back), border-color 0.25s, box-shadow 0.25s; padding: 0; position: relative; }
-.theme-dot[data-theme-set="cyan"]    { background: #00f0ff; box-shadow: 0 0 10px #00f0ff; }
-.theme-dot[data-theme-set="magenta"] { background: #ff1a6b; box-shadow: 0 0 10px #ff1a6b; }
-.theme-dot[data-theme-set="emerald"] { background: #7dff5c; box-shadow: 0 0 10px #7dff5c; }
 .theme-dot:hover { transform: scale(1.25); }
 .theme-dot.active { border-color: #fff; transform: scale(1.15); box-shadow: 0 0 15px currentColor, 0 0 0 3px color-mix(in srgb, currentColor 30%, transparent); }
 .theme-dot.active::after { content: ''; position: absolute; inset: -5px; border-radius: 50%; border: 1px solid currentColor; animation: themeRing 2s ease-in-out infinite; }
@@ -1346,11 +1342,8 @@ html[data-chroma="on"] #stageContainer { display: block !important; }
 
   <div class="nav-actions">
     <button id="searchToggleMobile" class="cyber-btn-icon" title="Buscar" aria-label="Buscar"><i class="fas fa-search"></i></button>
-    <div class="theme-dots" role="group" aria-label="Cambiar tema de color">
-      <button class="theme-dot active" data-theme-set="cyan" title="Tema Cyan" aria-label="Tema Cyan"></button>
-      <button class="theme-dot" data-theme-set="magenta" title="Tema Magenta" aria-label="Tema Magenta"></button>
-      <button class="theme-dot" data-theme-set="emerald" title="Tema Emerald" aria-label="Tema Emerald"></button>
-    </div>
+    <!-- ⚡ Los dots de tema se generan dinámicamente desde js/themes.js -->
+    <div class="theme-dots" role="group" aria-label="Cambiar tema de color"></div>
     <button id="configBtn" class="config-nav-btn" title="Configuración" aria-label="Configuración"><i class="fas fa-sliders-h"></i></button>
     <div class="notif-wrapper">
       <button id="notifBtn" class="cyber-btn-icon" onclick="toggleNotifMenu()"><i class="fas fa-bell"></i><span id="notifBadge" class="notif-badge" style="display:none"></span></button>
@@ -1694,20 +1687,8 @@ html[data-chroma="on"] #stageContainer { display: block !important; }
 
     <div class="config-group">
       <div class="config-group-label">Color de tema</div>
-      <div class="config-theme-dots">
-        <button class="config-theme-dot active" data-theme-set="cyan" aria-label="Tema Cyan">
-          <span class="config-theme-swatch" style="background:#00f0ff;color:#00f0ff;"></span>
-          <span class="config-theme-name">Cyan</span>
-        </button>
-        <button class="config-theme-dot" data-theme-set="magenta" aria-label="Tema Magenta">
-          <span class="config-theme-swatch" style="background:#ff1a6b;color:#ff1a6b;"></span>
-          <span class="config-theme-name">Magenta</span>
-        </button>
-        <button class="config-theme-dot" data-theme-set="emerald" aria-label="Tema Emerald">
-          <span class="config-theme-swatch" style="background:#7dff5c;color:#7dff5c;"></span>
-          <span class="config-theme-name">Emerald</span>
-        </button>
-      </div>
+      <!-- ⚡ Los dots se generan dinámicamente desde js/themes.js -->
+      <div class="config-theme-dots"></div>
     </div>
 
     <div class="config-group">
@@ -1732,7 +1713,6 @@ html[data-chroma="on"] #stageContainer { display: block !important; }
         <div class="config-toggle-info"><i class="fas fa-mouse-pointer"></i><div><div class="config-toggle-name">Efecto de cursor</div><div class="config-toggle-desc">Punto y anillo neón (solo PC)</div></div></div>
         <div class="config-switch"></div>
       </div>
-      <!-- ⚡ NUEVO: TOGGLE NOTIFICACIONES -->
       <div class="config-toggle-row" id="toggleNotifications" data-key="notifications">
         <div class="config-toggle-info"><i class="fas fa-bell"></i><div><div class="config-toggle-name">Notificaciones</div><div class="config-toggle-desc">Mostrar campana de notificaciones</div></div></div>
         <div class="config-switch"></div>
@@ -1850,7 +1830,6 @@ html[data-chroma="on"] #stageContainer { display: block !important; }
       <div id="detailAiringBadge" style="display:none; margin: 8px 0 12px; background:#ffaa00; color:#000; font-weight:700; font-size:0.75rem; padding:4px 14px; border-radius:20px; width:fit-content;">🔴 EN EMISIÓN</div>
       <div class="description" id="detailDesc">Contenido no disponible.</div>
       <div class="detail-actions">
-        <!-- ⚡ NUEVO ORDEN: Cerrar → Ver ahora -->
         <button class="btn-secondary" onclick="closeDetailModal()">Cerrar</button>
         <button class="btn-primary" id="detailWatchBtn"><i class="fas fa-play"></i> Ver ahora</button>
       </div>
@@ -1877,6 +1856,9 @@ html[data-chroma="on"] #stageContainer { display: block !important; }
     </div>
   </div>
 </div>
+
+<!-- ⚡ Añadido themes.js ANTES del script inline de configuración -->
+<script src="js/core/themes.js"></script>
 
 <script src="js/core/app-core.js"></script>
 <script src="data/catalogo.js"></script>
@@ -1924,29 +1906,9 @@ html[data-chroma="on"] #stageContainer { display: block !important; }
   })();
 
   const STORAGE_KEY = 'archinime_config_v27';
-  const THEME_KEY = 'archinime_theme';
 
-  // TEMA
-  function aplicarTema(theme) {
-    document.documentElement.dataset.theme = theme === 'cyan' ? '' : theme;
-    document.querySelectorAll('[data-theme-set]').forEach(d => {
-      d.classList.toggle('active', d.dataset.themeSet === theme);
-    });
-    try { localStorage.setItem(THEME_KEY, theme); } catch(e) {}
-  }
-  function cargarTemaGuardado() {
-    try {
-      const saved = localStorage.getItem(THEME_KEY);
-      if (saved) aplicarTema(saved);
-    } catch(e) {}
-  }
-  cargarTemaGuardado();
-
-  document.addEventListener('click', (e) => {
-    const dot = e.target.closest('[data-theme-set]');
-    if (dot) aplicarTema(dot.dataset.themeSet);
-  });
-  window.cambiarTema = aplicarTema;
+  // ⚡ El manejo de TEMAS ahora vive en js/themes.js
+  // window.cambiarTema() y window.ArchinimeThemes están disponibles globalmente.
 
   // ⚡ CALIDAD — MÓVIL SIEMPRE FLUIDA POR DEFECTO
   function detectarCalidad() {
