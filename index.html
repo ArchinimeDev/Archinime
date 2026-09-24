@@ -1640,7 +1640,7 @@ html[data-quality="alta"] .section-title .accent {
   <div class="cta-inner reveal">
     <h2>El futuro del anime<br>está <span class="accent">aquí.</span></h2>
     <p>Únete a la nueva era. Sin registros complicados, sin anuncios molestos. Solo tú y el mejor contenido.</p>
-    <button class="cta-btn" data-hover onclick="document.getElementById('catalog').scrollIntoView({behavior:'smooth'})"><i class="fas fa-rocket"></i><span>Comenzar ahora</span></button>
+    <button class="cta-btn" data-hover onclick="window.instalarPWA({ scroll: true })"><i class="fas fa-rocket"></i><span>Descargar</span></button>
   </div>
 </section>
 
@@ -2199,15 +2199,15 @@ html[data-quality="alta"] .section-title .accent {
     setInterval(forzarMuteDecorativos, 2000);
   })();
 
-  const pwaNotif = document.getElementById('pwaNotif');
+const pwaNotif = document.getElementById('pwaNotif');
   const pwaInstallBtn = document.getElementById('pwaInstallBtn');
   const pwaCloseBtn = document.getElementById('pwaCloseBtn');
-  let deferredInstallPrompt = null;
+  window.__deferredInstallPrompt = null;
   const isStandalone = () => window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
   const isIos = () => /iphone|ipad|ipod/i.test(navigator.userAgent);
   const yaMostrada = sessionStorage.getItem('archinime_pwa_notif_shown') === '1';
 
-  window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredInstallPrompt = e; });
+  window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); window.__deferredInstallPrompt = e; });
 
   function mostrarPwaNotif() {
     if (!pwaNotif || isStandalone() || yaMostrada) return;
@@ -2218,16 +2218,67 @@ html[data-quality="alta"] .section-title .accent {
   window.addEventListener('load', () => setTimeout(mostrarPwaNotif, 2500));
 
   if (pwaCloseBtn) pwaCloseBtn.addEventListener('click', () => pwaNotif.classList.remove('show'));
+
+  // ⚡ FUNCIÓN GLOBAL REUTILIZABLE — "Descargar / Instalar app"
+  //    window.instalarPWA({ scroll: true })  → scroll al catálogo + instala
+  //    window.instalarPWA({ scroll: false }) → solo instala (o solo scroll)
+  window.instalarPWA = async function(opts) {
+    opts = opts || {};
+    const scrollToCatalog = opts.scroll === true;
+    const silent = opts.silent === true;
+
+    // 1) Scroll al catálogo (solo si lo pide)
+    if (scrollToCatalog) {
+      try { document.getElementById('catalog')?.scrollIntoView({ behavior: 'smooth' }); } catch(_) {}
+    }
+
+    // 2) Ya está instalada como app
+    if (isStandalone()) {
+      if (!silent && typeof window.showToastSticker === 'function') {
+        try { window.showToastSticker('✅ La app ya está instalada'); } catch(_) {}
+      }
+      return;
+    }
+
+    // 3) iOS — sin beforeinstallprompt, instrucciones manuales
+    if (isIos()) {
+      if (!silent) {
+        const delay = scrollToCatalog ? 700 : 0;
+        setTimeout(() => alert('📲 En iOS: Comparte → "Añadir a pantalla de inicio"'), delay);
+      }
+      return;
+    }
+
+    // 4) Chrome/Edge/Android — prompt nativo si está disponible
+    if (window.__deferredInstallPrompt) {
+      try {
+        window.__deferredInstallPrompt.prompt();
+        const choice = await window.__deferredInstallPrompt.userChoice;
+        if (choice && choice.outcome === 'accepted') {
+          window.__deferredInstallPrompt = null;
+          if (pwaNotif) pwaNotif.classList.remove('show');
+        }
+      } catch(e) {}
+      return;
+    }
+
+    // 5) Fallback — sin prompt disponible
+    if (!silent) {
+      if (scrollToCatalog) {
+        setTimeout(() => {
+          if (typeof window.showToastSticker === 'function') {
+            try { window.showToastSticker('📲 Instálala desde el menú de Chrome'); } catch(_) {}
+          }
+        }, 900);
+      } else {
+        alert('📲 Instálala desde el menú de Chrome');
+      }
+    }
+  };
+
+  // El botón de la notificación flotante sigue funcionando igual
   if (pwaInstallBtn) {
-    pwaInstallBtn.addEventListener('click', async () => {
-      if (isIos()) { alert('📲 En iOS: Comparte → "Añadir a pantalla de inicio"'); pwaNotif.classList.remove('show'); return; }
-      if (deferredInstallPrompt) {
-        deferredInstallPrompt.prompt();
-        const choice = await deferredInstallPrompt.userChoice;
-        if (choice.outcome === 'accepted') pwaNotif.classList.remove('show');
-        deferredInstallPrompt = null;
-      } else { alert('📲 Instálala desde el menú de Chrome'); pwaNotif.classList.remove('show'); }
-    });
+    pwaInstallBtn.addEventListener('click', () => window.instalarPWA({ scroll: false }));
   }
 
   const searchToggleMobile = document.getElementById('searchToggleMobile');
