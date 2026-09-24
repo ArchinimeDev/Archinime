@@ -1,5 +1,5 @@
 /* ============================================================
-   ARCHINIME — SISTEMA DE TEMAS v27
+   ARCHINIME — SISTEMA DE TEMAS v28
    ------------------------------------------------------------
    📁 Ubicación: js/core/themes.js
    ------------------------------------------------------------
@@ -29,13 +29,37 @@
   // 📋 REGISTRO DE TEMAS
   // =========================================================
   const THEMES = {
+
+    // =========================================================
+    // 🌌 GALAXY — TEMA POR DEFECTO (video + paleta cósmica)
+    // =========================================================
+    galaxy: {
+      id: 'galaxy',
+      name: 'Galaxy',
+      swatch: '#b47aff',
+      isDefault: true,
+      bgVideo: 'https://cdn.jsdelivr.net/gh/ArchinimeDev/Archinime@main/assets/videos/galaxia.mp4',
+      vars: {
+        // Violeta brillante — visible sobre el fondo morado pero no saturado
+        '--neon-1': '#b47aff',
+        // Cian brillante — contraste fuerte y limpio sobre la galaxia
+        '--neon-2': '#22d3ee',
+        // Rosa suave — antes era #ff1a6b que chocaba con el morado
+        '--neon-3': '#f472b6',
+        // Amarillo cálido — acento final
+        '--neon-4': '#fde047',
+        // Fondo violeta muy oscuro, coherente con el video
+        '--bg-deep': '#08051a'
+      }
+    },
+
     cyan: {
       id: 'cyan',
       name: 'Cyan',
       swatch: '#00f0ff',
-      isDefault: true,
       vars: {} // usa los valores de :root
     },
+
     magenta: {
       id: 'magenta',
       name: 'Magenta',
@@ -48,6 +72,7 @@
         '--bg-deep': '#0a050a'
       }
     },
+
     emerald: {
       id: 'emerald',
       name: 'Emerald',
@@ -58,23 +83,6 @@
         '--neon-3': '#00ff9d',
         '--neon-4': '#ffd700',
         '--bg-deep': '#030806'
-      }
-    },
-
-    // =========================================================
-    // 🌌 TEMA CON VIDEO DE FONDO
-    // =========================================================
-    galaxy: {
-      id: 'galaxy',
-      name: 'Galaxy',
-      swatch: '#7a2fff',
-      bgVideo: 'https://cdn.jsdelivr.net/gh/ArchinimeDev/Archinime@main/assets/videos/galaxia.mp4',
-      vars: {
-        '--neon-1': '#7a2fff',
-        '--neon-2': '#00f0ff',
-        '--neon-3': '#ff1a6b',
-        '--neon-4': '#ffd700',
-        '--bg-deep': '#02020a'
       }
     }
 
@@ -110,26 +118,32 @@
         transition: opacity 1.1s ease;
         will-change: opacity;
         background: #000;
+        transform: translateZ(0);
       }
       #${VIDEO_EL_ID}.active { opacity: 1; }
 
-      /* Cuando hay video activo, suavizamos el resto de efectos */
+      /* Cuando hay video activo, suavizamos el resto de efectos
+         para que la galaxia respire y los textos se lean bien */
       html.theme-has-video .aurora     { opacity: 0.12 !important; }
-      html.theme-has-video .grid-floor { opacity: 0.20 !important; }
+      html.theme-has-video .grid-floor { opacity: 0.18 !important; }
       html.theme-has-video .vignette {
         background: radial-gradient(
           ellipse at center,
-          transparent 30%,
-          color-mix(in srgb, var(--bg-deep) 94%, transparent) 100%
+          transparent 28%,
+          color-mix(in srgb, var(--bg-deep) 92%, transparent) 100%
         ) !important;
       }
 
       @media (max-width: 768px) {
-        #${VIDEO_EL_ID} { filter: brightness(0.75) saturate(1.15); }
+        #${VIDEO_EL_ID} { filter: brightness(0.72) saturate(1.12); }
       }
       html.low-end #${VIDEO_EL_ID},
       [data-quality="fluida"] #${VIDEO_EL_ID} {
-        filter: brightness(0.55) !important;
+        filter: brightness(0.55) saturate(1.05) !important;
+      }
+      /* Accesibilidad: sin video si el usuario prefiere menos movimiento */
+      @media (prefers-reduced-motion: reduce) {
+        #${VIDEO_EL_ID} { display: none !important; }
       }
     `;
     document.head.appendChild(style);
@@ -178,9 +192,11 @@
             el.play().catch(() => {});
             document.removeEventListener('touchstart', tryPlay);
             document.removeEventListener('click', tryPlay);
+            document.removeEventListener('keydown', tryPlay);
           };
           document.addEventListener('touchstart', tryPlay, { once: true, passive: true });
           document.addEventListener('click', tryPlay, { once: true });
+          document.addEventListener('keydown', tryPlay, { once: true });
         });
       }
     });
@@ -271,6 +287,7 @@
     if (saved && THEMES[saved]) {
       aplicarTema(saved, false);
     } else {
+      // Por defecto → galaxy (definido con isDefault: true)
       aplicarTema(DEFAULT_THEME, false);
     }
   }
@@ -312,11 +329,23 @@
 
   // =========================================================
   // 🖱️ DELEGACIÓN DE CLICK
+  //    · Dots del NAV     → cambia tema sin recargar
+  //    · Dots del MODAL   → cambia tema y recarga para refrescar todo
   // =========================================================
   document.addEventListener('click', (e) => {
     const dot = e.target.closest('[data-theme-set]');
     if (dot && dot.dataset.themeSet) {
+      const inConfig = !!dot.closest('#configModal');
       aplicarTema(dot.dataset.themeSet);
+      if (inConfig) {
+        if (typeof window.showToastSticker === 'function') {
+          try {
+            const t = THEMES[dot.dataset.themeSet];
+            window.showToastSticker('🎨 Aplicando tema ' + (t ? t.name : '') + '...');
+          } catch(_) {}
+        }
+        setTimeout(() => { window.location.reload(); }, 400);
+      }
     }
   });
 
@@ -355,7 +384,8 @@
 
   console.log(
     '%c🎨 ArchinimeThemes cargado · ' + Object.keys(THEMES).length + ' temas' +
-    (Object.values(THEMES).some(t => t.bgVideo) ? ' (con video)' : ''),
+    (Object.values(THEMES).some(t => t.bgVideo) ? ' (con video)' : '') +
+    ' · Default: ' + DEFAULT_THEME,
     'color:#b114ff;font-family:monospace;font-weight:bold;'
   );
 })();
