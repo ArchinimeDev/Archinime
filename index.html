@@ -102,25 +102,17 @@ ul { list-style: none; }
 
 /* ⚡ CURSOR PERSONALIZADO — DESACTIVABLE con FIX GLOBAL */
 html.custom-cursor-off,
-html.custom-cursor-off * {
-  cursor: auto !important;
-}
+html.custom-cursor-off * { cursor: auto !important; }
 html.custom-cursor-off .cursor-dot,
-html.custom-cursor-off .cursor-ring {
-  display: none !important;
-}
+html.custom-cursor-off .cursor-ring { display: none !important; }
 html.custom-cursor-off a,
 html.custom-cursor-off button,
 html.custom-cursor-off [data-hover],
 html.custom-cursor-off input,
 html.custom-cursor-off textarea,
-html.custom-cursor-off select {
-  cursor: pointer !important;
-}
+html.custom-cursor-off select { cursor: pointer !important; }
 html.custom-cursor-off input,
-html.custom-cursor-off textarea {
-  cursor: text !important;
-}
+html.custom-cursor-off textarea { cursor: text !important; }
 
 /* ⚡ LOW-END OPTIMIZATIONS */
 html.low-end .aurora { animation: none !important; filter: blur(50px) !important; }
@@ -140,7 +132,7 @@ html.mobile-opt .scanlines { display: none !important; }
 html.mobile-opt .hud-frame { display: none !important; }
 html.mobile-opt .marquee { animation-duration: 60s !important; }
 
-/* CURSOR — z-index ARRIBA de modales (fix cursor desaparece) */
+/* CURSOR */
 .cursor-dot, .cursor-ring { position: fixed; top: 0; left: 0; pointer-events: none; z-index: 2147483647; transform: translate(-50%, -50%); will-change: transform; }
 .cursor-dot { width: 6px; height: 6px; background: var(--neon-1); border-radius: 50%; box-shadow: 0 0 12px var(--neon-1); transition: width 0.25s, height 0.25s, background 0.25s; }
 .cursor-ring { width: 36px; height: 36px; border: 1.5px solid color-mix(in srgb, var(--neon-1) 50%, transparent); border-radius: 50%; transition: width 0.3s var(--ease-back), height 0.3s var(--ease-back), border-color 0.3s, background 0.3s; }
@@ -687,7 +679,6 @@ section { padding: 120px 48px; position: relative; max-width: 1600px; margin: 0 
   box-shadow: 0 10px 20px color-mix(in srgb, var(--neon-1) 15%, transparent);
 }
 
-/* Footer responsive — tablet */
 @media (max-width: 900px) {
   .footer { padding: 70px 24px calc(36px + var(--safe-bottom)); }
   .footer-inner {
@@ -705,7 +696,6 @@ section { padding: 120px 48px; position: relative; max-width: 1600px; margin: 0 
   .footer-bottom { margin-top: 48px; }
 }
 
-/* Footer responsive — móvil */
 @media (max-width: 600px) {
   .footer { padding: 60px 20px calc(32px + var(--safe-bottom)); }
   .footer-inner {
@@ -823,31 +813,11 @@ section { padding: 120px 48px; position: relative; max-width: 1600px; margin: 0 
 #chatStickerPanelPanel .sticker-tab.active { background: color-mix(in srgb, var(--neon-1) 15%, transparent); color: var(--neon-1); }
 #chatStickerPanelPanel .sticker-tab-content { display: none; }
 #chatStickerPanelPanel .sticker-tab-content.active { display: block; }
-/* ⚡ Stickers del panel: MISMO TAMAÑO que comunidad (150x150) */
 #chatStickerPanelPanel .stickers-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-#chatStickerPanelPanel .sticker-item {
-  padding: 6px;
-  cursor: none;
-  transition: all 0.2s;
-  position: relative;
-  background: rgba(255,255,255,0.02);
-  border-radius: 10px;
-  display: flex; align-items: center; justify-content: center;
-  min-height: 120px;
-}
+#chatStickerPanelPanel .sticker-item { padding: 6px; cursor: none; transition: all 0.2s; position: relative; background: rgba(255,255,255,0.02); border-radius: 10px; display: flex; align-items: center; justify-content: center; min-height: 120px; }
 #chatStickerPanelPanel .sticker-item:hover { background: color-mix(in srgb, var(--neon-1) 10%, transparent); transform: scale(1.02); }
 #chatStickerPanelPanel .sticker-item img,
-#chatStickerPanelPanel .sticker-item video {
-  width: 100%;
-  max-width: 150px;
-  max-height: 150px;
-  height: auto;
-  aspect-ratio: auto;
-  object-fit: contain;
-  border-radius: 0;
-  background: transparent;
-  display: block;
-}
+#chatStickerPanelPanel .sticker-item video { width: 100%; max-width: 150px; max-height: 150px; height: auto; aspect-ratio: auto; object-fit: contain; border-radius: 0; background: transparent; display: block; }
 #chatStickerPanelPanel .sticker-item .sticker-delete-btn { position: absolute; top: -4px; right: -4px; background: var(--neon-3); border: none; border-radius: 50%; width: 20px; height: 20px; color: #fff; font-size: 9px; cursor: none; display: flex; align-items: center; justify-content: center; z-index: 2; }
 .sticker-empty-msg { text-align: center; color: var(--text-soft); padding: 20px; font-size: 0.85rem; grid-column: 1/-1; }
 .add-sticker-container { display: flex; flex-direction: column; align-items: center; padding: 16px; border: 2px dashed color-mix(in srgb, var(--neon-1) 20%, transparent); border-radius: 12px; background: rgba(0,0,0,0.2); gap: 8px; }
@@ -945,7 +915,6 @@ section { padding: 120px 48px; position: relative; max-width: 1600px; margin: 0 
 .event-btn:hover { background: var(--neon-1); box-shadow: 0 0 20px var(--neon-1); transform: scale(1.02); }
 #toastSticker, #toast, #toastComent { position: fixed; bottom: calc(100px + var(--safe-bottom)); left: 50%; transform: translateX(-50%); background: #0f0f13; color: var(--neon-1); padding: 12px 25px; border-radius: 30px; z-index: 1001; font-weight: bold; box-shadow: 0 0 20px color-mix(in srgb, var(--neon-1) 50%, transparent); border: 1px solid var(--neon-1); display: none; max-width: 90vw; text-align: center; }
 
-/* ⚡ PWA NOTIF — MÓVIL MEJORADA */
 #pwaNotif {
   position: fixed;
   top: calc(72px + var(--safe-top));
@@ -991,7 +960,6 @@ section { padding: 120px 48px; position: relative; max-width: 1600px; margin: 0 
 #pwaNotif .pwa-close-btn { background: transparent; border: none; color: #8a90a0; font-size: 1rem; padding: 6px; cursor: pointer; transition: color 0.2s; align-self: flex-start; }
 #pwaNotif .pwa-close-btn:hover { color: #ff1a6b; }
 
-/* ⚡ MOBILE PWA NOTIF — más compacta y ordenada */
 @media (max-width: 600px) {
   #pwaNotif {
     top: calc(60px + var(--safe-top));
@@ -1001,34 +969,12 @@ section { padding: 120px 48px; position: relative; max-width: 1600px; margin: 0 
     gap: 10px;
     border-radius: 16px;
   }
-  #pwaNotif .pwa-icon {
-    width: 34px; height: 34px;
-    font-size: 1rem;
-    border-radius: 10px;
-  }
-  #pwaNotif .pwa-title {
-    font-size: 0.68rem;
-    letter-spacing: 0.6px;
-    margin-bottom: 1px;
-  }
-  #pwaNotif .pwa-text {
-    font-size: 0.6rem;
-    line-height: 1.2;
-  }
-  #pwaNotif .pwa-install-btn {
-    padding: 6px 12px;
-    font-size: 0.6rem;
-    letter-spacing: 0.6px;
-  }
-  #pwaNotif .pwa-close-btn {
-    font-size: 0.85rem;
-    padding: 4px;
-    position: absolute;
-    top: 4px; right: 4px;
-  }
-  #pwaNotif .pwa-content {
-    padding-right: 16px;
-  }
+  #pwaNotif .pwa-icon { width: 34px; height: 34px; font-size: 1rem; border-radius: 10px; }
+  #pwaNotif .pwa-title { font-size: 0.68rem; letter-spacing: 0.6px; margin-bottom: 1px; }
+  #pwaNotif .pwa-text { font-size: 0.6rem; line-height: 1.2; }
+  #pwaNotif .pwa-install-btn { padding: 6px 12px; font-size: 0.6rem; letter-spacing: 0.6px; }
+  #pwaNotif .pwa-close-btn { font-size: 0.85rem; padding: 4px; position: absolute; top: 4px; right: 4px; }
+  #pwaNotif .pwa-content { padding-right: 16px; }
 }
 
 /* RESPONSIVE */
@@ -1325,6 +1271,12 @@ section { padding: 120px 48px; position: relative; max-width: 1600px; margin: 0 
   transition: all 0.25s;
 }
 #configModal .config-toggle-row:hover { border-color: rgba(0,240,255,0.25); }
+/* ⚡ Toggles bloqueados por calidad fluida */
+#configModal .config-toggle-row.q-locked {
+  opacity: 0.35;
+  pointer-events: none;
+  filter: grayscale(0.7);
+}
 #configModal .config-toggle-info { display: flex; align-items: center; gap: 12px; }
 #configModal .config-toggle-info i { font-size: 1.1rem; color: #00f0ff; width: 24px; text-align: center; }
 #configModal .config-toggle-name { font-size: 0.85rem; color: #fff; font-weight: 600; }
@@ -1378,32 +1330,6 @@ section { padding: 120px 48px; position: relative; max-width: 1600px; margin: 0 
 #configModal .config-theme-dot.active .config-theme-swatch { border-color: #fff; }
 #configModal .config-theme-name { font-family: 'Orbitron', sans-serif; font-size: 0.68rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
 
-[data-quality="fluida"] #bg-video { display: none !important; }
-[data-quality="fluida"] #particlesCanvas { display: none !important; }
-[data-quality="fluida"] #particles { display: none !important; }
-[data-quality="fluida"] #stageContainer { display: none !important; }
-[data-quality="fluida"] .aurora { animation: none !important; filter: blur(40px) !important; opacity: 0.35 !important; }
-[data-quality="fluida"] .grid-floor { animation: none !important; opacity: 0.3 !important; }
-[data-quality="fluida"] .scanlines { display: none !important; }
-[data-quality="fluida"] .hud-frame { display: none !important; }
-[data-quality="fluida"] .noise { display: none !important; }
-[data-quality="fluida"] #overlay { background: linear-gradient(160deg, #05070a 0%, #10061e 45%, #05070a 100%) !important; }
-
-[data-quality="media"] #stageContainer { display: none !important; }
-[data-quality="media"] #bg-video { filter: brightness(0.85) contrast(1.1) !important; }
-[data-quality="media"] .aurora { filter: blur(65px) !important; opacity: 0.4 !important; }
-[data-quality="media"] .grid-floor { opacity: 0.4 !important; }
-[data-quality="media"] .scanlines { opacity: 0.35 !important; }
-[data-quality="media"] .hud-frame { opacity: 0.5 !important; }
-[data-quality="media"] .noise { opacity: 0.03 !important; }
-
-[data-quality="alta"] #bg-video { filter: brightness(0.7) contrast(1.15) saturate(1.15) !important; }
-[data-quality="alta"] .aurora { filter: blur(85px) !important; opacity: 0.6 !important; }
-[data-quality="alta"] .grid-floor { opacity: 0.55 !important; }
-[data-quality="alta"] .scanlines { opacity: 0.7 !important; }
-[data-quality="alta"] .hud-frame { opacity: 1 !important; }
-[data-quality="alta"] .noise { opacity: 0.045 !important; }
-
 html:not([data-chroma="on"]) #stageContainer { display: none !important; }
 
 #stageContainer { position: fixed; inset: 0; z-index: 5; pointer-events: none; display: none; }
@@ -1428,10 +1354,7 @@ html[data-chroma="on"] #stageContainer { display: block !important; }
 @keyframes sparkAnim { to { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; } }
 
 @media (max-width: 768px) {
-  #stageContainer #fgContainer {
-    bottom: 90px;
-    width: clamp(70px, 20vw, 110px);
-  }
+  #stageContainer #fgContainer { bottom: 90px; width: clamp(70px, 20vw, 110px); }
   #stageContainer.fg-left #fgContainer { left: 12px; }
   #stageContainer.fg-right #fgContainer { right: 12px; }
 }
@@ -1439,6 +1362,274 @@ html[data-chroma="on"] #stageContainer { display: block !important; }
 @media (max-width: 900px) {
   .nav { padding-top: calc(12px + var(--safe-top)) !important; padding-bottom: 12px !important; }
   .nav.scrolled { padding-top: calc(10px + var(--safe-top)) !important; padding-bottom: 10px !important; }
+}
+
+/* ============================================================================
+   ⚡⚡⚡ v27+ — SISTEMA DE CALIDAD GRÁFICA REAL (FLUIDA / MEDIA / ALTA) ⚡⚡⚡
+   ----------------------------------------------------------------------------
+   Este bloque sobreescribe TODO según html[data-quality="..."].
+   - FLUIDA = máximo rendimiento: sin blur, sin sombras coloridas, sin gradientes,
+             sin backdrop-filter, sin glitch, sin ruido, sin scanlines, plana.
+   - MEDIA  = punto medio: algunos efectos suaves, look moderno sin castigar.
+   - ALTA   = máxima calidad: blurs intensos, glow doble, backdrop-filter completo,
+             saturation boost, drop-shadows neón, más partículas (JS).
+   ============================================================================ */
+
+/* ---------------- FLUIDA ----------------
+   Objetivo: quitar TODA carga GPU/CPU. Nada de blur costoso, nada de filtros
+   compuestos, nada de animaciones. Todo plano y oscuro. ------------------- */
+
+html[data-quality="fluida"] body { filter: saturate(0.9); }
+
+/* Fondos */
+html[data-quality="fluida"] .aurora {
+  animation: none !important;
+  filter: blur(28px) !important;
+  opacity: 0.20 !important;
+}
+html[data-quality="fluida"] .grid-floor {
+  animation: none !important;
+  opacity: 0.18 !important;
+  background-size: 90px 90px !important;
+}
+html[data-quality="fluida"] .noise,
+html[data-quality="fluida"] .scanlines,
+html[data-quality="fluida"] .hud-frame,
+html[data-quality="fluida"] #particles,
+html[data-quality="fluida"] #stageContainer { display: none !important; }
+html[data-quality="fluida"] .vignette {
+  background: linear-gradient(180deg, var(--bg-deep) 0%, var(--bg-deep) 100%) !important;
+  opacity: 0.55 !important;
+}
+
+/* Nada de backdrop-filter costoso */
+html[data-quality="fluida"] .nav,
+html[data-quality="fluida"] .theme-dots,
+html[data-quality="fluida"] .cyber-btn-icon,
+html[data-quality="fluida"] .config-nav-btn,
+html[data-quality="fluida"] .search-input,
+html[data-quality="fluida"] .notif-dropdown,
+html[data-quality="fluida"] .user-dropdown,
+html[data-quality="fluida"] .mobile-menu,
+html[data-quality="fluida"] .motion-player,
+html[data-quality="fluida"] .motion-badge,
+html[data-quality="fluida"] .motion-index,
+html[data-quality="fluida"] .motion-nav-btn,
+html[data-quality="fluida"] .motion-audio-notice,
+html[data-quality="fluida"] .bento-item,
+html[data-quality="fluida"] .community-msg,
+html[data-quality="fluida"] .anime-card,
+html[data-quality="fluida"] .side-panel,
+html[data-quality="fluida"] .filter-dropdown,
+html[data-quality="fluida"] .select-popup,
+html[data-quality="fluida"] .cyber-no-results,
+html[data-quality="fluida"] #configModal,
+html[data-quality="fluida"] #configModal .config-card,
+html[data-quality="fluida"] .auth-modal,
+html[data-quality="fluida"] .profile-modal,
+html[data-quality="fluida"] .detail-modal,
+html[data-quality="fluida"] .auth-card,
+html[data-quality="fluida"] .profile-card,
+html[data-quality="fluida"] .detail-card,
+html[data-quality="fluida"] #eventModal,
+html[data-quality="fluida"] .event-card,
+html[data-quality="fluida"] #pwaNotif,
+html[data-quality="fluida"] .cmd-overlay,
+html[data-quality="fluida"] .cmd-panel,
+html[data-quality="fluida"] .chip,
+html[data-quality="fluida"] .search-wrapper,
+html[data-quality="fluida"] #searchSuggestions {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+html[data-quality="fluida"] .nav { background: var(--bg-deep) !important; }
+html[data-quality="fluida"] .nav.scrolled { background: var(--bg-deep) !important; }
+html[data-quality="fluida"] .notif-dropdown,
+html[data-quality="fluida"] .user-dropdown,
+html[data-quality="fluida"] .side-panel,
+html[data-quality="fluida"] .filter-dropdown,
+html[data-quality="fluida"] .mobile-menu,
+html[data-quality="fluida"] #searchSuggestions { background: var(--bg-panel) !important; }
+
+/* Tarjetas planas: sin gradientes, sin doble sombra */
+html[data-quality="fluida"] .anime-card,
+html[data-quality="fluida"] .bento-item,
+html[data-quality="fluida"] .community-msg,
+html[data-quality="fluida"] .motion-player,
+html[data-quality="fluida"] .cyber-no-results {
+  background: var(--bg-panel) !important;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.45) !important;
+  border-radius: 12px !important;
+}
+html[data-quality="fluida"] .anime-card:hover,
+html[data-quality="fluida"] .bento-item:hover,
+html[data-quality="fluida"] .community-msg:hover {
+  transform: none !important;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.45) !important;
+  border-color: var(--line) !important;
+}
+html[data-quality="fluida"] .anime-card:hover img { transform: none !important; }
+html[data-quality="fluida"] .anime-card::before,
+html[data-quality="fluida"] .bento-item::before,
+html[data-quality="fluida"] .bento-item::after,
+html[data-quality="fluida"] .motion-player::before,
+html[data-quality="fluida"] .footer::before { display: none !important; }
+html[data-quality="fluida"] .bento-item:hover .bento-icon,
+html[data-quality="fluida"] .bento-item:hover .bento-visual { transform: none !important; }
+
+/* Botones sin glow */
+html[data-quality="fluida"] .btn,
+html[data-quality="fluida"] .cta-btn,
+html[data-quality="fluida"] .auth-form button,
+html[data-quality="fluida"] .profile-save-btn,
+html[data-quality="fluida"] .config-save,
+html[data-quality="fluida"] .event-btn,
+html[data-quality="fluida"] .chat-send-btn,
+html[data-quality="fluida"] .provider-btn {
+  box-shadow: none !important;
+  transform: none !important;
+}
+html[data-quality="fluida"] .btn::before,
+html[data-quality="fluida"] .cta-btn::before { display: none !important; }
+
+/* Textos: quitar gradientes (esto baja bastante GPU) */
+html[data-quality="fluida"] .hero-title .grad-1,
+html[data-quality="fluida"] .hero-title .grad-2,
+html[data-quality="fluida"] .section-title .accent,
+html[data-quality="fluida"] .stat-value,
+html[data-quality="fluida"] .cta h2 .accent,
+html[data-quality="fluida"] .footer-brand h3,
+html[data-quality="fluida"] .nav-logo .txt {
+  background: none !important;
+  -webkit-background-clip: initial !important;
+  background-clip: initial !important;
+  -webkit-text-fill-color: currentColor !important;
+  color: var(--neon-1) !important;
+  animation: none !important;
+  filter: none !important;
+}
+html[data-quality="fluida"] .nav-logo .txt { color: #fff !important; }
+
+/* Sin glitch */
+html[data-quality="fluida"] .glitch-wrap::before,
+html[data-quality="fluida"] .glitch-wrap::after { display: none !important; }
+
+/* Sin animaciones decorativas */
+html[data-quality="fluida"] .hero-eyebrow::before,
+html[data-quality="fluida"] .scroll-indicator .line::after,
+html[data-quality="fluida"] .nav-status .status-led,
+html[data-quality="fluida"] .nav-logo .dot,
+html[data-quality="fluida"] .chip,
+html[data-quality="fluida"] .theme-dot.active::after,
+html[data-quality="fluida"] .community-online .online-dot,
+html[data-quality="fluida"] .motion-badge .live-dot,
+html[data-quality="fluida"] .nav-logo .logo-img,
+html[data-quality="fluida"] #pwaNotif .pwa-icon { animation: none !important; }
+
+html[data-quality="fluida"] .marquee { animation-duration: 120s !important; }
+
+/* Transiciones globales rápidas */
+html[data-quality="fluida"] * {
+  transition-duration: 0.12s !important;
+  transition-timing-function: linear !important;
+}
+
+/* Ocultar decoraciones extra */
+html[data-quality="fluida"] .hero-title .word { animation: none !important; transform: translateY(0) !important; }
+html[data-quality="fluida"] .reveal { transition: none !important; opacity: 1 !important; transform: none !important; }
+
+/* ---------------- MEDIA ----------------
+   Punto medio: efectos suaves, sin cosas pesadas. ----------------------- */
+html[data-quality="media"] body { filter: saturate(1); }
+html[data-quality="media"] .aurora {
+  filter: blur(55px) !important;
+  opacity: 0.35 !important;
+  animation-duration: 30s !important;
+}
+html[data-quality="media"] .grid-floor {
+  opacity: 0.32 !important;
+  animation-duration: 26s !important;
+}
+html[data-quality="media"] .noise { opacity: 0.022 !important; }
+html[data-quality="media"] .scanlines { opacity: 0.35 !important; }
+html[data-quality="media"] .hud-frame { opacity: 0.5 !important; }
+html[data-quality="media"] #particles { opacity: 0.4 !important; }
+html[data-quality="media"] #stageContainer { display: none !important; }
+
+html[data-quality="media"] .nav { backdrop-filter: blur(10px) saturate(1.2) !important; }
+html[data-quality="media"] .notif-dropdown,
+html[data-quality="media"] .user-dropdown,
+html[data-quality="media"] .side-panel,
+html[data-quality="media"] .filter-dropdown,
+html[data-quality="media"] .select-popup,
+html[data-quality="media"] #searchSuggestions,
+html[data-quality="media"] .mobile-menu { backdrop-filter: blur(12px) !important; -webkit-backdrop-filter: blur(12px) !important; }
+
+html[data-quality="media"] .anime-card:hover,
+html[data-quality="media"] .bento-item:hover,
+html[data-quality="media"] .community-msg:hover {
+  box-shadow: 0 15px 40px rgba(0,0,0,0.55), 0 0 22px color-mix(in srgb, var(--neon-1) 15%, transparent) !important;
+}
+
+/* ---------------- ALTA ----------------
+   Máxima calidad: blurs intensos, glow extra, saturación boost. --------- */
+html[data-quality="alta"] body {
+  filter: saturate(1.12) contrast(1.02);
+}
+html[data-quality="alta"] .aurora {
+  filter: blur(95px) !important;
+  opacity: 0.6 !important;
+  animation-duration: 20s !important;
+}
+html[data-quality="alta"] .grid-floor {
+  opacity: 0.62 !important;
+  animation-duration: 16s !important;
+}
+html[data-quality="alta"] .noise { opacity: 0.05 !important; }
+html[data-quality="alta"] .scanlines { opacity: 0.8 !important; }
+html[data-quality="alta"] .hud-frame { opacity: 1 !important; }
+html[data-quality="alta"] #particles { opacity: 0.9 !important; }
+
+html[data-quality="alta"] .nav { backdrop-filter: blur(20px) saturate(1.6) !important; }
+html[data-quality="alta"] .notif-dropdown,
+html[data-quality="alta"] .user-dropdown,
+html[data-quality="alta"] .side-panel,
+html[data-quality="alta"] .filter-dropdown,
+html[data-quality="alta"] .select-popup,
+html[data-quality="alta"] #searchSuggestions,
+html[data-quality="alta"] .mobile-menu { backdrop-filter: blur(22px) saturate(1.6) !important; -webkit-backdrop-filter: blur(22px) saturate(1.6) !important; }
+
+html[data-quality="alta"] .anime-card:hover {
+  box-shadow: 0 30px 70px rgba(0,0,0,0.85), 0 0 60px color-mix(in srgb, var(--neon-1) 35%, transparent) !important;
+}
+html[data-quality="alta"] .bento-item:hover,
+html[data-quality="alta"] .community-msg:hover {
+  box-shadow: 0 30px 70px rgba(0,0,0,0.7), 0 0 50px color-mix(in srgb, var(--neon-1) 30%, transparent) !important;
+}
+html[data-quality="alta"] .motion-player {
+  box-shadow: 0 40px 100px rgba(0,0,0,0.8), 0 0 90px color-mix(in srgb, var(--neon-1) 22%, transparent) !important;
+}
+
+html[data-quality="alta"] .btn-primary {
+  box-shadow: 0 0 55px color-mix(in srgb, var(--neon-1) 55%, transparent) !important;
+}
+html[data-quality="alta"] .cta-btn {
+  box-shadow: 0 0 60px color-mix(in srgb, var(--neon-1) 45%, transparent) !important;
+}
+
+html[data-quality="alta"] .hero-title .grad-1,
+html[data-quality="alta"] .hero-title .grad-2 {
+  filter: drop-shadow(0 0 30px currentColor);
+}
+html[data-quality="alta"] .section-title .accent,
+html[data-quality="alta"] .stat-value {
+  filter: drop-shadow(0 0 18px color-mix(in srgb, var(--neon-1) 55%, transparent));
+}
+html[data-quality="alta"] .nav-logo .logo-img {
+  filter: drop-shadow(0 0 20px color-mix(in srgb, var(--neon-1) 75%, transparent)) !important;
+}
+html[data-quality="alta"] .theme-dot.active {
+  box-shadow: 0 0 22px currentColor, 0 0 0 4px color-mix(in srgb, currentColor 35%, transparent) !important;
 }
 </style>
 </head>
@@ -1504,7 +1695,6 @@ html[data-chroma="on"] #stageContainer { display: block !important; }
 
   <div class="nav-actions">
     <button id="searchToggleMobile" class="cyber-btn-icon" title="Buscar" aria-label="Buscar"><i class="fas fa-search"></i></button>
-    <!-- ⚡ Los dots de tema se generan dinámicamente desde js/core/themes.js -->
     <div class="theme-dots" role="group" aria-label="Cambiar tema de color"></div>
     <button id="configBtn" class="config-nav-btn" title="Configuración" aria-label="Configuración"><i class="fas fa-sliders-h"></i></button>
     <div class="notif-wrapper">
@@ -1866,19 +2056,18 @@ html[data-chroma="on"] #stageContainer { display: block !important; }
       </div>
       <div class="config-options" id="qualityOptions">
         <div class="config-option" data-quality="fluida"><i class="fas fa-feather"></i><div class="config-option-name">Fluida</div><div class="config-option-desc">Máximo rendimiento</div></div>
-        <div class="config-option" data-quality="media"><i class="fas fa-balance-scale"></i><div class="config-option-name">Media</div><div class="config-option-desc">Balance</div></div>
-        <div class="config-option" data-quality="alta"><i class="fas fa-gem"></i><div class="config-option-name">Alta</div><div class="config-option-desc">Chroma + efectos</div></div>
+        <div class="config-option" data-quality="media"><i class="fas fa-balance-scale"></i><div class="config-option-name">Media</div><div class="config-option-desc">Balance visual</div></div>
+        <div class="config-option" data-quality="alta"><i class="fas fa-gem"></i><div class="config-option-name">Alta</div><div class="config-option-desc">Máxima calidad</div></div>
       </div>
     </div>
 
     <div class="config-group">
       <div class="config-group-label">Color de tema</div>
-      <!-- ⚡ Los dots se generan dinámicamente desde js/core/themes.js -->
       <div class="config-theme-dots"></div>
     </div>
 
     <div class="config-group">
-      <div class="config-group-label">Efectos</div>
+      <div class="config-group-label">Efectos avanzados</div>
       <div class="config-toggle-row" id="toggleChroma" data-key="chroma">
         <div class="config-toggle-info"><i class="fas fa-mask"></i><div><div class="config-toggle-name">Animaciones Chroma</div><div class="config-toggle-desc">Personajes con fondo verde removido</div></div></div>
         <div class="config-switch"></div>
@@ -2033,7 +2222,6 @@ html[data-chroma="on"] #stageContainer { display: block !important; }
   </div>
 </div>
 
-<!-- ⚡ themes.js movido a js/core/ (mejor organización) -->
 <script src="js/core/themes.js"></script>
 
 <script src="js/core/app-core.js"></script>
@@ -2065,62 +2253,34 @@ html[data-chroma="on"] #stageContainer { display: block !important; }
   const isMobileDevice = () => window.matchMedia('(max-width: 768px)').matches ||
     /Android|iPhone|iPad|iPod|Mobile|Opera Mini|IEMobile/i.test(navigator.userAgent);
 
-  // ⚡ MÓVIL: clase para opt móvil + clase low-end
-  (function detectMobile() {
-    if (isMobileDevice()) {
-      document.documentElement.classList.add('mobile-opt');
-      // En móvil siempre low-end (para desactivar noise, scanlines, etc.)
-      document.documentElement.classList.add('low-end');
-    }
-  })();
-
-  (function detectLowEnd() {
-    const cores = navigator.hardwareConcurrency || 2;
-    const ram = navigator.deviceMemory || 4;
-    const isLow = (cores <= 4 && ram <= 4) || window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (isLow) document.documentElement.classList.add('low-end');
-  })();
-
   const STORAGE_KEY = 'archinime_config_v27';
-
-  // ⚡ El manejo de TEMAS ahora vive en js/core/themes.js
-  // window.cambiarTema() y window.ArchinimeThemes están disponibles globalmente.
 
   // ⚡ CALIDAD — MÓVIL SIEMPRE FLUIDA POR DEFECTO
   function detectarCalidad() {
     if (isMobileDevice()) return 'fluida';
-    const ua = navigator.userAgent;
-    const isMobile = /Android|iPhone|iPad|iPod|Mobile|Opera Mini|IEMobile/i.test(ua);
     const cores = navigator.hardwareConcurrency || 2;
     const ram = navigator.deviceMemory || 4;
     const dpr = window.devicePixelRatio || 1;
     const isLowEnd = cores <= 4 && ram <= 2;
     const isMidEnd = cores >= 4 && cores < 8 && ram >= 3;
     const isHighEnd = cores >= 8 && ram >= 6;
-    if (!isMobile && isHighEnd) return 'alta';
-    if (!isMobile && isMidEnd) return 'alta';
-    if (!isMobile) return 'media';
+    if (isHighEnd) return 'alta';
+    if (isMidEnd) return 'alta';
     if (isLowEnd) return 'fluida';
-    if (isMidEnd) return 'media';
-    if (isHighEnd && dpr >= 2) return 'media';
     return 'media';
   }
 
-  // ⚡ CONFIG: cursor OFF por defecto en PC, notifications ON
+  // ⚡ CONFIG: cursor OFF por defecto en PC
   const configPorDefecto = { quality: null, chroma: false, particles: null, bgVideo: null, music: true, cursor: false, notifications: true };
 
   function cargarConfig() {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) return Object.assign({}, configPorDefecto, JSON.parse(raw));
-      // migrar desde v26 o v25
       const old = localStorage.getItem('archinime_config_v26') || localStorage.getItem('archinime_config_v25');
       if (old) {
         const parsed = JSON.parse(old);
-        return Object.assign({}, configPorDefecto, parsed, {
-          cursor: parsed.cursor === true ? false : false, // forzar cursor OFF por defecto en migración
-          notifications: parsed.notifications !== false
-        });
+        return Object.assign({}, configPorDefecto, parsed, { cursor: false, notifications: parsed.notifications !== false });
       }
     } catch(e) {}
     return null;
@@ -2144,25 +2304,41 @@ html[data-chroma="on"] #stageContainer { display: block !important; }
   if (!config.quality) config.quality = detectedQuality;
   if (config.cursor === undefined) config.cursor = false;
   if (config.notifications === undefined) config.notifications = true;
+  if (config.particles === null || config.particles === undefined) config.particles = config.quality !== 'fluida';
+  if (config.bgVideo === null || config.bgVideo === undefined) config.bgVideo = config.quality === 'alta';
+  if (config.chroma === undefined) config.chroma = false;
 
   window.__archinimeConfig = config;
 
   function aplicarConfig() {
     const html = document.documentElement;
     html.dataset.quality = config.quality;
+
+    // ⚡ Reset de clases: ahora la calidad manda
+    html.classList.remove('low-end', 'mobile-opt');
+
+    if (config.quality === 'fluida') {
+      html.classList.add('low-end');
+      if (isMobileDevice()) html.classList.add('mobile-opt');
+    } else if (config.quality === 'media') {
+      if (isMobileDevice()) html.classList.add('mobile-opt');
+    }
+    // alta: sin clases restrictivas
+
     if (config.chroma) html.dataset.chroma = 'on';
     else html.removeAttribute('data-chroma');
 
-    // Cursor personalizado
     if (config.cursor === true) html.classList.remove('custom-cursor-off');
     else html.classList.add('custom-cursor-off');
 
-    // Notificaciones
     if (config.notifications === false) html.classList.add('notif-off');
     else html.classList.remove('notif-off');
 
     const canvas = document.getElementById('particles');
-    if (canvas) canvas.style.display = config.particles ? '' : 'none';
+    if (canvas) {
+      // En fluida el CSS ya lo oculta con !important, pero igual aplicamos display coherente
+      canvas.style.display = config.particles ? '' : 'none';
+    }
 
     const bgv = document.getElementById('bg-video');
     const overlay = document.getElementById('overlay');
@@ -2174,6 +2350,7 @@ html[data-chroma="on"] #stageContainer { display: block !important; }
       if (!config.bgVideo) overlay.style.background = 'linear-gradient(160deg, #05070a 0%, #10061e 45%, #05070a 100%)';
       else overlay.style.background = '';
     }
+
     window.dispatchEvent(new CustomEvent('archinime:config-changed', { detail: config }));
   }
   aplicarConfig();
@@ -2196,15 +2373,26 @@ html[data-chroma="on"] #stageContainer { display: block !important; }
 
   let draft = null;
 
+  // ⚡ Los toggles que dependen de la calidad gráfica
+  const Q_DEPENDENT_TOGGLES = [toggleChroma, toggleParticles, toggleBgVideo];
+
   function pintarUI() {
     if (!draft) return;
     qualityOptions.forEach(opt => opt.classList.toggle('active', opt.dataset.quality === draft.quality));
-    toggleChroma.classList.toggle('active', !!draft.chroma);
-    toggleParticles.classList.toggle('active', !!draft.particles);
-    toggleBgVideo.classList.toggle('active', !!draft.bgVideo);
-    toggleMusic.classList.toggle('active', !!draft.music);
-    if (toggleCursor) toggleCursor.classList.toggle('active', draft.cursor === true);
-    if (toggleNotifications) toggleNotifications.classList.toggle('active', draft.notifications !== false);
+    toggleChroma?.classList.toggle('active', !!draft.chroma);
+    toggleParticles?.classList.toggle('active', !!draft.particles);
+    toggleBgVideo?.classList.toggle('active', !!draft.bgVideo);
+    toggleMusic?.classList.toggle('active', !!draft.music);
+    toggleCursor?.classList.toggle('active', draft.cursor === true);
+    toggleNotifications?.classList.toggle('active', draft.notifications !== false);
+
+    // ⚡ Bloquear visualmente los toggles que dependen de la calidad
+    const locked = draft.quality === 'fluida';
+    Q_DEPENDENT_TOGGLES.forEach(t => {
+      if (!t) return;
+      t.classList.toggle('q-locked', locked);
+      t.title = locked ? 'No disponible en calidad Fluida' : '';
+    });
   }
 
   function abrirConfigModal() {
@@ -2225,29 +2413,22 @@ html[data-chroma="on"] #stageContainer { display: block !important; }
 
   modal.addEventListener('click', e => { if (e.target === modal) closeConfigModal(); });
 
+  // ⚡ CAMBIO DE CALIDAD: NO modifica los toggles individuales.
+  // El CSS reescribe todo el look. Los toggles quedan bloqueados en fluida.
   qualityOptions.forEach(opt => {
     opt.addEventListener('click', () => {
       draft.quality = opt.dataset.quality;
-      if (draft.quality === 'fluida') {
-        draft.particles = false;
-        draft.bgVideo = false;
-        draft.chroma = false;
-      } else if (draft.quality === 'media') {
-        draft.particles = true;
-        draft.bgVideo = true;
-        draft.chroma = false;
-      } else if (draft.quality === 'alta') {
-        draft.particles = true;
-        draft.bgVideo = true;
-        draft.chroma = true;
-      }
       pintarUI();
     });
   });
 
   function bindToggle(el, key) {
     if (!el) return;
-    el.addEventListener('click', () => { draft[key] = !draft[key]; pintarUI(); });
+    el.addEventListener('click', () => {
+      if (el.classList.contains('q-locked')) return;
+      draft[key] = !draft[key];
+      pintarUI();
+    });
   }
   bindToggle(toggleChroma, 'chroma');
   bindToggle(toggleParticles, 'particles');
@@ -2376,7 +2557,7 @@ html[data-chroma="on"] #stageContainer { display: block !important; }
   const oldInstallBtn = document.getElementById('installBtn');
   if (oldInstallBtn) oldInstallBtn.style.display = 'none';
 
-  console.log('%c✅ Archinime v27 · Calidad: ' + config.quality + ' · Chroma: ' + (config.chroma ? 'ON' : 'OFF') + ' · Cursor: ' + (config.cursor ? 'ON' : 'OFF') + ' · Notif: ' + (config.notifications !== false ? 'ON' : 'OFF'), 'color:#00f0ff;font-family:monospace;font-weight:bold;');
+  console.log('%c✅ Archinime v27 · Calidad: ' + config.quality.toUpperCase() + ' · Chroma: ' + (config.chroma ? 'ON' : 'OFF') + ' · Cursor: ' + (config.cursor ? 'ON' : 'OFF'), 'color:#00f0ff;font-family:monospace;font-weight:bold;');
 })();
 </script>
 
@@ -2390,11 +2571,13 @@ html[data-chroma="on"] #stageContainer { display: block !important; }
   const DEBUG = false;
   const log = (...args) => { if (DEBUG) console.log(...args); };
   const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-  const isMobileDevice = window.matchMedia('(max-width: 768px)').matches;
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const LOW_END = document.documentElement.classList.contains('low-end');
   const $  = (s, p = document) => p.querySelector(s);
   const $$ = (s, p = document) => Array.from(p.querySelectorAll(s));
+
+  // ⚡ LEER CALIDAD ACTUAL
+  const CURRENT_QUALITY = document.documentElement.dataset.quality || 'media';
 
   let currentFilters = { search: '', genre: '', demographic: '', rating: '' };
 
@@ -2433,7 +2616,7 @@ html[data-chroma="on"] #stageContainer { display: block !important; }
   window.addEventListener('load', () => setTimeout(finishLoader, 600));
   setTimeout(finishLoader, 4500);
 
-  // ⚡ CURSOR — solo inicializar si está activado
+  // CURSOR
   function initCursor() {
     if (isTouch || !document.getElementById('cursorDot')) return;
     if (document.documentElement.classList.contains('custom-cursor-off')) return;
@@ -2462,7 +2645,7 @@ html[data-chroma="on"] #stageContainer { display: block !important; }
   if (window.__archinimeConfig?.cursor === true) initCursor();
 
   // RIPPLE
-  if (!prefersReduced && !isTouch && !LOW_END) {
+  if (!prefersReduced && !isTouch && CURRENT_QUALITY === 'alta') {
     document.addEventListener('click', e => {
       const r = document.createElement('div');
       r.className = 'ripple';
@@ -2501,7 +2684,7 @@ html[data-chroma="on"] #stageContainer { display: block !important; }
   $$('.reveal').forEach((el, i) => { el.style.transitionDelay = (i % 6) * 0.06 + 's'; revealIO.observe(el); });
 
   // BENTO TILT
-  if (!isTouch && !prefersReduced && !LOW_END) {
+  if (!isTouch && !prefersReduced && CURRENT_QUALITY !== 'fluida') {
     $$('.bento-item').forEach(card => {
       card.addEventListener('mousemove', e => {
         if (card._raf) cancelAnimationFrame(card._raf);
@@ -2516,7 +2699,7 @@ html[data-chroma="on"] #stageContainer { display: block !important; }
   }
 
   // MAGNETIC
-  if (!isTouch && !prefersReduced && !LOW_END) {
+  if (!isTouch && !prefersReduced && CURRENT_QUALITY === 'alta') {
     $$('.magnetic').forEach(btn => {
       btn.addEventListener('mousemove', e => {
         if (btn._raf) cancelAnimationFrame(btn._raf);
@@ -2551,18 +2734,35 @@ html[data-chroma="on"] #stageContainer { display: block !important; }
     }
     requestAnimationFrame(frame);
   }
-  setTimeout(() => { $$('[data-scramble]').forEach(el => scramble(el, el.dataset.scramble, 1400)); }, 1600);
+  if (CURRENT_QUALITY !== 'fluida') {
+    setTimeout(() => { $$('[data-scramble]').forEach(el => scramble(el, el.dataset.scramble, 1400)); }, 1600);
+  } else {
+    // En fluida, mostrarlo directo sin animación
+    $$('[data-scramble]').forEach(el => el.textContent = el.dataset.scramble);
+  }
 
-  // PARTÍCULAS
-  if (!prefersReduced && !LOW_END) {
+  // ⚡ PARTÍCULAS — depende de la calidad
+  if (!prefersReduced && CURRENT_QUALITY !== 'fluida') {
     const canvas = $('#particles');
     if (canvas) {
       const ctx = canvas.getContext('2d', { alpha: true });
       let W, H;
       const isSmall = window.matchMedia('(max-width: 768px)').matches;
-      const COUNT = isTouch ? (isSmall ? 12 : 20) : 40;
+
+      // ⚡ CONFIG POR CALIDAD
+      let COUNT, DPR_MAX, FRAME_DELAY;
+      if (CURRENT_QUALITY === 'media') {
+        COUNT = isTouch ? (isSmall ? 15 : 22) : 30;
+        DPR_MAX = 1.5;
+        FRAME_DELAY = 22; // ~45fps
+      } else { // alta
+        COUNT = isTouch ? (isSmall ? 25 : 40) : 60;
+        DPR_MAX = 2;
+        FRAME_DELAY = 0; // sin throttle
+      }
+
       const parts = [];
-      let dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+      let dpr = Math.min(window.devicePixelRatio || 1, DPR_MAX);
       function resize() {
         W = canvas.width = Math.floor(window.innerWidth * dpr);
         H = canvas.height = Math.floor(window.innerHeight * dpr);
@@ -2573,22 +2773,34 @@ html[data-chroma="on"] #stageContainer { display: block !important; }
       let rt;
       window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(resize, 200); }, { passive: true });
       for (let i = 0; i < COUNT; i++) {
-        parts.push({ x: Math.random() * W, y: Math.random() * H, r: (Math.random() * 1.6 + 0.3) * dpr, vx: (Math.random() - 0.5) * 0.28 * dpr, vy: (Math.random() - 0.5) * 0.28 * dpr, hue: Math.random() > 0.5 ? 185 : 295, alpha: Math.random() * 0.4 + 0.15 });
+        parts.push({
+          x: Math.random() * W,
+          y: Math.random() * H,
+          r: (Math.random() * 1.6 + 0.3) * dpr,
+          vx: (Math.random() - 0.5) * 0.28 * dpr,
+          vy: (Math.random() - 0.5) * 0.28 * dpr,
+          hue: Math.random() > 0.5 ? 185 : 295,
+          alpha: Math.random() * 0.4 + 0.15
+        });
       }
-      (function animate() {
-        ctx.clearRect(0, 0, W, H);
-        for (const p of parts) {
-          p.x += p.vx; p.y += p.vy;
-          if (p.x < 0 || p.x > W) p.vx *= -1;
-          if (p.y < 0 || p.y > H) p.vy *= -1;
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-          ctx.fillStyle = `hsla(${p.hue}, 100%, 65%, ${p.alpha})`;
-          ctx.fill();
+
+      let lastFrame = 0;
+      (function animate(now) {
+        if (now - lastFrame >= FRAME_DELAY) {
+          lastFrame = now;
+          ctx.clearRect(0, 0, W, H);
+          for (const p of parts) {
+            p.x += p.vx; p.y += p.vy;
+            if (p.x < 0 || p.x > W) p.vx *= -1;
+            if (p.y < 0 || p.y > H) p.vy *= -1;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+            ctx.fillStyle = `hsla(${p.hue}, 100%, 65%, ${p.alpha})`;
+            ctx.fill();
+          }
         }
-        requestAnimationFrame(play);
-      })();
-      function play() { requestAnimationFrame(play); }
+        requestAnimationFrame(animate);
+      })(0);
     }
   }
 
@@ -3023,7 +3235,6 @@ html[data-chroma="on"] #stageContainer { display: block !important; }
     const cols = template.split(' ').filter(s => s && s.trim() !== 'none').length;
     return cols > 0 ? cols : 0;
   }
-  // ⚡ MÓVIL: 2 columnas × 8 filas = 16 animes por página
   function calcularItemsPerPage() {
     const cols = contarColumnasGrid();
     if (cols < 1) return 24;
@@ -3220,7 +3431,9 @@ html[data-chroma="on"] #stageContainer { display: block !important; }
   })();
 
   function aplicarTilt() {
-    if (isTouch || prefersReduced || LOW_END) return;
+    // Tilt solo en media o alta, y nunca en touch
+    if (isTouch || prefersReduced || CURRENT_QUALITY === 'fluida') return;
+    const INTENSITY = CURRENT_QUALITY === 'alta' ? 5 : 3;
     document.querySelectorAll('.anime-card:not([data-tilt])').forEach(card => {
       card.dataset.tilt = 'true';
       card.addEventListener('mousemove', e => {
@@ -3228,8 +3441,8 @@ html[data-chroma="on"] #stageContainer { display: block !important; }
         card._raf = requestAnimationFrame(() => {
           const rect = card.getBoundingClientRect();
           const x = e.clientX - rect.left, y = e.clientY - rect.top;
-          const rx = ((y - rect.height/2) / (rect.height/2)) * -5;
-          const ry = ((x - rect.width/2) / (rect.width/2)) * 5;
+          const rx = ((y - rect.height/2) / (rect.height/2)) * -INTENSITY;
+          const ry = ((x - rect.width/2) / (rect.width/2)) * INTENSITY;
           card.style.transform = `translateY(-8px) scale(1.02) perspective(1000px) rotateX(${rx}deg) rotateY(${ry}deg)`;
         });
       });
@@ -3438,10 +3651,7 @@ html[data-chroma="on"] #stageContainer { display: block !important; }
 
   window.addEventListener('load', () => { if (window.startNotificationSequence) window.startNotificationSequence(); });
 
-  const dockProfileBtn = document.getElementById('dockProfileBtn');
-  if (dockProfileBtn) { dockProfileBtn.addEventListener('click', () => { if (typeof showProfileModal === 'function') showProfileModal(); else if (typeof showAuthModal === 'function') showAuthModal(); }); }
-
-  // CHROMA KEY v27
+  // CHROMA KEY v27 — solo en alta
   function randomizeFgPosition() {
     const container = document.getElementById('stageContainer');
     if (!container) return;
@@ -3542,13 +3752,14 @@ html[data-chroma="on"] #stageContainer { display: block !important; }
     });
   }
 
-  if (window.__archinimeConfig?.chroma && currentAnim) {
+  // Solo activar chroma si calidad != fluida Y chroma está activado
+  if (window.__archinimeConfig?.chroma && currentAnim && CURRENT_QUALITY !== 'fluida') {
     setTimeout(activarChromaCompleto, 800);
   }
 
   window.addEventListener('archinime:config-changed', (e) => {
     const cfg = e.detail;
-    if (cfg.chroma && currentAnim) {
+    if (cfg.chroma && currentAnim && cfg.quality !== 'fluida') {
       activarChromaCompleto();
     } else {
       window.stopChroma();
@@ -3594,10 +3805,10 @@ html[data-chroma="on"] #stageContainer { display: block !important; }
     });
   }
 
-  log('🚀 Archinime NEXT v27 cargado');
+  log('🚀 Archinime NEXT v27 cargado · Calidad: ' + CURRENT_QUALITY);
 })();
 
-/* MOTION PLAYER — v27: no autoplay en PC */
+/* MOTION PLAYER — v27 */
 (function() {
   'use strict';
   const $ = (s, p = document) => p.querySelector(s);
@@ -3625,7 +3836,6 @@ html[data-chroma="on"] #stageContainer { display: block !important; }
 
   let currentIndex = 0;
   let userInteracted = false;
-  let audioNoticeTimer = null;
 
   const musicState = { pausedByUs: new Set() };
   function videoTieneSonido() { return !video.muted && video.volume > 0; }
@@ -3695,7 +3905,6 @@ html[data-chroma="on"] #stageContainer { display: block !important; }
     updateIndexUI(); updateTitleUI(); updateDotsUI();
   }
   function tryPlay() {
-    // ⚡ Solo auto-play si es móvil O si el usuario interactuó
     if (!userInteracted && !isMobileDevice) return;
     const p = video.play();
     if (p && typeof p.catch === 'function') p.catch(() => { if (!video.muted) { video.muted = true; video.play().catch(() => {}); } });
@@ -3712,12 +3921,10 @@ html[data-chroma="on"] #stageContainer { display: block !important; }
   if (btnNext) btnNext.addEventListener('click', (e) => { e.stopPropagation(); nextVideo(); });
   if (btnPrev) btnPrev.addEventListener('click', (e) => { e.stopPropagation(); prevVideo(); });
 
-  // ⚡ Auto-play al entrar en viewport SOLO en móvil
   const io = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
         if (isMobileDevice && video.paused && !userInteracted) {
-          // Autoplay silenciado en móvil
           video.muted = true;
           video.play().catch(() => {});
         }
