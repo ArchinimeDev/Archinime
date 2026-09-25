@@ -430,19 +430,40 @@ section { padding: 120px 48px; position: relative; max-width: 1600px; margin: 0 
 .motion-player.controls-hidden .motion-overlay { opacity: 0; }
 .motion-topbar, .motion-title-wrap { display: none !important; }
 
-.motion-nav-btn { position: absolute; top: 50%; transform: translateY(-50%); width: 52px; height: 52px; border-radius: 50%; background: rgba(10, 12, 20, 0.7); border: 1px solid rgba(255,255,255,0.15); backdrop-filter: blur(12px) saturate(1.4); -webkit-backdrop-filter: blur(12px) saturate(1.4); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 1rem; cursor: none; transition: all 0.3s var(--ease-out-expo); z-index: 5; opacity: 0.6; pointer-events: auto; }
-.motion-nav-btn:hover { opacity: 1; background: color-mix(in srgb, var(--neon-1) 20%, rgba(10,12,20,0.9)); border-color: var(--neon-1); color: var(--neon-1); transform: translateY(-50%) scale(1.1); box-shadow: 0 0 25px color-mix(in srgb, var(--neon-1) 40%, transparent); }
+/* ⚡ CAMBIO: botones prev/next ocultos por defecto, visibles al hover o al tocar */
+.motion-nav-btn { position: absolute; top: 50%; transform: translateY(-50%); width: 52px; height: 52px; border-radius: 50%; background: rgba(10, 12, 20, 0.7); border: 1px solid rgba(255,255,255,0.15); backdrop-filter: blur(12px) saturate(1.4); -webkit-backdrop-filter: blur(12px) saturate(1.4); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 1rem; cursor: none; transition: opacity 0.3s ease, background 0.3s, border-color 0.3s, color 0.3s, transform 0.3s, box-shadow 0.3s; z-index: 5; opacity: 0 !important; pointer-events: none !important; }
+.motion-player:hover .motion-nav-btn,
+.motion-player.controls-visible .motion-nav-btn {
+  opacity: 0.85 !important;
+  pointer-events: auto !important;
+}
+.motion-player:hover .motion-nav-btn:hover,
+.motion-player.controls-visible .motion-nav-btn:hover {
+  opacity: 1 !important;
+  background: color-mix(in srgb, var(--neon-1) 20%, rgba(10,12,20,0.9));
+  border-color: var(--neon-1);
+  color: var(--neon-1);
+  transform: translateY(-50%) scale(1.1);
+  box-shadow: 0 0 25px color-mix(in srgb, var(--neon-1) 40%, transparent);
+}
 .motion-nav-btn.prev { left: 20px; }
 .motion-nav-btn.next { right: 20px; }
-.motion-dots { position: absolute; top: 50%; right: 90px; transform: translateY(-50%); display: flex; flex-direction: column; gap: 10px; z-index: 5; pointer-events: auto; }
+
+/* ⚡ CAMBIO: dots ocultos por defecto, visibles al hover o al tocar */
+.motion-dots { position: absolute; top: 50%; right: 90px; transform: translateY(-50%); display: flex; flex-direction: column; gap: 10px; z-index: 5; pointer-events: none !important; opacity: 0 !important; transition: opacity 0.3s ease; }
+.motion-player:hover .motion-dots,
+.motion-player.controls-visible .motion-dots {
+  pointer-events: auto !important;
+  opacity: 1 !important;
+}
 .motion-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.3); border: none; cursor: none; transition: all 0.3s var(--ease-out-expo); padding: 0; }
 .motion-dot:hover { background: rgba(255,255,255,0.7); transform: scale(1.3); }
 .motion-dot.active { background: var(--neon-1); box-shadow: 0 0 14px var(--neon-1); transform: scale(1.4); height: 24px; border-radius: 100px; }
 .motion-audio-notice { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); border: 1px solid color-mix(in srgb, var(--neon-1) 40%, transparent); color: var(--neon-1); padding: 8px 18px; border-radius: 100px; font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 1.5px; text-transform: uppercase; z-index: 8; opacity: 0; pointer-events: none; transition: opacity 0.4s; backdrop-filter: blur(8px); white-space: nowrap; }
 .motion-audio-notice.show { opacity: 1; }
 @media (max-width: 768px) { .motion-section { padding-top: 60px; padding-bottom: 60px; } .motion-player { border-radius: 20px; } .motion-overlay { padding: 14px; } .motion-nav-btn { width: 42px; height: 42px; font-size: 0.85rem; } .motion-nav-btn.prev { left: 12px; } .motion-nav-btn.next { right: 12px; } .motion-dots { right: 70px; gap: 8px; } .motion-dot { width: 7px; height: 7px; } }
-@media (max-width: 480px) { .motion-nav-btn { width: 36px; height: 36px; font-size: 0.75rem; opacity: 0.85; } .motion-nav-btn.prev { left: 8px; } .motion-nav-btn.next { right: 8px; } .motion-dots { right: 56px; gap: 6px; } .motion-dot { width: 6px; height: 6px; } .motion-dot.active { height: 18px; } }
-@media (hover: none) { .motion-overlay { opacity: 1 !important; } .motion-nav-btn { opacity: 0.9; } }
+@media (max-width: 480px) { .motion-nav-btn { width: 36px; height: 36px; font-size: 0.75rem; } .motion-nav-btn.prev { left: 8px; } .motion-nav-btn.next { right: 8px; } .motion-dots { right: 56px; gap: 6px; } .motion-dot { width: 6px; height: 6px; } .motion-dot.active { height: 18px; } }
+@media (hover: none) { .motion-overlay { opacity: 1 !important; } }
 
 .catalog-section { position: relative; padding-top: 60px; }
 .filters-bar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 32px; align-items: center; justify-content: center; }
@@ -1088,9 +1109,7 @@ html.theme-has-video .footer-bottom {
 #configModal .config-theme-dot.active .config-theme-swatch { border-color: #fff; }
 #configModal .config-theme-name { font-family: 'Orbitron', sans-serif; font-size: 0.68rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
 
-/* ============================================================================
-   ⚡ CAMBIO — stageContainer: personaje más grande y pegado al borde
-   ============================================================================ */
+/* stageContainer: personaje más grande y pegado al borde */
 html:not([data-chroma="on"]) #stageContainer { display: none !important; }
 #stageContainer { position: fixed; inset: 0; z-index: 5; pointer-events: none; display: none; }
 html[data-chroma="on"] #stageContainer { display: block !important; }
@@ -1475,7 +1494,6 @@ html[data-quality="alta"] .section-title .accent {
   <div class="scroll-indicator"><span class="line"></span><span>Scroll</span></div>
 </section>
 
-<!-- ⚡ MARQUEE DE GÉNEROS CLICKEABLES -->
 <div class="marquee-wrap">
   <div class="marquee">
     <button class="marquee-item" data-genre="Acción">Acción</button>
@@ -3181,7 +3199,6 @@ const pwaNotif = document.getElementById('pwaNotif');
   document.getElementById('demographic-select')?.addEventListener('change', e => { currentFilters.demographic = e.target.value; cargarDatosYMostrar(); });
   document.getElementById('rating-select')?.addEventListener('change', e => { currentFilters.rating = e.target.value; cargarDatosYMostrar(); });
 
-  // ⚡ MARQUEE: click en género → filtra el catálogo
   (function setupMarqueeGenreClicks() {
     const genreSelect = document.getElementById('genre-select');
     if (!genreSelect) return;
@@ -3433,7 +3450,6 @@ const pwaNotif = document.getElementById('pwaNotif');
   const fgCanvas = document.getElementById('fgCanvas');
   const fgCtx = fgCanvas ? fgCanvas.getContext('2d', { willReadFrequently: true }) : null;
 
-  // ⚡ Fluidez chroma según calidad seleccionada
   const IS_MOBILE_DEVICE_CHROMA = window.matchMedia('(max-width: 768px)').matches;
   const CHROMA_QUALITY = window.__archinimeConfig?.quality || 'media';
   const CHROMA_FRAME_SKIP = CHROMA_QUALITY === 'alta' ? 4 : (CHROMA_QUALITY === 'media' ? 12 : 30);
@@ -3578,7 +3594,7 @@ const pwaNotif = document.getElementById('pwaNotif');
   log('🚀 Archinime NEXT v28 cargado · Chroma skip: ' + CHROMA_FRAME_SKIP + ' (calidad: ' + CHROMA_QUALITY + ')');
 })();
 
-/* MOTION PLAYER — v28: SIN autoplay, video limpio */
+/* MOTION PLAYER — v28: SIN autoplay, video limpio, controles ocultos hasta hover/click */
 (function() {
   'use strict';
   const $ = (s, p = document) => p.querySelector(s);
@@ -3682,6 +3698,34 @@ const pwaNotif = document.getElementById('pwaNotif');
 
   buildDots();
   loadCurrentVideo();
+
+  // ⚡ Mostrar controles al hover (PC) o al tocar (móvil), ocultar tras 3s
+  let hideControlsTimer = null;
+  function showControls() {
+    player.classList.add('controls-visible');
+    if (hideControlsTimer) clearTimeout(hideControlsTimer);
+    hideControlsTimer = setTimeout(() => {
+      player.classList.remove('controls-visible');
+      hideControlsTimer = null;
+    }, 3000);
+  }
+  player.addEventListener('click', (e) => {
+    if (e.target.closest('.motion-nav-btn') || e.target.closest('.motion-dot')) return;
+    showControls();
+  });
+  player.addEventListener('touchstart', (e) => {
+    if (e.target.closest('.motion-nav-btn') || e.target.closest('.motion-dot')) return;
+    showControls();
+  }, { passive: true });
+  [btnPrev, btnNext].forEach(btn => {
+    if (!btn) return;
+    btn.addEventListener('click', showControls);
+    btn.addEventListener('mouseenter', () => { if (hideControlsTimer) clearTimeout(hideControlsTimer); });
+  });
+  if (dotsContainer) {
+    dotsContainer.addEventListener('click', showControls);
+    dotsContainer.addEventListener('mouseenter', () => { if (hideControlsTimer) clearTimeout(hideControlsTimer); });
+  }
 
   document.addEventListener('visibilitychange', () => { if (document.hidden) { if (!video.paused) video.pause(); reanudarTodaLaMusica(); } });
 
