@@ -198,7 +198,6 @@ body.cursor-hover .cursor-ring { width: 60px; height: 60px; border-color: var(--
 .nav-logo .dot { width: 10px; height: 10px; background: var(--neon-1); border-radius: 50%; box-shadow: 0 0 12px var(--neon-1), 0 0 24px var(--neon-1); animation: pulseDot 2s ease-in-out infinite; flex-shrink: 0; }
 @keyframes pulseDot { 0%,100% { opacity: 1; transform: scale(1);} 50% { opacity: 0.6; transform: scale(0.75);} }
 
-/* ⚡ FIX: usar background-image en vez de background para no romper background-clip: text */
 .nav-logo .txt {
   background-image: linear-gradient(135deg, #fff, var(--neon-1), var(--neon-2));
   -webkit-background-clip: text;
@@ -581,7 +580,6 @@ section { padding: 120px 48px; position: relative; max-width: 1600px; margin: 0 
 .footer-socials a { width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--line); display: inline-flex; align-items: center; justify-content: center; color: var(--text-soft); font-size: 0.85rem; transition: all 0.3s var(--ease-out-expo); flex-shrink: 0; }
 .footer-socials a:hover { border-color: var(--neon-1); color: var(--neon-1); transform: translateY(-3px) rotate(-6deg); box-shadow: 0 10px 20px color-mix(in srgb, var(--neon-1) 15%, transparent); }
 
-/* ⚡ Galaxy theme: sombras de texto en footer para que se lea sobre el video */
 html.theme-has-video .footer-brand h3,
 html.theme-has-video .footer-brand p,
 html.theme-has-video .footer-col h4,
@@ -591,7 +589,6 @@ html.theme-has-video .footer-bottom {
   text-shadow: 0 2px 10px rgba(0,0,0,0.85), 0 0 20px rgba(0,0,0,0.55);
 }
 
-/* Footer responsive — tablet */
 @media (max-width: 900px) {
   .footer { padding: 70px 24px calc(36px + var(--safe-bottom)); }
   .footer-inner { grid-template-columns: 1fr 1fr 1fr; gap: 40px 28px; }
@@ -600,7 +597,6 @@ html.theme-has-video .footer-bottom {
   .footer-bottom { margin-top: 48px; }
 }
 
-/* ⚡ Footer responsive — móvil (FIX: 3 columnas centradas, no 2) */
 @media (max-width: 600px) {
   .footer { padding: 60px 20px calc(32px + var(--safe-bottom)); }
   .footer-inner {
@@ -1087,11 +1083,14 @@ html.theme-has-video .footer-bottom {
 #configModal .config-theme-dot.active .config-theme-swatch { border-color: #fff; }
 #configModal .config-theme-name { font-family: 'Orbitron', sans-serif; font-size: 0.68rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
 
-/* stageContainer legacy */
+/* ============================================================================
+   ⚡ CAMBIO 1 — stageContainer legacy: personaje más grande y pegado al borde
+   ============================================================================ */
 html:not([data-chroma="on"]) #stageContainer { display: none !important; }
 #stageContainer { position: fixed; inset: 0; z-index: 5; pointer-events: none; display: none; }
 html[data-chroma="on"] #stageContainer { display: block !important; }
-#stageContainer #fgContainer { position: absolute; bottom: 100px; width: clamp(90px, 12vw, 160px); height: auto; pointer-events: auto; cursor: pointer; transition: left 0.6s, right 0.6s, transform 0.4s, width 0.4s; filter: drop-shadow(0 0 14px color-mix(in srgb, var(--neon-1) 45%, transparent)); }
+/* ⚡ CAMBIO: bottom 100px→15px, width el doble (era clamp(90px, 12vw, 160px)) */
+#stageContainer #fgContainer { position: absolute; bottom: 15px; width: clamp(180px, 24vw, 320px); height: auto; pointer-events: auto; cursor: pointer; transition: left 0.6s, right 0.6s, transform 0.4s, width 0.4s; filter: drop-shadow(0 0 18px color-mix(in srgb, var(--neon-1) 55%, transparent)); }
 #stageContainer.fg-left #fgContainer { left: 24px; right: auto; }
 #stageContainer.fg-right #fgContainer { right: 24px; left: auto; }
 #stageContainer #fgContainer.poof { animation: poofAnim 0.6s ease forwards; }
@@ -1100,7 +1099,8 @@ html[data-chroma="on"] #stageContainer { display: block !important; }
 #stageContainer #fgVideo { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; pointer-events: none; }
 .spark { position: fixed; border-radius: 50%; pointer-events: none; z-index: 9999; animation: sparkAnim 0.8s ease-out forwards; }
 @keyframes sparkAnim { to { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; } }
-@media (max-width: 768px) { #stageContainer #fgContainer { bottom: 90px; width: clamp(70px, 20vw, 110px); } #stageContainer.fg-left #fgContainer { left: 12px; } #stageContainer.fg-right #fgContainer { right: 12px; } }
+/* ⚡ CAMBIO 2: responsive móvil — bottom 90px→8px, width el doble (era clamp(70px, 20vw, 110px)) */
+@media (max-width: 768px) { #stageContainer #fgContainer { bottom: 8px; width: clamp(140px, 40vw, 220px); } #stageContainer.fg-left #fgContainer { left: 8px; } #stageContainer.fg-right #fgContainer { right: 8px; } }
 @media (max-width: 900px) { .nav { padding-top: calc(12px + var(--safe-top)) !important; padding-bottom: 12px !important; } .nav.scrolled { padding-top: calc(10px + var(--safe-top)) !important; padding-bottom: 10px !important; } }
 
 /* ============================================================================
@@ -1288,7 +1288,6 @@ html[data-quality="fluida"] .btn-primary:hover { background: var(--neon-1); }
 html[data-quality="fluida"] .nav-logo .logo-img { animation: none !important; filter: none !important; }
 html[data-quality="fluida"] .nav-logo .dot { animation: none !important; box-shadow: none !important; }
 
-/* ⚡ FIX CRÍTICO: usar background-image para no romper background-clip: text */
 html[data-quality="fluida"] .nav-logo .txt {
   animation: none !important;
   background-image: linear-gradient(135deg, #fff, var(--neon-1)) !important;
@@ -1331,7 +1330,6 @@ html[data-quality="fluida"] .progress-bar { box-shadow: none !important; }
 html[data-quality="fluida"] .event-card { box-shadow: 0 15px 40px rgba(0,0,0,0.7) !important; }
 html[data-quality="fluida"] .visual-bg { filter: blur(12px) brightness(0.55) !important; }
 
-/* FIX accent con background-clip preservado en TODAS las calidades */
 html[data-quality="fluida"] .stat-value,
 html[data-quality="fluida"] .cta h2 .accent { background-image: linear-gradient(135deg, var(--neon-1), var(--neon-2)) !important; -webkit-background-clip: text !important; background-clip: text !important; -webkit-text-fill-color: transparent !important; color: transparent !important; }
 html[data-quality="fluida"] .hero-title .grad-1 { background: none !important; -webkit-text-fill-color: #fff !important; color: #fff !important; }
@@ -2246,20 +2244,15 @@ const pwaNotif = document.getElementById('pwaNotif');
 
   if (pwaCloseBtn) pwaCloseBtn.addEventListener('click', () => pwaNotif.classList.remove('show'));
 
-  // ⚡ FUNCIÓN GLOBAL REUTILIZABLE — "Descargar / Instalar app"
-  //    window.instalarPWA({ scroll: true })  → scroll al catálogo + instala
-  //    window.instalarPWA({ scroll: false }) → solo instala (o solo scroll)
   window.instalarPWA = async function(opts) {
     opts = opts || {};
     const scrollToCatalog = opts.scroll === true;
     const silent = opts.silent === true;
 
-    // 1) Scroll al catálogo (solo si lo pide)
     if (scrollToCatalog) {
       try { document.getElementById('catalog')?.scrollIntoView({ behavior: 'smooth' }); } catch(_) {}
     }
 
-    // 2) Ya está instalada como app
     if (isStandalone()) {
       if (!silent && typeof window.showToastSticker === 'function') {
         try { window.showToastSticker('✅ La app ya está instalada'); } catch(_) {}
@@ -2267,7 +2260,6 @@ const pwaNotif = document.getElementById('pwaNotif');
       return;
     }
 
-    // 3) iOS — sin beforeinstallprompt, instrucciones manuales
     if (isIos()) {
       if (!silent) {
         const delay = scrollToCatalog ? 700 : 0;
@@ -2276,7 +2268,6 @@ const pwaNotif = document.getElementById('pwaNotif');
       return;
     }
 
-    // 4) Chrome/Edge/Android — prompt nativo si está disponible
     if (window.__deferredInstallPrompt) {
       try {
         window.__deferredInstallPrompt.prompt();
@@ -2289,7 +2280,6 @@ const pwaNotif = document.getElementById('pwaNotif');
       return;
     }
 
-    // 5) Fallback — sin prompt disponible
     if (!silent) {
       if (scrollToCatalog) {
         setTimeout(() => {
@@ -2303,7 +2293,6 @@ const pwaNotif = document.getElementById('pwaNotif');
     }
   };
 
-  // El botón de la notificación flotante sigue funcionando igual
   if (pwaInstallBtn) {
     pwaInstallBtn.addEventListener('click', () => window.instalarPWA({ scroll: false }));
   }
@@ -3391,8 +3380,15 @@ const pwaNotif = document.getElementById('pwaNotif');
   const fgCanvas = document.getElementById('fgCanvas');
   const fgCtx = fgCanvas ? fgCanvas.getContext('2d', { willReadFrequently: true }) : null;
 
+  // ============================================================================
+  // ⚡ CAMBIO 3 — Fluidez chroma según calidad seleccionada
+  //   fluida → 30 (lento, ahorra CPU) — como antes
+  //   media  → 12 (fluido normal)
+  //   alta   → 4  (muy fluido, más CPU)
+  // ============================================================================
   const IS_MOBILE_DEVICE_CHROMA = window.matchMedia('(max-width: 768px)').matches;
-  const CHROMA_FRAME_SKIP = IS_MOBILE_DEVICE_CHROMA ? 28 : 20;
+  const CHROMA_QUALITY = window.__archinimeConfig?.quality || 'media';
+  const CHROMA_FRAME_SKIP = CHROMA_QUALITY === 'alta' ? 4 : (CHROMA_QUALITY === 'media' ? 12 : 30);
 
   let currentAnim = null;
   let isTransitioning = false;
@@ -3531,7 +3527,7 @@ const pwaNotif = document.getElementById('pwaNotif');
     });
   }
 
-  log('🚀 Archinime NEXT v28 cargado');
+  log('🚀 Archinime NEXT v28 cargado · Chroma frame skip: ' + CHROMA_FRAME_SKIP + ' (calidad: ' + CHROMA_QUALITY + ')');
 })();
 
 /* MOTION PLAYER — v28: SIN autoplay, video limpio */
