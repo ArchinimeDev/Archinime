@@ -407,13 +407,18 @@ section { padding: 120px 48px; position: relative; max-width: 1600px; margin: 0 
 .reveal { opacity: 0; transform: translateY(40px); transition: opacity 0.8s var(--ease-out-expo), transform 0.8s var(--ease-out-expo); }
 .reveal.visible { opacity: 1; transform: translateY(0); }
 
+/* ============================================================================
+   ⚡ MARQUEE — géneros clickeables
+   ============================================================================ */
 .marquee-wrap { padding: 40px 0; overflow: hidden; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); background: color-mix(in srgb, var(--bg-panel) 40%, transparent); mask-image: linear-gradient(90deg, transparent, black 10%, black 90%, transparent); -webkit-mask-image: linear-gradient(90deg, transparent, black 10%, black 90%, transparent); }
 .marquee { display: flex; gap: 60px; width: max-content; animation: scroll 40s linear infinite; }
 .marquee:hover { animation-play-state: paused; }
 @keyframes scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-.marquee-item { display: inline-flex; align-items: center; gap: 14px; font-family: var(--font-display); font-weight: 700; font-size: 1.1rem; letter-spacing: 2px; color: var(--text-dim); text-transform: uppercase; white-space: nowrap; transition: color 0.3s; }
-.marquee-item:hover { color: var(--neon-1); }
-.marquee-item::before { content: '◆'; color: var(--neon-1); font-size: 0.7rem; opacity: 0.6; }
+.marquee-item { display: inline-flex; align-items: center; gap: 14px; font-family: var(--font-display); font-weight: 700; font-size: 1.1rem; letter-spacing: 2px; color: var(--text-dim); text-transform: uppercase; white-space: nowrap; transition: color 0.3s, transform 0.2s; background: none; border: none; padding: 0; cursor: pointer; }
+.marquee-item:hover { color: var(--neon-1); transform: scale(1.08); }
+.marquee-item:active { transform: scale(0.96); }
+.marquee-item::before { content: '◆'; color: var(--neon-1); font-size: 0.7rem; opacity: 0.6; transition: opacity 0.3s; }
+.marquee-item:hover::before { opacity: 1; }
 
 .motion-section { padding-top: 80px; padding-bottom: 80px; }
 .motion-player { position: relative; width: 100%; aspect-ratio: 16 / 9; border-radius: var(--radius-xl); overflow: hidden; background: #000; border: 1px solid var(--line); box-shadow: 0 30px 80px rgba(0,0,0,0.7), 0 0 60px color-mix(in srgb, var(--neon-1) 8%, transparent), inset 0 0 0 1px color-mix(in srgb, var(--neon-1) 5%, transparent); isolation: isolate; }
@@ -1084,12 +1089,11 @@ html.theme-has-video .footer-bottom {
 #configModal .config-theme-name { font-family: 'Orbitron', sans-serif; font-size: 0.68rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
 
 /* ============================================================================
-   ⚡ CAMBIO 1 — stageContainer legacy: personaje más grande y pegado al borde
+   ⚡ CAMBIO — stageContainer: personaje más grande y pegado al borde
    ============================================================================ */
 html:not([data-chroma="on"]) #stageContainer { display: none !important; }
 #stageContainer { position: fixed; inset: 0; z-index: 5; pointer-events: none; display: none; }
 html[data-chroma="on"] #stageContainer { display: block !important; }
-/* ⚡ CAMBIO: bottom 100px→15px, width el doble (era clamp(90px, 12vw, 160px)) */
 #stageContainer #fgContainer { position: absolute; bottom: 15px; width: clamp(180px, 24vw, 320px); height: auto; pointer-events: auto; cursor: pointer; transition: left 0.6s, right 0.6s, transform 0.4s, width 0.4s; filter: drop-shadow(0 0 18px color-mix(in srgb, var(--neon-1) 55%, transparent)); }
 #stageContainer.fg-left #fgContainer { left: 24px; right: auto; }
 #stageContainer.fg-right #fgContainer { right: 24px; left: auto; }
@@ -1099,7 +1103,6 @@ html[data-chroma="on"] #stageContainer { display: block !important; }
 #stageContainer #fgVideo { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; pointer-events: none; }
 .spark { position: fixed; border-radius: 50%; pointer-events: none; z-index: 9999; animation: sparkAnim 0.8s ease-out forwards; }
 @keyframes sparkAnim { to { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; } }
-/* ⚡ CAMBIO 2: responsive móvil — bottom 90px→8px, width el doble (era clamp(70px, 20vw, 110px)) */
 @media (max-width: 768px) { #stageContainer #fgContainer { bottom: 8px; width: clamp(140px, 40vw, 220px); } #stageContainer.fg-left #fgContainer { left: 8px; } #stageContainer.fg-right #fgContainer { right: 8px; } }
 @media (max-width: 900px) { .nav { padding-top: calc(12px + var(--safe-top)) !important; padding-bottom: 12px !important; } .nav.scrolled { padding-top: calc(10px + var(--safe-top)) !important; padding-bottom: 10px !important; } }
 
@@ -1132,7 +1135,6 @@ html {
   --q-text-shadow-hero: 0 4px 20px rgba(0,0,0,0.9);
 }
 
-/* ==================== FLUIDA ==================== */
 html[data-quality="fluida"] {
   --q-blur-aurora: 45px;
   --q-aurora-opacity: 0.32;
@@ -1159,7 +1161,6 @@ html[data-quality="fluida"] {
   --q-text-shadow-hero: none;
 }
 
-/* ==================== MEDIA ==================== */
 html[data-quality="media"] {
   --q-blur-aurora: 65px;
   --q-aurora-opacity: 0.38;
@@ -1186,7 +1187,6 @@ html[data-quality="media"] {
   --q-text-shadow-hero: 0 2px 10px rgba(0,0,0,0.7);
 }
 
-/* ==================== ALTA ==================== */
 html[data-quality="alta"] {
   --q-blur-aurora: 120px;
   --q-aurora-opacity: 0.6;
@@ -1475,16 +1475,29 @@ html[data-quality="alta"] .section-title .accent {
   <div class="scroll-indicator"><span class="line"></span><span>Scroll</span></div>
 </section>
 
+<!-- ⚡ MARQUEE DE GÉNEROS CLICKEABLES -->
 <div class="marquee-wrap">
   <div class="marquee">
-    <span class="marquee-item">Acción</span><span class="marquee-item">Aventura</span><span class="marquee-item">Isekai</span>
-    <span class="marquee-item">Romance</span><span class="marquee-item">Sci-Fi</span><span class="marquee-item">Mecha</span>
-    <span class="marquee-item">Shōnen</span><span class="marquee-item">Seinen</span><span class="marquee-item">Fantasía</span>
-    <span class="marquee-item">Slice of Life</span>
-    <span class="marquee-item">Acción</span><span class="marquee-item">Aventura</span><span class="marquee-item">Isekai</span>
-    <span class="marquee-item">Romance</span><span class="marquee-item">Sci-Fi</span><span class="marquee-item">Mecha</span>
-    <span class="marquee-item">Shōnen</span><span class="marquee-item">Seinen</span><span class="marquee-item">Fantasía</span>
-    <span class="marquee-item">Slice of Life</span>
+    <button class="marquee-item" data-genre="Acción">Acción</button>
+    <button class="marquee-item" data-genre="Aventura">Aventura</button>
+    <button class="marquee-item" data-genre="Isekai">Isekai</button>
+    <button class="marquee-item" data-genre="Romance">Romance</button>
+    <button class="marquee-item" data-genre="Ciencia ficción">Sci-Fi</button>
+    <button class="marquee-item" data-genre="Mecha">Mecha</button>
+    <button class="marquee-item" data-genre="Shōnen">Shōnen</button>
+    <button class="marquee-item" data-genre="Seinen">Seinen</button>
+    <button class="marquee-item" data-genre="Fantasía">Fantasía</button>
+    <button class="marquee-item" data-genre="Slice of Life">Slice of Life</button>
+    <button class="marquee-item" data-genre="Acción">Acción</button>
+    <button class="marquee-item" data-genre="Aventura">Aventura</button>
+    <button class="marquee-item" data-genre="Isekai">Isekai</button>
+    <button class="marquee-item" data-genre="Romance">Romance</button>
+    <button class="marquee-item" data-genre="Ciencia ficción">Sci-Fi</button>
+    <button class="marquee-item" data-genre="Mecha">Mecha</button>
+    <button class="marquee-item" data-genre="Shōnen">Shōnen</button>
+    <button class="marquee-item" data-genre="Seinen">Seinen</button>
+    <button class="marquee-item" data-genre="Fantasía">Fantasía</button>
+    <button class="marquee-item" data-genre="Slice of Life">Slice of Life</button>
   </div>
 </div>
 
@@ -3168,6 +3181,46 @@ const pwaNotif = document.getElementById('pwaNotif');
   document.getElementById('demographic-select')?.addEventListener('change', e => { currentFilters.demographic = e.target.value; cargarDatosYMostrar(); });
   document.getElementById('rating-select')?.addEventListener('change', e => { currentFilters.rating = e.target.value; cargarDatosYMostrar(); });
 
+  // ⚡ MARQUEE: click en género → filtra el catálogo
+  (function setupMarqueeGenreClicks() {
+    const genreSelect = document.getElementById('genre-select');
+    if (!genreSelect) return;
+
+    document.querySelectorAll('.marquee-item[data-genre]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const genre = btn.dataset.genre;
+        if (!genre) return;
+
+        const option = Array.from(genreSelect.options).find(o => o.value === genre);
+        if (!option) return;
+
+        genreSelect.value = genre;
+        currentFilters.genre = genre;
+
+        const trigger = genreSelect.previousElementSibling;
+        if (trigger && trigger.classList.contains('filter-trigger')) {
+          trigger.textContent = option.textContent;
+        }
+
+        currentPage = 1;
+        cargarDatosYMostrar();
+
+        setTimeout(() => {
+          const catalog = document.getElementById('catalog');
+          if (catalog) {
+            const y = catalog.getBoundingClientRect().top + window.scrollY - 80;
+            window.scrollTo({ top: y, behavior: 'smooth' });
+          }
+        }, 100);
+
+        if (typeof window.showToastSticker === 'function') {
+          try { window.showToastSticker('🎬 Filtrando: ' + option.textContent); } catch(_) {}
+        }
+      });
+    });
+  })();
+
   window.resetearFiltrosGlobal = function() {
     if (searchInput) searchInput.value = '';
     const gs = document.getElementById('genre-select'); const ds = document.getElementById('demographic-select'); const rs = document.getElementById('rating-select');
@@ -3380,12 +3433,7 @@ const pwaNotif = document.getElementById('pwaNotif');
   const fgCanvas = document.getElementById('fgCanvas');
   const fgCtx = fgCanvas ? fgCanvas.getContext('2d', { willReadFrequently: true }) : null;
 
-  // ============================================================================
-  // ⚡ CAMBIO 3 — Fluidez chroma según calidad seleccionada
-  //   fluida → 30 (lento, ahorra CPU) — como antes
-  //   media  → 12 (fluido normal)
-  //   alta   → 4  (muy fluido, más CPU)
-  // ============================================================================
+  // ⚡ Fluidez chroma según calidad seleccionada
   const IS_MOBILE_DEVICE_CHROMA = window.matchMedia('(max-width: 768px)').matches;
   const CHROMA_QUALITY = window.__archinimeConfig?.quality || 'media';
   const CHROMA_FRAME_SKIP = CHROMA_QUALITY === 'alta' ? 4 : (CHROMA_QUALITY === 'media' ? 12 : 30);
@@ -3527,7 +3575,7 @@ const pwaNotif = document.getElementById('pwaNotif');
     });
   }
 
-  log('🚀 Archinime NEXT v28 cargado · Chroma frame skip: ' + CHROMA_FRAME_SKIP + ' (calidad: ' + CHROMA_QUALITY + ')');
+  log('🚀 Archinime NEXT v28 cargado · Chroma skip: ' + CHROMA_FRAME_SKIP + ' (calidad: ' + CHROMA_QUALITY + ')');
 })();
 
 /* MOTION PLAYER — v28: SIN autoplay, video limpio */
