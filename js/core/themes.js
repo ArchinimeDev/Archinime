@@ -31,23 +31,23 @@
   const THEMES = {
 
     // =========================================================
-    // 🌌 GALAXY — TEMA POR DEFECTO (video + paleta cósmica)
+    // 🌌 GALAXY — TEMA POR DEFECTO (video + paleta neón cósmica)
     // =========================================================
     galaxy: {
       id: 'galaxy',
       name: 'Galaxy',
-      swatch: '#b47aff',
+      swatch: '#bf4dff',
       isDefault: true,
       bgVideo: 'https://cdn.jsdelivr.net/gh/ArchinimeDev/Archinime@main/assets/videos/galaxia.mp4',
       vars: {
-        // Violeta brillante — visible sobre el fondo morado pero no saturado
-        '--neon-1': '#b47aff',
-        // Cian brillante — contraste fuerte y limpio sobre la galaxia
-        '--neon-2': '#22d3ee',
-        // Rosa suave — antes era #ff1a6b que chocaba con el morado
-        '--neon-3': '#f472b6',
-        // Amarillo cálido — acento final
-        '--neon-4': '#fde047',
+        // Violeta neón puro — brilla con fuerza sobre el fondo morado
+        '--neon-1': '#bf4dff',
+        // Cian neón clásico — contraste fuerte y limpio sobre la galaxia
+        '--neon-2': '#00f0ff',
+        // Rosa neón intenso — vibrante, tipo hot pink fluorescente
+        '--neon-3': '#ff2eb8',
+        // Amarillo neón intenso — acento final brillante
+        '--neon-4': '#ffe600',
         // Fondo violeta muy oscuro, coherente con el video
         '--bg-deep': '#08051a'
       }
@@ -119,6 +119,11 @@
         will-change: opacity;
         background: #000;
         transform: translateZ(0);
+
+        /* 🎬 FILTRO UNIFICADO:
+           El video se ve IGUAL en fluida, media y alta.
+           Antes solo fluida tenía este filtro; ahora se aplica siempre. */
+        filter: brightness(0.55) saturate(1.05);
       }
       #${VIDEO_EL_ID}.active { opacity: 1; }
 
@@ -134,13 +139,6 @@
         ) !important;
       }
 
-      @media (max-width: 768px) {
-        #${VIDEO_EL_ID} { filter: brightness(0.72) saturate(1.12); }
-      }
-      html.low-end #${VIDEO_EL_ID},
-      [data-quality="fluida"] #${VIDEO_EL_ID} {
-        filter: brightness(0.55) saturate(1.05) !important;
-      }
       /* Accesibilidad: sin video si el usuario prefiere menos movimiento */
       @media (prefers-reduced-motion: reduce) {
         #${VIDEO_EL_ID} { display: none !important; }
