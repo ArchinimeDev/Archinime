@@ -1725,8 +1725,46 @@ window.showToastSticker = showToast;
 })();
 
 /* ============================================================
-   PWA — gestionada por ../js/components/pwa-handler.js
+   PWA
    ============================================================ */
+(function() {
+  const pwaNotif = document.getElementById('pwaNotif');
+  const pwaInstallBtn = document.getElementById('pwaInstallBtn');
+  const pwaCloseBtn = document.getElementById('pwaCloseBtn');
+  window.__deferredInstallPrompt = null;
+  const isStandalone = () => window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+  const isIos = () => /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const yaMostrada = sessionStorage.getItem('archinime_pwa_player_shown') === '1';
+
+  window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); window.__deferredInstallPrompt = e; });
+
+  function mostrarPwaNotif() {
+    if (!pwaNotif || isStandalone() || yaMostrada) return;
+    pwaNotif.classList.add('show');
+    sessionStorage.setItem('archinime_pwa_player_shown', '1');
+    setTimeout(() => pwaNotif.classList.remove('show'), 12000);
+  }
+  window.addEventListener('load', () => setTimeout(mostrarPwaNotif, 2500));
+  pwaCloseBtn?.addEventListener('click', () => pwaNotif.classList.remove('show'));
+
+  window.instalarPWA = async function() {
+    if (isStandalone()) { showToast('✅ La app ya está instalada'); return; }
+    if (isIos()) { alert('📲 En iOS: Comparte → "Añadir a pantalla de inicio"'); return; }
+    if (window.__deferredInstallPrompt) {
+      try {
+        window.__deferredInstallPrompt.prompt();
+        const choice = await window.__deferredInstallPrompt.userChoice;
+        if (choice && choice.outcome === 'accepted') {
+          window.__deferredInstallPrompt = null;
+          pwaNotif.classList.remove('show');
+        }
+      } catch(e) {}
+      return;
+    }
+    alert('📲 Instálala desde el menú de Chrome');
+  };
+  pwaInstallBtn?.addEventListener('click', () => window.instalarPWA());
+})();
 
 /* ============================================================
    SHARE
