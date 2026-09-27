@@ -721,21 +721,6 @@ body.cursor-hover .cursor-ring { width: 60px; height: 60px; border-color: var(--
 .cmd-item-shortcut { font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim); padding: 3px 8px; background: rgba(255,255,255,0.05); border-radius: 6px; }
 .cmd-footer { padding: 12px 22px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim); letter-spacing: 1px; text-transform: uppercase; }
 
-/* PWA */
-#pwaNotif { position: fixed; top: calc(72px + var(--safe-top)); left: 50%; transform: translate(-50%, -150%); background: linear-gradient(135deg, rgba(10,12,20,0.98), rgba(20,10,35,0.98)); border: 1px solid rgba(0,240,255,0.4); border-radius: 20px; padding: 16px 18px; display: flex; align-items: center; gap: 14px; box-shadow: 0 20px 60px rgba(0,0,0,0.8), 0 0 40px rgba(0,240,255,0.2); z-index: 10005; max-width: 90vw; width: 380px; transition: transform 0.6s cubic-bezier(0.19,1,0.22,1), opacity 0.4s; opacity: 0; pointer-events: none; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
-#pwaNotif.show { transform: translate(-50%, 0); opacity: 1; pointer-events: auto; }
-#pwaNotif .pwa-icon { width: 46px; height: 46px; border-radius: 14px; background: linear-gradient(135deg, #00f0ff, #b114ff); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; color: #04050a; flex-shrink: 0; box-shadow: 0 0 20px rgba(0,240,255,0.4); animation: pwaPulse 2s ease-in-out infinite; }
-@keyframes pwaPulse { 0%,100% { box-shadow: 0 0 20px rgba(0,240,255,0.4); } 50% { box-shadow: 0 0 35px rgba(0,240,255,0.7), 0 0 50px rgba(177,20,255,0.4); } }
-#pwaNotif .pwa-content { flex: 1; min-width: 0; }
-#pwaNotif .pwa-title { font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 0.82rem; color: #00f0ff; letter-spacing: 1px; margin-bottom: 2px; text-shadow: 0 0 12px rgba(0,240,255,0.5); }
-#pwaNotif .pwa-text { font-size: 0.75rem; color: #8a90a0; line-height: 1.3; }
-#pwaNotif .pwa-actions { display: flex; gap: 6px; flex-shrink: 0; }
-#pwaNotif .pwa-install-btn { background: linear-gradient(135deg, #00f0ff, #b114ff); color: #04050a; border: none; padding: 8px 14px; border-radius: 100px; font-family: 'Orbitron', sans-serif; font-weight: 800; font-size: 0.68rem; letter-spacing: 1px; transition: all 0.25s; white-space: nowrap; }
-#pwaNotif .pwa-install-btn:hover { transform: scale(1.05); box-shadow: 0 0 25px rgba(0,240,255,0.6); }
-#pwaNotif .pwa-close-btn { background: transparent; border: none; color: #8a90a0; font-size: 1rem; padding: 6px; transition: color 0.2s; align-self: flex-start; }
-#pwaNotif .pwa-close-btn:hover { color: #ff1a6b; }
-@media (max-width: 600px) { #pwaNotif { top: calc(60px + var(--safe-top)); width: calc(100vw - 24px); max-width: none; padding: 10px 12px; gap: 10px; border-radius: 16px; } #pwaNotif .pwa-icon { width: 34px; height: 34px; font-size: 1rem; border-radius: 10px; } #pwaNotif .pwa-title { font-size: 0.68rem; letter-spacing: 0.6px; } #pwaNotif .pwa-text { font-size: 0.6rem; line-height: 1.2; } #pwaNotif .pwa-install-btn { padding: 6px 12px; font-size: 0.6rem; } #pwaNotif .pwa-close-btn { font-size: 0.85rem; padding: 4px; position: absolute; top: 4px; right: 4px; } #pwaNotif .pwa-content { padding-right: 16px; } }
-
 #toast, #toastSticker, #toastComent { position: fixed; bottom: calc(100px + var(--safe-bottom)); left: 50%; transform: translateX(-50%); background: #0f0f13; color: var(--neon-1); padding: 12px 25px; border-radius: 30px; z-index: 1001; font-weight: bold; box-shadow: 0 0 20px color-mix(in srgb, var(--neon-1) 50%, transparent); border: 1px solid var(--neon-1); display: none; max-width: 90vw; text-align: center; font-size: 0.85rem; }
 
 .ripple { position: fixed; width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--neon-1); pointer-events: none; z-index: 99998; transform: translate(-50%,-50%) scale(0); animation: rippleAnim 0.8s var(--ease-out-expo) forwards; }
@@ -837,8 +822,6 @@ html[data-quality="fluida"] .nav-status .status-led { animation: none !important
 .cursor-dot { box-shadow: 0 0 calc(12px * var(--q-neon-glow)) var(--neon-1) !important; }
 html[data-quality="fluida"] .cursor-dot { box-shadow: none !important; }
 html[data-quality="fluida"] .cyber-btn-icon:hover, html[data-quality="fluida"] .config-nav-btn:hover { box-shadow: none !important; transform: none !important; }
-html[data-quality="fluida"] #pwaNotif { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; box-shadow: 0 10px 30px rgba(0,0,0,0.6) !important; }
-html[data-quality="fluida"] #pwaNotif .pwa-icon { animation: none !important; box-shadow: none !important; }
 html[data-quality="fluida"] .loader-logo path, html[data-quality="fluida"] .loader-logo circle, html[data-quality="fluida"] .loader-logo line { filter: none !important; }
 html[data-quality="fluida"] .loader-progress-bar, html[data-quality="fluida"] .progress-bar { box-shadow: none !important; }
 html[data-quality="fluida"] .back-btn:hover, html[data-quality="fluida"] .nav-btn:hover, html[data-quality="fluida"] #downloadBtn:hover { transform: none !important; box-shadow: none !important; }
@@ -1154,15 +1137,11 @@ html[data-quality="fluida"] .enviar-comentario-btn:hover, html[data-quality="flu
   </div>
 </div>
 
-<div id="pwaNotif">
-  <div class="pwa-icon"><i class="fas fa-rocket"></i></div>
-  <div class="pwa-content">
-    <div class="pwa-title">INSTALA ARCHINIME</div>
-    <div class="pwa-text">Acceso rápido desde tu pantalla de inicio</div>
-  </div>
-  <div class="pwa-actions"><button class="pwa-install-btn" id="pwaInstallBtn">Instalar</button></div>
-  <button class="pwa-close-btn" id="pwaCloseBtn" aria-label="Cerrar"><i class="fas fa-times"></i></button>
-</div>
+<!--
+  ℹ️ NO hay <div id="pwaNotif"> en el reproductor.
+  La notificación PWA solo aparece en index.html y anime-detail.html.
+  El reproductor se enfoca únicamente en el video y los comentarios.
+-->
 
 <div id="stageContainer">
   <div id="fgContainer">
@@ -1725,46 +1704,11 @@ window.showToastSticker = showToast;
 })();
 
 /* ============================================================
-   PWA
+   PWA — NO se muestra en el reproductor.
+   El <div id="pwaNotif"> fue eliminado de este HTML.
+   La gestión vive en ../js/components/pwa-handler.js
+   y se activa solo en index.html y anime-detail.html
    ============================================================ */
-(function() {
-  const pwaNotif = document.getElementById('pwaNotif');
-  const pwaInstallBtn = document.getElementById('pwaInstallBtn');
-  const pwaCloseBtn = document.getElementById('pwaCloseBtn');
-  window.__deferredInstallPrompt = null;
-  const isStandalone = () => window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
-  const isIos = () => /iphone|ipad|ipod/i.test(navigator.userAgent);
-  const yaMostrada = sessionStorage.getItem('archinime_pwa_player_shown') === '1';
-
-  window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); window.__deferredInstallPrompt = e; });
-
-  function mostrarPwaNotif() {
-    if (!pwaNotif || isStandalone() || yaMostrada) return;
-    pwaNotif.classList.add('show');
-    sessionStorage.setItem('archinime_pwa_player_shown', '1');
-    setTimeout(() => pwaNotif.classList.remove('show'), 12000);
-  }
-  window.addEventListener('load', () => setTimeout(mostrarPwaNotif, 2500));
-  pwaCloseBtn?.addEventListener('click', () => pwaNotif.classList.remove('show'));
-
-  window.instalarPWA = async function() {
-    if (isStandalone()) { showToast('✅ La app ya está instalada'); return; }
-    if (isIos()) { alert('📲 En iOS: Comparte → "Añadir a pantalla de inicio"'); return; }
-    if (window.__deferredInstallPrompt) {
-      try {
-        window.__deferredInstallPrompt.prompt();
-        const choice = await window.__deferredInstallPrompt.userChoice;
-        if (choice && choice.outcome === 'accepted') {
-          window.__deferredInstallPrompt = null;
-          pwaNotif.classList.remove('show');
-        }
-      } catch(e) {}
-      return;
-    }
-    alert('📲 Instálala desde el menú de Chrome');
-  };
-  pwaInstallBtn?.addEventListener('click', () => window.instalarPWA());
-})();
 
 /* ============================================================
    SHARE
