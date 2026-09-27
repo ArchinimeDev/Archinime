@@ -1138,9 +1138,8 @@ html[data-quality="fluida"] .enviar-comentario-btn:hover, html[data-quality="flu
 </div>
 
 <!--
-  ℹ️ NO hay <div id="pwaNotif"> en el reproductor.
-  La notificación PWA solo aparece en index.html y anime-detail.html.
-  El reproductor se enfoca únicamente en el video y los comentarios.
+  Nota: se eliminó por completo el bloque <div id="pwaNotif">...</div>
+  (notificación emergente de instalación PWA que rompía el diseño).
 -->
 
 <div id="stageContainer">
@@ -1704,10 +1703,10 @@ window.showToastSticker = showToast;
 })();
 
 /* ============================================================
-   PWA — NO se muestra en el reproductor.
-   El <div id="pwaNotif"> fue eliminado de este HTML.
-   La gestión vive en ../js/components/pwa-handler.js
-   y se activa solo en index.html y anime-detail.html
+   ❌ BLOQUE PWA ELIMINADO
+   La notificación emergente #pwaNotif fue removida del HTML
+   y toda la lógica de instalación/mostrado fue eliminada.
+   No aparece ninguna ventana emergente automática.
    ============================================================ */
 
 /* ============================================================
