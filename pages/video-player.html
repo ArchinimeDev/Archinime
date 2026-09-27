@@ -966,13 +966,6 @@ body.cursor-hover .cursor-ring { width: 60px; height: 60px; border-color: var(--
 #configModal .config-detected i { font-size: 0.6rem; }
 #configModal .config-save { width: 100%; margin-top: 8px; padding: 14px; border-radius: 100px; background: linear-gradient(135deg, #00f0ff, #b114ff); color: #04050a; font-family: 'Orbitron', sans-serif; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; border: none; cursor: pointer; transition: all 0.25s; box-shadow: 0 0 30px rgba(0,240,255,0.35); }
 #configModal .config-save:hover { transform: translateY(-2px); box-shadow: 0 10px 40px rgba(0,240,255,0.5); color: #fff; }
-#configModal .config-theme-dots { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-#configModal .config-theme-dot { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 14px 10px; border-radius: 14px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); cursor: pointer; transition: all 0.25s; color: #8a90a0; }
-#configModal .config-theme-dot:hover { transform: translateY(-2px); border-color: rgba(0,240,255,0.3); }
-#configModal .config-theme-dot.active { border-color: #00f0ff; background: rgba(0,240,255,0.08); color: #fff; box-shadow: 0 0 20px rgba(0,240,255,0.2); }
-#configModal .config-theme-swatch { width: 28px; height: 28px; border-radius: 50%; box-shadow: 0 0 12px currentColor; flex-shrink: 0; border: 2px solid rgba(255,255,255,0.15); }
-#configModal .config-theme-dot.active .config-theme-swatch { border-color: #fff; }
-#configModal .config-theme-name { font-family: 'Orbitron', sans-serif; font-size: 0.68rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
 
 /* ============================================
    PWA
@@ -1263,7 +1256,7 @@ html[data-quality="fluida"] #particles { display: none !important; }
             <label for="stickerFileInput" class="upload-sticker-label">
               <i class="fas fa-cloud-upload-alt"></i> Seleccionar archivo
             </label>
-            <input type="file" id="stickerFileInput" accept="image/*,video/mp4,video/webm" style="display:none" onchange="window.procesarArchivoSticker(this.files[0])">
+            <input type="file" id="stickerFileInput" accept="image/*,video/mp4,video/webm" style="display:none" onchange="window.procesarArchivoSticker && window.procesarArchivoSticker(this.files[0])">
             <div id="stickerPreview" style="display:none; margin-top:10px;">
               <img id="previewImage" style="display:none; max-width:150px; border-radius:12px;">
               <video id="previewVideo" autoplay loop muted playsinline style="display:none; max-width:150px; border-radius:12px;"></video>
@@ -1417,17 +1410,7 @@ html[data-quality="fluida"] #particles { display: none !important; }
 <script src="../js/components/stickers-system.js"></script>
 <script src="../js/components/reacciones.js"></script>
 <script src="../js/components/comentarios.js"></script>
-<script src="../js/pages/video-player-core.js?v=20250413"></script>
-
-<script>
-  (function() {
-    try {
-      if (typeof videoList !== 'undefined' && Array.isArray(videoList)) {
-        window.videoList = videoList;
-      }
-    } catch (e) {}
-  })();
-</script>
+<script src="../js/pages/video-player-core.js"></script>
 
 <script>
 /* ============================================================
@@ -1645,8 +1628,7 @@ window.showToastSticker = showToast;
 
   let mx = window.innerWidth / 2, my = window.innerHeight / 2;
   let rx = mx, ry = my, dx = mx, dy = my;
-  let running = false;
-  let lastMove = 0;
+  let running = false, lastMove = 0;
 
   function loop() {
     dx += (mx - dx) * 0.55; dy += (my - dy) * 0.55;
@@ -1654,11 +1636,8 @@ window.showToastSticker = showToast;
     dot.style.transform = `translate(${dx}px, ${dy}px) translate(-50%, -50%)`;
     ring.style.transform = `translate(${rx}px, ${ry}px) translate(-50%, -50%)`;
     const dist = Math.abs(mx - dx) + Math.abs(my - dy) + Math.abs(mx - rx) + Math.abs(my - ry);
-    if (dist > 0.5 || performance.now() - lastMove < 200) {
-      requestAnimationFrame(loop);
-    } else {
-      running = false;
-    }
+    if (dist > 0.5 || performance.now() - lastMove < 200) requestAnimationFrame(loop);
+    else running = false;
   }
 
   window.addEventListener('mousemove', e => {
@@ -1710,9 +1689,7 @@ window.showToastSticker = showToast;
     });
   }
 
-  let paused = false;
-  let rafId = null;
-
+  let paused = false, rafId = null;
   function animate() {
     if (paused) { rafId = null; return; }
     ctx.clearRect(0, 0, W, H);
@@ -1854,7 +1831,6 @@ window.showToastSticker = showToast;
   });
   loginBtnItem?.addEventListener('click', () => {
     if (typeof window.showAuthModal === 'function') window.showAuthModal();
-    else if (typeof openAuthModal === 'function') openAuthModal();
   });
   profileDropdownBtn?.addEventListener('click', () => {
     if (typeof window.showProfileModal === 'function') window.showProfileModal();
@@ -1922,275 +1898,7 @@ if ('serviceWorker' in navigator) {
   });
 }
 
-console.log('%c✅ Archinime Player v28.8 · Quality: ' + (window.__archinimeConfig?.quality || 'media'), 'color:#00f0ff;font-family:monospace;font-weight:bold;');
-</script>
-
-<script>
-/* ============================================================
-   VIDEO PLAYER CORE FALLBACK (si el módulo no está disponible)
-   Mantiene: selector de servidores, prev/next, descarga,
-   reproducción por iframe/video, título y sincronización con
-   el sistema de comentarios/stickers.
-   ============================================================ */
-(function() {
-  'use strict';
-  const $ = (s, p = document) => p.querySelector(s);
-  const $$ = (s, p = document) => Array.from(p.querySelectorAll(s));
-
-  // Estado del reproductor
-  const state = {
-    animes: (typeof catalogoArray !== 'undefined' && Array.isArray(catalogoArray)) ? catalogoArray : [],
-    currentAnimeId: null,
-    currentSeasonIdx: 0,
-    currentEpIdx: 0,
-    currentServerIdx: 0
-  };
-
-  // Esperar a que el DOM esté listo
-  function init() {
-    const params = new URLSearchParams(window.location.search);
-    const animeId = params.get('id') || params.get('anime') || null;
-    const seasonParam = parseInt(params.get('season') || '0', 10) || 0;
-    const epParam = parseInt(params.get('ep') || params.get('episodio') || '0', 10) || 0;
-
-    if (!state.animes || state.animes.length === 0) {
-      state.currentAnimeId = animeId;
-      // No hay catálogo, al menos intentar cargar desde comentarios
-      if (window.videoPlayerCore && typeof window.videoPlayerCore.init === 'function') {
-        // Ya fue inicializado por el módulo externo
-      }
-      return;
-    }
-
-    // Buscar el anime
-    let anime = null;
-    if (animeId) {
-      anime = state.animes.find(a => String(a.id) === String(animeId));
-    }
-    if (!anime) anime = state.animes[0];
-
-    state.currentAnimeId = anime.id;
-
-    // Determinar temporada/episodio
-    let season = null;
-    if (anime.seasons && anime.seasons.length > 0) {
-      state.currentSeasonIdx = Math.min(seasonParam, anime.seasons.length - 1);
-      season = anime.seasons[state.currentSeasonIdx];
-      if (season.eps && season.eps.length > 0) {
-        state.currentEpIdx = Math.min(epParam, season.eps.length - 1);
-      }
-    }
-
-    // Exponer para scripts externos (video-player-core.js)
-    window.__playerState = state;
-    window.__playerAnime = anime;
-
-    // Si el módulo externo ya inicializó todo, no hacer nada más
-    if (window.__playerModuleReady) return;
-
-    // Construir selector de servidores e información básica
-    buildServerOptions(anime, season);
-    buildEpisodeNav(anime, season);
-    loadEpisode(anime, season, state.currentEpIdx, state.currentServerIdx);
-  }
-
-  function buildServerOptions(anime, season) {
-    const opts = $('#serverOptions');
-    if (!opts) return;
-    opts.innerHTML = '';
-    const serverSel = document.createElement('select');
-    serverSel.id = 'serverSelect';
-    serverSel.setAttribute('aria-label', 'Servidor');
-
-    let servers = [];
-    if (season && season.eps && season.eps[state.currentEpIdx] && season.eps[state.currentEpIdx].servers) {
-      servers = season.eps[state.currentEpIdx].servers;
-    } else if (season && season.eps && season.eps[state.currentEpIdx] && season.eps[state.currentEpIdx].links) {
-      servers = season.eps[state.currentEpIdx].links;
-    } else if (anime && anime.servers) {
-      servers = anime.servers;
-    } else if (anime && anime.links) {
-      servers = anime.links;
-    }
-
-    if (!servers || servers.length === 0) {
-      const o = document.createElement('option');
-      o.textContent = 'Servidor único';
-      o.value = '';
-      serverSel.appendChild(o);
-    } else {
-      servers.forEach((s, i) => {
-        const o = document.createElement('option');
-        const label = s.name || s.server || s.title || `Servidor ${i + 1}`;
-        o.textContent = label;
-        o.value = String(i);
-        serverSel.appendChild(o);
-      });
-    }
-    opts.appendChild(serverSel);
-
-    serverSel.addEventListener('change', () => {
-      state.currentServerIdx = parseInt(serverSel.value, 10) || 0;
-      loadEpisode(anime, season, state.currentEpIdx, state.currentServerIdx);
-    });
-  }
-
-  function buildEpisodeNav(anime, season) {
-    const prev = $('#prevBtn');
-    const next = $('#nextBtn');
-    const totalEps = (season && season.eps) ? season.eps.length : 0;
-
-    if (!totalEps || totalEps <= 1) {
-      prev.classList.add('btn-hidden');
-      next.classList.add('btn-hidden');
-      return;
-    }
-
-    prev.classList.remove('btn-hidden');
-    next.classList.remove('btn-hidden');
-
-    prev.classList.toggle('btn-hidden', state.currentEpIdx <= 0);
-    next.classList.toggle('btn-hidden', state.currentEpIdx >= totalEps - 1);
-
-    prev.onclick = (e) => {
-      e.preventDefault();
-      if (state.currentEpIdx > 0) {
-        state.currentEpIdx--;
-        location.href = buildUrl(anime.id, state.currentSeasonIdx, state.currentEpIdx);
-      }
-    };
-    next.onclick = (e) => {
-      e.preventDefault();
-      if (state.currentEpIdx < totalEps - 1) {
-        state.currentEpIdx++;
-        location.href = buildUrl(anime.id, state.currentSeasonIdx, state.currentEpIdx);
-      }
-    };
-  }
-
-  function buildUrl(id, season, ep) {
-    const url = new URL(window.location.href);
-    url.searchParams.set('id', id);
-    if (season > 0) url.searchParams.set('season', season);
-    if (ep > 0) url.searchParams.set('ep', ep);
-    return url.pathname + '?' + url.searchParams.toString();
-  }
-
-  function loadEpisode(anime, season, epIdx, serverIdx) {
-    const media = $('#mediaContainer');
-    if (!media) return;
-
-    const epData = (season && season.eps && season.eps[epIdx]) ? season.eps[epIdx] : null;
-    const title = (epData && (epData.title || epData.name)) ? `${anime.title} · ${epData.title}` : (epData && epData.name ? epData.name : (anime.title || 'Reproduciendo'));
-    const titleEl = $('#epTitle');
-    if (titleEl) titleEl.textContent = title;
-    document.title = title + ' · ARCHINIME';
-
-    // Limpiar
-    media.innerHTML = '';
-
-    let server = null;
-    if (epData) {
-      const servers = epData.servers || epData.links || [];
-      if (servers.length > 0) {
-        server = servers[Math.min(serverIdx, servers.length - 1)];
-      }
-    }
-
-    if (!server) {
-      // Sin fuente: mostrar mensaje
-      const msg = document.createElement('div');
-      msg.style.cssText = 'display:flex;align-items:center;justify-content:center;color:#8a90a0;font-family:var(--font-mono);font-size:0.85rem;height:100%;text-align:center;padding:20px;';
-      msg.innerHTML = '<div><i class="fas fa-satellite-dish" style="font-size:2rem;color:var(--neon-1);display:block;margin-bottom:12px;"></i>Fuente no disponible todavía</div>';
-      media.appendChild(msg);
-      updateDownload(anime, epData, null);
-      return;
-    }
-
-    const url = typeof server === 'string' ? server : (server.url || server.src || server.embed);
-    const type = typeof server === 'string' ? 'iframe' : (server.type || 'iframe');
-
-    if (!url) return;
-
-    if (type === 'video' || /\.(mp4|webm|m3u8)(\?|$)/i.test(url)) {
-      const v = document.createElement('video');
-      v.src = url;
-      v.controls = true;
-      v.playsInline = true;
-      v.preload = 'metadata';
-      v.style.cssText = 'width:100%;height:100%;background:#000;';
-      media.appendChild(v);
-    } else {
-      const iframe = document.createElement('iframe');
-      iframe.src = url;
-      iframe.allowFullscreen = true;
-      iframe.setAttribute('allow', 'autoplay; fullscreen; encrypted-media; picture-in-picture');
-      iframe.setAttribute('referrerpolicy', 'no-referrer');
-      iframe.style.cssText = 'width:100%;height:100%;border:none;';
-      media.appendChild(iframe);
-    }
-
-    updateDownload(anime, epData, url);
-  }
-
-  function updateDownload(anime, epData, url) {
-    const btn = $('#downloadBtn');
-    if (!btn) return;
-    const dl = (epData && (epData.download || epData.dl)) || (anime && anime.download) || url;
-    if (dl && typeof dl === 'string') {
-      btn.style.display = '';
-      btn.onclick = () => window.open(dl, '_blank', 'noopener');
-    } else {
-      btn.style.display = 'none';
-    }
-  }
-
-  // Marcar cuando el módulo externo esté listo
-  window.addEventListener('load', () => {
-    // Dar tiempo al módulo externo para inicializar
-    setTimeout(() => {
-      if (window.videoPlayerCore && window.__playerModuleReady) {
-        // El módulo externo gestiona todo
-        return;
-      }
-      init();
-    }, 300);
-  });
-})();
-
-/* Drag & Drop para stickers (siempre activo como fallback) */
-(function() {
-  const dropZone = document.getElementById('dragDropZone');
-  const fileInput = document.getElementById('stickerFileInput');
-  if (!dropZone || !fileInput) return;
-
-  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-    document.body.addEventListener(eventName, preventDefaults, false);
-  });
-  function preventDefaults(e) { e.preventDefault(); e.stopPropagation(); }
-  ['dragenter', 'dragover'].forEach(eventName => {
-    dropZone.addEventListener(eventName, () => dropZone.classList.add('drag-over'), false);
-  });
-  ['dragleave', 'drop'].forEach(eventName => {
-    dropZone.addEventListener(eventName, () => dropZone.classList.remove('drag-over'), false);
-  });
-  dropZone.addEventListener('drop', handleDrop, false);
-  function handleDrop(e) {
-    preventDefaults(e);
-    const files = e.dataTransfer.files;
-    if (files.length > 0) {
-      const file = files[0];
-      if (file.type.startsWith('image/') || file.type.startsWith('video/')) {
-        if (typeof window.procesarArchivoSticker === 'function') window.procesarArchivoSticker(file);
-        else if (window.videoPlayer?.procesarArchivoSticker) window.videoPlayer.procesarArchivoSticker(file);
-      } else {
-        alert('Solo se permiten imágenes o videos.');
-      }
-    }
-  }
-})();
-
-/* Extras: Ctrl+Enter para enviar comentario */
+/* Ctrl+Enter para enviar comentario */
 document.addEventListener('DOMContentLoaded', () => {
   const ta = document.getElementById('comentarioTexto');
   if (ta) {
@@ -2202,6 +1910,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 });
+
+console.log('%c✅ Archinime Player v28.8 · Quality: ' + (window.__archinimeConfig?.quality || 'media'), 'color:#00f0ff;font-family:monospace;font-weight:bold;');
 </script>
 
 </body>
