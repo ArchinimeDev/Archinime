@@ -62,6 +62,286 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script>
 
+<!--
+  ⚠️ ANTI-AD BLOCKER (head)
+  Se ejecuta lo antes posible para:
+   - Interceptar window.open (popups/popunders)
+   - Bloquear redirects y links publicitarios
+   - Observar el DOM y eliminar ads inyectados en tiempo real
+   NO toca iframes del reproductor ni componentes propios de Archinime.
+-->
+<script>
+(function() {
+  'use strict';
+  if (window.__ARCHINIME_ANTIAD__) return;
+  window.__ARCHINIME_ANTIAD__ = true;
+
+  /* ============================================================
+     1. BLOQUEO DE window.open (POPUPS / POPUNDERS)
+     ============================================================ */
+  const blockOpen = function() {
+    try { console.warn('[AntiAd] window.open bloqueado'); } catch(e) {}
+    return null;
+  };
+  try {
+    Object.defineProperty(window, 'open', {
+      value: blockOpen, writable: false, configurable: false
+    });
+  } catch(e) {
+    try { window.open = blockOpen; } catch(_) {}
+  }
+
+  /* ============================================================
+     2. BLOQUEO DE REDIRECTS MALICIOSOS (top-level hijack)
+     ============================================================ */
+  try {
+    const origAssign = window.location.assign.bind(window.location);
+    const origReplace = window.location.replace.bind(window.location);
+    const BAD_URL_RE = /(popads|propeller|adf\.ly|shorte\.st|linkvertise|onclickads|onclickalgo|ad-?maven|bidvertiser|zeropark|popcash|clickaine|doubleclick|googlesyndication|exoclick|juicyads|trafficjunky|adsterra|hilltopads|adcash|clickadu|mgid|revcontent|taboola|outbrain)/i;
+    Object.defineProperty(window.location, 'assign', {
+      value: function(url) {
+        if (BAD_URL_RE.test(String(url))) { console.warn('[AntiAd] assign bloqueado:', url); return; }
+        return origAssign(url);
+      }, writable: false, configurable: true
+    });
+    Object.defineProperty(window.location, 'replace', {
+      value: function(url) {
+        if (BAD_URL_RE.test(String(url))) { console.warn('[AntiAd] replace bloqueado:', url); return; }
+        return origReplace(url);
+      }, writable: false, configurable: true
+    });
+  } catch(e) {}
+
+  /* ============================================================
+     3. LISTA DE REDES / PATRONES DE ADS
+     ============================================================ */
+  const AD_IFRAME_HOSTS = [
+    'doubleclick.net', 'googlesyndication.com', 'adservice.google',
+    'popads.net', 'popcash.net', 'propellerads', 'propellerpops',
+    'adnxs.com', 'adsystem', 'exoclick', 'juicyads', 'trafficjunky',
+    'taboola', 'outbrain', 'revcontent', 'mgid.com', 'zergnet',
+    'adcash', 'clickadu', 'hilltopads', 'adsterra', 'onclickads',
+    'onclickalgo', 'ad-maven', 'admaven', 'bidvertiser', 'zeropark',
+    'popmyads', 'clickaine', 'adf.ly', 'shorte.st', 'linkvertise',
+    'revenuehits', 'adfoc.us', 'adprovider', 'adspyglass', 'adspy',
+    'poptm.com', 'popmyads.com', 'poptm', 'popmonetizer',
+    'monetizemore', 'clickadu.com', 'adcash.com', 'trafficshop',
+    'adnetwork', 'adsrvr', 'adroll', 'criteo', 'smartadserver',
+    'rubiconproject', 'pubmatic', 'openx.net', 'yieldmo',
+    'sharethrough', 'teads.tv', 'spotxchange', 'districtm'
+  ];
+
+  const AD_ID_RE = /^(ad|ads|adv|advert|banner|popunder|interstitial|google_ads|div-gpt-ad|aswift|sponsor|promo[-_]?ad)\b|[-_](ad|ads|advert|popunder|interstitial|banner)$|advert|popunder|interstitial/i;
+  const AD_CLASS_RE = /(^|\s)(ad|ads|adv|advert|advertisement|popunder|interstitial|ad[-_]?overlay|ad[-_]?container|ad[-_]?wrapper|adsbygoogle|google[-_]?ad|banner[-_]?ad|ad[-_]?banner|sponsored[-_]?ad|promo[-_]?ad)(\s|$|[-_])/i;
+
+  const PROTECTED_SELECTOR = [
+    '.nav', '.cmd-overlay', '.auth-modal', '.profile-modal',
+    '#configModal', '#pwaNotif', '#loader', '.comentarios-section',
+    '#stageContainer', '.logo-blocker', '.hud-frame', '#mediaContainer',
+    '#playerContainer', '#playerWrapper', '.player-wrapper',
+    '.container', '.bg-layer', '.grid-floor', '.noise', '.vignette',
+    '.cursor-dot', '.cursor-ring', '#particles', '.scanlines',
+    '.progress-bar', '.controls', '.top-bar', '.comentarios-list',
+    '#toast', '#toastSticker', '#toastComent'
+  ].join(',');
+
+  /* ============================================================
+     4. DETECCIÓN DE ANUNCIOS
+     ============================================================ */
+  function isProtected(el) {
+    if (!el || !el.closest) return false;
+    try {
+      if (el.matches && el.matches(PROTECTED_SELECTOR)) return true;
+      if (el.closest('.nav, .cmd-overlay, .auth-modal, .profile-modal, #configModal, #pwaNotif, #loader, .comentarios-section, #stageContainer, .logo-blocker')) return true;
+    } catch(e) {}
+    return false;
+  }
+
+  function isVideoIframe(el) {
+    if (!el || el.tagName !== 'IFRAME') return false;
+    try { return !!el.closest('#mediaContainer, .player-wrapper'); } catch(e) { return false; }
+  }
+
+  function looksLikeAd(el) {
+    if (!el || el.nodeType !== 1) return false;
+    const tag = el.tagName;
+    if (tag === 'SCRIPT' || tag === 'STYLE' || tag === 'LINK' || tag === 'META' || tag === 'HEAD' || tag === 'HTML') return false;
+    if (isProtected(el)) return false;
+    if (tag === 'IFRAME' && isVideoIframe(el)) return false;
+
+    const id  = (el.id || '').toString();
+    let cls = '';
+    if (typeof el.className === 'string') cls = el.className;
+    else if (el.getAttribute) cls = el.getAttribute('class') || '';
+
+    // Iframes publicitarios
+    if (tag === 'IFRAME') {
+      const src = ((el.src || '') + ' ' + (el.getAttribute('data-src') || '') + ' ' + (el.getAttribute('srcdoc') || '')).toLowerCase();
+      if (src.trim()) {
+        for (const h of AD_IFRAME_HOSTS) if (src.includes(h)) return true;
+      } else {
+        // Iframe vacío inyectado directo al body → sospechoso
+        const p = el.parentElement;
+        if (p && (p === document.body || p.tagName === 'HTML')) return true;
+      }
+      // Iframe con tamaño 0x0 o display:none inyectado (tracker/redirect)
+      try {
+        const cs = getComputedStyle(el);
+        if ((cs.display === 'none' || cs.visibility === 'hidden') && !isVideoIframe(el)) {
+          if (!el.closest('.player-wrapper, .container, .nav')) return true;
+        }
+      } catch(e) {}
+    }
+
+    // ID con pinta de ad
+    if (id && AD_ID_RE.test(id)) {
+      // Excepciones explícitas de la app
+      if (!/^(adaptive|adapter|address|admin|advertise|advertisement-app|advance)/i.test(id)) return true;
+    }
+
+    // Clase con pinta de ad
+    if (cls && AD_CLASS_RE.test(cls)) return true;
+
+    // Links / anchors sospechosos
+    if (tag === 'A') {
+      const href = (el.href || '').toLowerCase();
+      if (href) {
+        for (const h of AD_IFRAME_HOSTS) if (href.includes(h)) return true;
+      }
+    }
+
+    // Overlays de clickjacking (fixed, fullscreen, transparentes, z-index alto)
+    if ((tag === 'DIV' || tag === 'SECTION' || tag === 'A' || tag === 'INS' || tag === 'SPAN') &&
+        (el.parentElement === document.body || (el.parentElement && el.parentElement.tagName === 'HTML'))) {
+      try {
+        const cs = getComputedStyle(el);
+        if (cs.position === 'fixed' || cs.position === 'absolute') {
+          const w = el.offsetWidth || 0;
+          const h = el.offsetHeight || 0;
+          const z = parseInt(cs.zIndex, 10) || 0;
+          const vw = window.innerWidth, vh = window.innerHeight;
+          if (w >= vw * 0.85 && h >= vh * 0.85 && z > 900) {
+            const bg = (cs.backgroundColor || '').replace(/\s/g, '');
+            const transparent = bg === 'transparent' || bg === 'rgba(0,0,0,0)' || cs.opacity === '0';
+            if (transparent) return true; // clickjacker típico
+          }
+        }
+      } catch(e) {}
+    }
+
+    // <ins> de Google Adsense
+    if (tag === 'INS' && (cls.includes('adsbygoogle') || el.getAttribute('data-ad-client') || el.getAttribute('data-ad-slot'))) return true;
+
+    return false;
+  }
+
+  function killAd(el) {
+    try {
+      if (el.parentNode) el.parentNode.removeChild(el);
+      else if (el.remove) el.remove();
+    } catch(e) {
+      try { el.style.setProperty('display','none','important'); } catch(_) {}
+    }
+  }
+
+  function scanTree(root) {
+    if (!root || root.nodeType !== 1) return 0;
+    let killed = 0;
+    if (looksLikeAd(root)) { killAd(root); return 1; }
+    let all;
+    try { all = root.querySelectorAll ? root.querySelectorAll('*') : []; } catch(e) { all = []; }
+    for (const el of all) {
+      if (looksLikeAd(el)) { killAd(el); killed++; }
+    }
+    return killed;
+  }
+
+  /* ============================================================
+     5. MUTATION OBSERVER (elimina ads en tiempo real)
+     ============================================================ */
+  const observer = new MutationObserver(function(mutations) {
+    for (const m of mutations) {
+      if (m.type === 'childList' && m.addedNodes && m.addedNodes.length) {
+        for (const n of m.addedNodes) {
+          if (n && n.nodeType === 1) scanTree(n);
+        }
+      } else if (m.type === 'attributes' && m.target && m.target.nodeType === 1) {
+        if (looksLikeAd(m.target)) killAd(m.target);
+      }
+    }
+  });
+
+  function startObserver() {
+    if (!document.body) return;
+    try {
+      observer.observe(document.body, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['src', 'href', 'style', 'class', 'id']
+      });
+    } catch(e) {}
+    scanTree(document.body);
+  }
+
+  if (document.body) startObserver();
+  else document.addEventListener('DOMContentLoaded', startObserver);
+
+  // Escaneo periódico de seguridad (por si algo esquiva al observer)
+  let ticks = 0;
+  const periodic = setInterval(function() {
+    if (document.hidden) return;
+    if (document.body) scanTree(document.body);
+    if (++ticks > 200) clearInterval(periodic); // ~10 min
+  }, 3000);
+
+  /* ============================================================
+     6. INTERCEPCIÓN DE CLICS SOSPECHOSOS (clickjacking / open new tab)
+     ============================================================ */
+  document.addEventListener('click', function(e) {
+    // Interceptar clicks en anchors con target=_blank a dominios de ads
+    const a = e.target && e.target.closest ? e.target.closest('a[target="_blank"]') : null;
+    if (a) {
+      const href = (a.href || '').toLowerCase();
+      for (const h of AD_IFRAME_HOSTS) {
+        if (href.includes(h)) {
+          e.preventDefault();
+          e.stopPropagation();
+          e.stopImmediatePropagation();
+          console.warn('[AntiAd] Link ad bloqueado:', href);
+          return;
+        }
+      }
+    }
+    // Interceptar clicks sobre overlays transparentes inyectados
+    const t = e.target;
+    if (t && t.nodeType === 1 && t !== document.body && t !== document.documentElement) {
+      if (looksLikeAd(t)) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        killAd(t);
+      }
+    }
+  }, true);
+
+  /* ============================================================
+     7. BLOQUEO DE IFRAMES DE ADS EN CARGA
+     ============================================================ */
+  document.addEventListener('load', function(e) {
+    const t = e.target;
+    if (t && t.tagName === 'IFRAME' && !isVideoIframe(t) && looksLikeAd(t)) killAd(t);
+  }, true);
+
+  /* ============================================================
+     8. LOG
+     ============================================================ */
+  try {
+    console.log('%c🛡️ AntiAd Blocker activo', 'color:#7dff5c;font-family:monospace;font-weight:bold;');
+  } catch(e) {}
+})();
+</script>
+
 <style>
 /* ============================================
    THEMES v28
@@ -721,6 +1001,21 @@ body.cursor-hover .cursor-ring { width: 60px; height: 60px; border-color: var(--
 .cmd-item-shortcut { font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim); padding: 3px 8px; background: rgba(255,255,255,0.05); border-radius: 6px; }
 .cmd-footer { padding: 12px 22px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim); letter-spacing: 1px; text-transform: uppercase; }
 
+/* PWA */
+#pwaNotif { position: fixed; top: calc(72px + var(--safe-top)); left: 50%; transform: translate(-50%, -150%); background: linear-gradient(135deg, rgba(10,12,20,0.98), rgba(20,10,35,0.98)); border: 1px solid rgba(0,240,255,0.4); border-radius: 20px; padding: 16px 18px; display: flex; align-items: center; gap: 14px; box-shadow: 0 20px 60px rgba(0,0,0,0.8), 0 0 40px rgba(0,240,255,0.2); z-index: 10005; max-width: 90vw; width: 380px; transition: transform 0.6s cubic-bezier(0.19,1,0.22,1), opacity 0.4s; opacity: 0; pointer-events: none; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+#pwaNotif.show { transform: translate(-50%, 0); opacity: 1; pointer-events: auto; }
+#pwaNotif .pwa-icon { width: 46px; height: 46px; border-radius: 14px; background: linear-gradient(135deg, #00f0ff, #b114ff); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; color: #04050a; flex-shrink: 0; box-shadow: 0 0 20px rgba(0,240,255,0.4); animation: pwaPulse 2s ease-in-out infinite; }
+@keyframes pwaPulse { 0%,100% { box-shadow: 0 0 20px rgba(0,240,255,0.4); } 50% { box-shadow: 0 0 35px rgba(0,240,255,0.7), 0 0 50px rgba(177,20,255,0.4); } }
+#pwaNotif .pwa-content { flex: 1; min-width: 0; }
+#pwaNotif .pwa-title { font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 0.82rem; color: #00f0ff; letter-spacing: 1px; margin-bottom: 2px; text-shadow: 0 0 12px rgba(0,240,255,0.5); }
+#pwaNotif .pwa-text { font-size: 0.75rem; color: #8a90a0; line-height: 1.3; }
+#pwaNotif .pwa-actions { display: flex; gap: 6px; flex-shrink: 0; }
+#pwaNotif .pwa-install-btn { background: linear-gradient(135deg, #00f0ff, #b114ff); color: #04050a; border: none; padding: 8px 14px; border-radius: 100px; font-family: 'Orbitron', sans-serif; font-weight: 800; font-size: 0.68rem; letter-spacing: 1px; transition: all 0.25s; white-space: nowrap; }
+#pwaNotif .pwa-install-btn:hover { transform: scale(1.05); box-shadow: 0 0 25px rgba(0,240,255,0.6); }
+#pwaNotif .pwa-close-btn { background: transparent; border: none; color: #8a90a0; font-size: 1rem; padding: 6px; transition: color 0.2s; align-self: flex-start; }
+#pwaNotif .pwa-close-btn:hover { color: #ff1a6b; }
+@media (max-width: 600px) { #pwaNotif { top: calc(60px + var(--safe-top)); width: calc(100vw - 24px); max-width: none; padding: 10px 12px; gap: 10px; border-radius: 16px; } #pwaNotif .pwa-icon { width: 34px; height: 34px; font-size: 1rem; border-radius: 10px; } #pwaNotif .pwa-title { font-size: 0.68rem; letter-spacing: 0.6px; } #pwaNotif .pwa-text { font-size: 0.6rem; line-height: 1.2; } #pwaNotif .pwa-install-btn { padding: 6px 12px; font-size: 0.6rem; } #pwaNotif .pwa-close-btn { font-size: 0.85rem; padding: 4px; position: absolute; top: 4px; right: 4px; } #pwaNotif .pwa-content { padding-right: 16px; } }
+
 #toast, #toastSticker, #toastComent { position: fixed; bottom: calc(100px + var(--safe-bottom)); left: 50%; transform: translateX(-50%); background: #0f0f13; color: var(--neon-1); padding: 12px 25px; border-radius: 30px; z-index: 1001; font-weight: bold; box-shadow: 0 0 20px color-mix(in srgb, var(--neon-1) 50%, transparent); border: 1px solid var(--neon-1); display: none; max-width: 90vw; text-align: center; font-size: 0.85rem; }
 
 .ripple { position: fixed; width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--neon-1); pointer-events: none; z-index: 99998; transform: translate(-50%,-50%) scale(0); animation: rippleAnim 0.8s var(--ease-out-expo) forwards; }
@@ -822,11 +1117,106 @@ html[data-quality="fluida"] .nav-status .status-led { animation: none !important
 .cursor-dot { box-shadow: 0 0 calc(12px * var(--q-neon-glow)) var(--neon-1) !important; }
 html[data-quality="fluida"] .cursor-dot { box-shadow: none !important; }
 html[data-quality="fluida"] .cyber-btn-icon:hover, html[data-quality="fluida"] .config-nav-btn:hover { box-shadow: none !important; transform: none !important; }
+html[data-quality="fluida"] #pwaNotif { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; box-shadow: 0 10px 30px rgba(0,0,0,0.6) !important; }
+html[data-quality="fluida"] #pwaNotif .pwa-icon { animation: none !important; box-shadow: none !important; }
 html[data-quality="fluida"] .loader-logo path, html[data-quality="fluida"] .loader-logo circle, html[data-quality="fluida"] .loader-logo line { filter: none !important; }
 html[data-quality="fluida"] .loader-progress-bar, html[data-quality="fluida"] .progress-bar { box-shadow: none !important; }
 html[data-quality="fluida"] .back-btn:hover, html[data-quality="fluida"] .nav-btn:hover, html[data-quality="fluida"] #downloadBtn:hover { transform: none !important; box-shadow: none !important; }
 html[data-quality="fluida"] .blocker-text { animation: none !important; }
 html[data-quality="fluida"] .enviar-comentario-btn:hover, html[data-quality="fluida"] .login-link-btn:hover, html[data-quality="fluida"] .upload-sticker-label:hover { transform: none !important; box-shadow: none !important; }
+
+/* ============================================
+   ANTI-AD BLOCKER (CSS)
+   Oculta contenedores publicitarios inyectados
+   por el host de video (streamtape, filemoon, etc.)
+   ============================================ */
+/* IDs típicos de ads */
+[id^="ad-" i], [id^="ad_" i], [id^="ads-" i], [id^="ads_" i],
+[id^="ads" i]:not([id^="adsense-"]):not([id*="advance"]),
+[id$="-ad" i], [id$="_ad" i], [id$="-ads" i], [id$="_ads" i],
+[id*="advert" i], [id*="popunder" i], [id*="interstitial" i],
+[id*="banner-ad" i], [id*="ad-banner" i], [id*="ads-banner" i],
+[id*="google_ads" i], [id^="div-gpt-ad" i], [id^="aswift" i],
+[id*="ad-container" i], [id*="ad-wrapper" i], [id*="ad-overlay" i],
+[id*="ad_overlay" i], [id*="ad-slot" i], [id*="ad_slot" i] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  position: absolute !important;
+  left: -99999px !important;
+  top: -99999px !important;
+  width: 0 !important;
+  height: 0 !important;
+  max-width: 0 !important;
+  max-height: 0 !important;
+}
+
+/* Clases típicas de ads */
+[class^="ad-" i], [class^="ad_" i], [class^="ads-" i], [class^="ads_" i],
+[class*=" ad-" i]:not([class*="ad-card"]):not([class*="ad-avatar"]),
+[class*=" ad_" i],
+[class*=" ads-" i], [class*=" ads_" i],
+[class$="-ad" i], [class$="_ad" i], [class$="-ads" i], [class$="_ads" i],
+[class*="advert" i], [class*="popunder" i], [class*="interstitial" i],
+[class*="ad-banner" i], [class*="ads-banner" i],
+[class*="ad_overlay" i], [class*="ad-overlay" i],
+[class*="ad-container" i], [class*="ad_container" i],
+[class*="ad-wrapper" i], [class*="ad_wrapper" i],
+.adsbygoogle, ins.adsbygoogle, .google-ad, .google_ads,
+.ad-slot, .ad_slot, .ad-slot__container {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Iframes de redes publicitarias conocidas */
+iframe[src*="doubleclick.net"],
+iframe[src*="googlesyndication.com"],
+iframe[src*="adservice.google"],
+iframe[src*="popads.net"],
+iframe[src*="popcash.net"],
+iframe[src*="propellerads"],
+iframe[src*="propellerpops"],
+iframe[src*="adnxs.com"],
+iframe[src*="adsystem"],
+iframe[src*="exoclick"],
+iframe[src*="juicyads"],
+iframe[src*="trafficjunky"],
+iframe[src*="taboola"],
+iframe[src*="outbrain"],
+iframe[src*="revcontent"],
+iframe[src*="mgid.com"],
+iframe[src*="zergnet"],
+iframe[src*="adcash"],
+iframe[src*="clickadu"],
+iframe[src*="hilltopads"],
+iframe[src*="adsterra"],
+iframe[src*="onclickads"],
+iframe[src*="onclickalgo"],
+iframe[src*="ad-maven"],
+iframe[src*="admaven"],
+iframe[src*="bidvertiser"],
+iframe[src*="zeropark"],
+iframe[src*="popmyads"],
+iframe[src*="clickaine"],
+iframe[src*="adf.ly"],
+iframe[src*="shorte.st"],
+iframe[src*="linkvertise"],
+iframe[src*="revenuehits"],
+iframe[src*="adfoc.us"],
+iframe[src*="adprovider"],
+iframe[src*="adspyglass"] {
+  display: none !important;
+  visibility: hidden !important;
+  width: 0 !important;
+  height: 0 !important;
+  pointer-events: none !important;
+  position: absolute !important;
+  left: -99999px !important;
+  top: -99999px !important;
+}
 </style>
 </head>
 <body>
@@ -1137,10 +1527,15 @@ html[data-quality="fluida"] .enviar-comentario-btn:hover, html[data-quality="flu
   </div>
 </div>
 
-<!--
-  Nota: se eliminó por completo el bloque <div id="pwaNotif">...</div>
-  (notificación emergente de instalación PWA que rompía el diseño).
--->
+<div id="pwaNotif">
+  <div class="pwa-icon"><i class="fas fa-rocket"></i></div>
+  <div class="pwa-content">
+    <div class="pwa-title">INSTALA ARCHINIME</div>
+    <div class="pwa-text">Acceso rápido desde tu pantalla de inicio</div>
+  </div>
+  <div class="pwa-actions"><button class="pwa-install-btn" id="pwaInstallBtn">Instalar</button></div>
+  <button class="pwa-close-btn" id="pwaCloseBtn" aria-label="Cerrar"><i class="fas fa-times"></i></button>
+</div>
 
 <div id="stageContainer">
   <div id="fgContainer">
@@ -1153,8 +1548,9 @@ html[data-quality="fluida"] .enviar-comentario-btn:hover, html[data-quality="flu
   ⚠️ SCRIPTS SIN defer — orden crítico:
   1. Firebase (ya cargado en <head>)
   2. DOMPurify (ya cargado en <head>)
-  3. Core: themes → dompurify-config → state → app-core
-  4. Datos, utils, componentes, page-core
+  3. AntiAd (ya cargado en <head>)
+  4. Core: themes → dompurify-config → state → app-core
+  5. Datos, utils, componentes, page-core
   NO se carga musica_fondo.js (el player solo reproduce el video)
 -->
 <script src="../js/core/themes.js"></script>
@@ -1703,11 +2099,46 @@ window.showToastSticker = showToast;
 })();
 
 /* ============================================================
-   ❌ BLOQUE PWA ELIMINADO
-   La notificación emergente #pwaNotif fue removida del HTML
-   y toda la lógica de instalación/mostrado fue eliminada.
-   No aparece ninguna ventana emergente automática.
+   PWA
    ============================================================ */
+(function() {
+  const pwaNotif = document.getElementById('pwaNotif');
+  const pwaInstallBtn = document.getElementById('pwaInstallBtn');
+  const pwaCloseBtn = document.getElementById('pwaCloseBtn');
+  window.__deferredInstallPrompt = null;
+  const isStandalone = () => window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+  const isIos = () => /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const yaMostrada = sessionStorage.getItem('archinime_pwa_player_shown') === '1';
+
+  window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); window.__deferredInstallPrompt = e; });
+
+  function mostrarPwaNotif() {
+    if (!pwaNotif || isStandalone() || yaMostrada) return;
+    pwaNotif.classList.add('show');
+    sessionStorage.setItem('archinime_pwa_player_shown', '1');
+    setTimeout(() => pwaNotif.classList.remove('show'), 12000);
+  }
+  window.addEventListener('load', () => setTimeout(mostrarPwaNotif, 2500));
+  pwaCloseBtn?.addEventListener('click', () => pwaNotif.classList.remove('show'));
+
+  window.instalarPWA = async function() {
+    if (isStandalone()) { showToast('✅ La app ya está instalada'); return; }
+    if (isIos()) { alert('📲 En iOS: Comparte → "Añadir a pantalla de inicio"'); return; }
+    if (window.__deferredInstallPrompt) {
+      try {
+        window.__deferredInstallPrompt.prompt();
+        const choice = await window.__deferredInstallPrompt.userChoice;
+        if (choice && choice.outcome === 'accepted') {
+          window.__deferredInstallPrompt = null;
+          pwaNotif.classList.remove('show');
+        }
+      } catch(e) {}
+      return;
+    }
+    alert('📲 Instálala desde el menú de Chrome');
+  };
+  pwaInstallBtn?.addEventListener('click', () => window.instalarPWA());
+})();
 
 /* ============================================================
    SHARE
@@ -1934,6 +2365,7 @@ if ('serviceWorker' in navigator) {
 }
 
 console.log('%c✅ Archinime Player v28 · Quality: ' + (window.__archinimeConfig?.quality || 'media'), 'color:#00f0ff;font-family:monospace;font-weight:bold;');
+console.log('%c🛡️ AntiAd v1 cargado (CSS + Observer + window.open override)', 'color:#7dff5c;font-family:monospace;font-weight:bold;');
 </script>
 
 </body>
