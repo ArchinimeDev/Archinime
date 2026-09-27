@@ -1,70 +1,179 @@
-/* Archivo: pwa-handler.js */
+/* Archivo: js/components/pwa-handler.js
+   v2.0 — Detección robusta, localStorage, soporta iOS + Android + Desktop
+   
+   Uso: solo incluir <script src=".../pwa-handler.js"></script> en cualquier HTML
+   que tenga los elementos #pwaNotif, #pwaInstallBtn, #pwaCloseBtn (opcionales).
+   
+   NO duplicar esta lógica inline en los HTMLs. Este módulo la maneja sola.
+*/
 
-let deferredPrompt;
-const installBtn = document.getElementById('installBtn');
-const iosModal = document.getElementById('iosInstallModal');
+(function() {
+  'use strict';
 
-// 1. Detectar si es iOS (iPhone/iPad)
-const isIos = () => {
-  const userAgent = window.navigator.userAgent.toLowerCase();
-  return /iphone|ipad|ipod/.test(userAgent);
-}
+  // ═══════════════════════════════════════════════════════════
+  // CONFIG
+  // ═══════════════════════════════════════════════════════════
+  const STORAGE_KEY = 'archinime_pwa_install_dismissed';
+  const COOLDOWN_MS = 30 * 24 * 60 * 60 * 1000; // 30 días
+  let deferredPrompt = null;
 
-// 2. Detectar si ya está instalada (Standalone)
-const isInStandaloneMode = () => ('standalone' in window.navigator) && (window.navigator.standalone);
+  // ═══════════════════════════════════════════════════════════
+  // DETECCIÓN
+  // ═══════════════════════════════════════════════════════════
+  const isIos = () => /iphone|ipad|ipod/i.test(navigator.userAgent);
 
-// 3. Detectar si es Móvil (coincidiendo con tu CSS de 780px)
-const isMobile = () => window.matchMedia('(max-width: 780px)').matches;
+  function isStandalone() {
+    if (window.navigator.standalone === true) return true;                    // iOS
+    if (window.matchMedia('(display-mode: standalone)').matches) return true; // Android/Desktop
+    if (window.matchMedia('(display-mode: fullscreen)').matches) return true;
+    if (window.matchMedia('(display-mode: minimal-ui)').matches) return true;
+    if (window.matchMedia('(display-mode: window-controls-overlay)').matches) return true;
+    if (document.referrer.startsWith('android-app://')) return true;
+    return false;
+  }
 
-// FUNCIÓN PRINCIPAL: Controlar visibilidad del botón
-function checkInstallButtonVisibility() {
-    // Solo mostrar si es Móvil Y NO está ya instalada en modo app
-    if (isMobile() && !isInStandaloneMode()) {
-        installBtn.style.display = 'flex';
-    } else {
-        // En PC o si ya está instalada, lo ocultamos
-        installBtn.style.display = 'none';
+  function fueDescartadoRecientemente() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return false;
+      const ts = parseInt(raw, 10);
+      if (isNaN(ts)) return false;
+      return (Date.now() - ts) < COOLDOWN_MS;
+    } catch (e) { return false; }
+  }
+
+  function marcarComoDescartado() {
+    try { localStorage.setItem(STORAGE_KEY, String(Date.now())); } catch (e) {}
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // VISIBILIDAD
+  // ═══════════════════════════════════════════════════════════
+  function actualizarVisibilidad() {
+    const installBtn = document.getElementById('installBtn');
+    const pwaNotif = document.getElementById('pwaNotif');
+    const debeMostrarse = !isStandalone() && !fueDescartadoRecientemente();
+
+    if (installBtn) {
+      installBtn.style.display = debeMostrarse ? 'flex' : 'none';
     }
-}
+    if (pwaNotif && !debeMostrarse) {
+      pwaNotif.classList.remove('show');
+    }
+  }
 
-// 4. Manejo del evento nativo (Android / PC Chrome)
-window.addEventListener('beforeinstallprompt', (e) => {
-  // Evita que Chrome muestre el prompt nativo inmediatamente y lo guarda
-  e.preventDefault();
-  deferredPrompt = e;
-  // Actualizamos visibilidad (por seguridad)
-  checkInstallButtonVisibility();
-});
+  // ═══════════════════════════════════════════════════════════
+  // EVENTOS NATIVOS DEL NAVEGADOR
+  // ═══════════════════════════════════════════════════════════
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    window.__deferredInstallPrompt = e;   // compat con código legacy
+    actualizarVisibilidad();
+  });
 
-// 5. Click en el botón de instalar
-installBtn.addEventListener('click', () => {
+  window.addEventListener('appinstalled', () => {
+    marcarComoDescartado();
+    deferredPrompt = null;
+    window.__deferredInstallPrompt = null;
+    const pwaNotif = document.getElementById('pwaNotif');
+    if (pwaNotif) pwaNotif.classList.remove('show');
+    actualizarVisibilidad();
+  });
+
+  // ═══════════════════════════════════════════════════════════
+  // API GLOBAL — usada por onclick="instalarPWA()" en los HTMLs
+  // ═══════════════════════════════════════════════════════════
+  window.instalarPWA = async function(opts) {
+    opts = opts || {};
+    const silent = opts.silent === true;
+
+    if (isStandalone()) {
+      if (!silent) {
+        if (typeof window.showToast === 'function') window.showToast('✅ La app ya está instalada');
+        else alert('✅ La app ya está instalada');
+      }
+      return;
+    }
+
     if (isIos()) {
-        // iOS: Mostrar instrucciones manuales (modal)
+      const iosModal = document.getElementById('iosInstallModal');
+      if (iosModal) {
         iosModal.style.display = 'block';
-    } else if (deferredPrompt) {
-        // Android: Si tenemos el prompt guardado, lo lanzamos
-        deferredPrompt.prompt();
-        
-        deferredPrompt.userChoice.then((choiceResult) => {
-            if (choiceResult.outcome === 'accepted') {
-                console.log('Usuario aceptó instalar');
-            }
-            // NO ocultamos el botón aunque acepte o cancele, para que persista
-            deferredPrompt = null;
-        });
-    } else {
-        // FALLBACK: Si no hay prompt (porque ya se usó o el navegador no lo da)
-        // pero seguimos en móvil, mostramos una alerta de ayuda.
-        alert("¡Ya la tienes! 😄\nLa app ya está instalada. Ábrela desde tu pantalla de inicio.");
+      } else if (!silent) {
+        alert('📲 En iOS: Comparte → "Añadir a pantalla de inicio"');
+      }
+      return;
     }
-});
 
-function closeIosModal() {
-    iosModal.style.display = 'none';
-}
+    if (deferredPrompt) {
+      try {
+        deferredPrompt.prompt();
+        const choice = await deferredPrompt.userChoice;
+        // Descartar SIEMPRE (acepte o cancele), para no insistir
+        marcarComoDescartado();
+        deferredPrompt = null;
+        window.__deferredInstallPrompt = null;
+        actualizarVisibilidad();
+      } catch (e) {
+        console.warn('[PWA] Error al prompt:', e);
+      }
+      return;
+    }
 
-// Inicialización: Comprobar al cargar la página
-window.addEventListener('DOMContentLoaded', checkInstallButtonVisibility);
+    if (!silent) {
+      if (typeof window.showToast === 'function') {
+        window.showToast('📲 Instálala desde el menú del navegador');
+      } else {
+        alert('📲 Instálala desde el menú del navegador');
+      }
+    }
+  };
 
-// Comprobar si cambia el tamaño de ventana (por si giran el móvil o redimensionan)
-window.addEventListener('resize', checkInstallButtonVisibility);
+  window.cerrarPwaNotif = function() {
+    marcarComoDescartado();
+    const pwaNotif = document.getElementById('pwaNotif');
+    if (pwaNotif) pwaNotif.classList.remove('show');
+    actualizarVisibilidad();
+  };
+
+  // ═══════════════════════════════════════════════════════════
+  // SETUP — conectar botones
+  // ═══════════════════════════════════════════════════════════
+  function setup() {
+    const installBtn = document.getElementById('installBtn');
+    if (installBtn && !installBtn._pwaBound) {
+      installBtn._pwaBound = true;
+      installBtn.addEventListener('click', () => window.instalarPWA());
+    }
+
+    const pwaCloseBtn = document.getElementById('pwaCloseBtn');
+    if (pwaCloseBtn && !pwaCloseBtn._pwaBound) {
+      pwaCloseBtn._pwaBound = true;
+      pwaCloseBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        window.cerrarPwaNotif();
+      });
+    }
+
+    const pwaInstallBtn = document.getElementById('pwaInstallBtn');
+    if (pwaInstallBtn && !pwaInstallBtn._pwaBound) {
+      pwaInstallBtn._pwaBound = true;
+      pwaInstallBtn.addEventListener('click', () => window.instalarPWA());
+    }
+
+    actualizarVisibilidad();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setup);
+  } else {
+    setup();
+  }
+
+  window.addEventListener('resize', actualizarVisibilidad, { passive: true });
+  window.addEventListener('orientationchange', () => setTimeout(actualizarVisibilidad, 300));
+
+  console.log('✅ pwa-handler.js v2.0 cargado · Standalone:', isStandalone(), '· Descartado:', fueDescartadoRecientemente());
+
+})();
