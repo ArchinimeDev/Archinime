@@ -1126,6 +1126,28 @@ html[data-quality="fluida"] .blocker-text { animation: none !important; }
 html[data-quality="fluida"] .enviar-comentario-btn:hover, html[data-quality="fluida"] .login-link-btn:hover, html[data-quality="fluida"] .upload-sticker-label:hover { transform: none !important; box-shadow: none !important; }
 
 /* ============================================
+   SOLUCIÓN 1: FONDO VISIBLE EN MÓVILES
+   ============================================ */
+@media (max-width: 768px) {
+  html {
+    --q-aurora-opacity: 0.65 !important;
+    --q-grid-opacity: 0.45 !important;
+    --q-blur-aurora: 35px !important;
+  }
+}
+
+/* ============================================
+   SOLUCIÓN 2: OCULTAR SECCIÓN DE COMENTARIOS / OTROS ANIMES
+   ============================================ */
+.comentarios-section {
+  display: none !important;
+}
+/* Ocultar posibles secciones de recomendaciones inyectadas */
+#related-animes, .related-section, .recommendations, .animes-relacionados {
+  display: none !important;
+}
+
+/* ============================================
    ANTI-AD BLOCKER (CSS)
    Oculta contenedores publicitarios inyectados
    por el host de video (streamtape, filemoon, etc.)
@@ -1315,7 +1337,9 @@ iframe[src*="adspyglass"] {
     <a id="nextBtn" class="btn nav-btn btn-hidden">Sig. <i class="fas fa-forward"></i></a>
   </div>
 
-  <div class="comentarios-section">
+  <!-- SECCIÓN DE COMENTARIOS OCULTA POR PETICIÓN DEL USUARIO -->
+  <!-- Si deseas volver a mostrarla, elimina el estilo .comentarios-section { display: none !important; } en el CSS -->
+  <div class="comentarios-section" style="display:none !important;">
     <div class="comentarios-header">
       <i class="fas fa-comments"></i>
       <h3>Zona de comentarios</h3>
@@ -1525,16 +1549,6 @@ iframe[src*="adspyglass"] {
     </div>
     <div class="cmd-footer"><span>↵ Enter</span><span>ESC cerrar</span></div>
   </div>
-</div>
-
-<div id="pwaNotif">
-  <div class="pwa-icon"><i class="fas fa-rocket"></i></div>
-  <div class="pwa-content">
-    <div class="pwa-title">INSTALA ARCHINIME</div>
-    <div class="pwa-text">Acceso rápido desde tu pantalla de inicio</div>
-  </div>
-  <div class="pwa-actions"><button class="pwa-install-btn" id="pwaInstallBtn">Instalar</button></div>
-  <button class="pwa-close-btn" id="pwaCloseBtn" aria-label="Cerrar"><i class="fas fa-times"></i></button>
 </div>
 
 <div id="stageContainer">
@@ -2099,48 +2113,6 @@ window.showToastSticker = showToast;
 })();
 
 /* ============================================================
-   PWA
-   ============================================================ */
-(function() {
-  const pwaNotif = document.getElementById('pwaNotif');
-  const pwaInstallBtn = document.getElementById('pwaInstallBtn');
-  const pwaCloseBtn = document.getElementById('pwaCloseBtn');
-  window.__deferredInstallPrompt = null;
-  const isStandalone = () => window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
-  const isIos = () => /iphone|ipad|ipod/i.test(navigator.userAgent);
-  const yaMostrada = sessionStorage.getItem('archinime_pwa_player_shown') === '1';
-
-  window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); window.__deferredInstallPrompt = e; });
-
-  function mostrarPwaNotif() {
-    if (!pwaNotif || isStandalone() || yaMostrada) return;
-    pwaNotif.classList.add('show');
-    sessionStorage.setItem('archinime_pwa_player_shown', '1');
-    setTimeout(() => pwaNotif.classList.remove('show'), 12000);
-  }
-  window.addEventListener('load', () => setTimeout(mostrarPwaNotif, 2500));
-  pwaCloseBtn?.addEventListener('click', () => pwaNotif.classList.remove('show'));
-
-  window.instalarPWA = async function() {
-    if (isStandalone()) { showToast('✅ La app ya está instalada'); return; }
-    if (isIos()) { alert('📲 En iOS: Comparte → "Añadir a pantalla de inicio"'); return; }
-    if (window.__deferredInstallPrompt) {
-      try {
-        window.__deferredInstallPrompt.prompt();
-        const choice = await window.__deferredInstallPrompt.userChoice;
-        if (choice && choice.outcome === 'accepted') {
-          window.__deferredInstallPrompt = null;
-          pwaNotif.classList.remove('show');
-        }
-      } catch(e) {}
-      return;
-    }
-    alert('📲 Instálala desde el menú de Chrome');
-  };
-  pwaInstallBtn?.addEventListener('click', () => window.instalarPWA());
-})();
-
-/* ============================================================
    SHARE
    ============================================================ */
 document.getElementById('shareNavBtn')?.addEventListener('click', async () => {
@@ -2363,6 +2335,41 @@ if ('serviceWorker' in navigator) {
       .catch(err => console.error('SW error:', err));
   });
 }
+
+/* ============================================================
+   SOLUCIÓN 3: ELIMINAR SECCIONES DE RECOMENDACIONES INYECTADAS
+   ============================================================ */
+(function() {
+  'use strict';
+  // Lista de selectores comunes que usan los reproductores para inyectar "animes relacionados"
+  const RECOMMENDATION_SELECTORS = [
+    '#related-animes', '.related-section', '.recommendations',
+    '.animes-relacionados', '.related-videos', '.video-recommendations',
+    '.recommended-animes', '.related-anime', '.recomendaciones'
+  ].join(',');
+
+  function removeRecommendations() {
+    const elements = document.querySelectorAll(RECOMMENDATION_SELECTORS);
+    elements.forEach(el => {
+      try {
+        el.style.display = 'none !important';
+        el.remove();
+      } catch(e) {}
+    });
+  }
+
+  // Ejecutar al cargar
+  removeRecommendations();
+
+  // Observar cambios en el DOM para eliminarlas si se inyectan después
+  const observer = new MutationObserver(() => {
+    removeRecommendations();
+  });
+  observer.observe(document.body, { childList: true, subtree: true });
+
+  // También ejecutar cada 2 segundos por si acaso
+  setInterval(removeRecommendations, 2000);
+})();
 
 console.log('%c✅ Archinime Player v28 · Quality: ' + (window.__archinimeConfig?.quality || 'media'), 'color:#00f0ff;font-family:monospace;font-weight:bold;');
 console.log('%c🛡️ AntiAd v1 cargado (CSS + Observer + window.open override)', 'color:#7dff5c;font-family:monospace;font-weight:bold;');
