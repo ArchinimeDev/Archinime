@@ -80,7 +80,7 @@ ul { list-style: none; }
 ::-webkit-scrollbar-track { background: var(--bg-deep); }
 ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, var(--neon-1), var(--neon-2)); border-radius: 10px; }
 
-/* ⚡ Pausar TODAS las animaciones cuando la pestaña está oculta (ahorro enorme) */
+/* ⚡ Pausar TODAS las animaciones cuando la pestaña está oculta */
 html.tab-hidden *,
 html.tab-hidden *::before,
 html.tab-hidden *::after {
@@ -103,7 +103,7 @@ body.cursor-hover .cursor-dot { width: 10px; height: 10px; background: var(--neo
 body.cursor-hover .cursor-ring { width: 60px; height: 60px; border-color: var(--neon-3); background: color-mix(in srgb, var(--neon-3) 8%, transparent); }
 @media (hover: none), (pointer: coarse) { .cursor-dot, .cursor-ring { display: none !important; } body, button, a, input, textarea, select, [data-hover] { cursor: auto !important; } }
 
-/* FONDOS — contain aísla repaints */
+/* FONDOS */
 .bg-layer { position: fixed; inset: 0; z-index: -3; pointer-events: none; overflow: hidden; contain: strict; }
 .aurora { position: absolute; border-radius: 50%; opacity: 0.45; will-change: transform; }
 .aurora.a1 { width: 55vw; height: 55vw; background: radial-gradient(circle, var(--neon-2), transparent 65%); top: -20%; left: -10%; animation: aurora1 24s ease-in-out infinite; }
@@ -195,24 +195,20 @@ body.cursor-hover .cursor-ring { width: 60px; height: 60px; border-color: var(--
 }
 
 /* ============================================
-   CONTAINER DEL DETALLE — SIN backdrop-filter
-   Optimizado: box-shadow en vez de mask-composite
+   CONTAINER — AHORA TRANSPARENTE
+   El contenido flota sobre el video de fondo.
    ============================================ */
 .container {
   position: relative;
   z-index: 1;
   max-width: 1200px;
   margin: calc(110px + var(--safe-top)) auto 60px;
-  padding: 25px 30px;
-  background: linear-gradient(160deg,
-    color-mix(in srgb, var(--bg-panel) 88%, var(--neon-1) 12%),
-    color-mix(in srgb, var(--bg-panel) 94%, var(--neon-2) 6%));
-  border-radius: 24px;
-  border: 1px solid color-mix(in srgb, var(--neon-1) 20%, var(--line));
-  box-shadow:
-    0 20px 60px rgba(0,0,0,0.5),
-    inset 0 1px 0 color-mix(in srgb, var(--neon-1) 18%, transparent),
-    inset 0 -1px 0 color-mix(in srgb, var(--neon-2) 12%, transparent);
+  padding: 0 20px;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
   animation: fadeInUp 0.6s var(--ease-out-expo);
   contain: layout style;
 }
@@ -224,17 +220,20 @@ body.cursor-hover .cursor-ring { width: 60px; height: 60px; border-color: var(--
   align-items: center;
   gap: 15px;
   flex-wrap: wrap;
-  margin: -25px -30px 25px -30px;
-  padding: 15px 25px;
-  background: linear-gradient(135deg, color-mix(in srgb, var(--neon-1) 8%, transparent), color-mix(in srgb, var(--neon-2) 4%, transparent));
-  border-bottom: 1px solid color-mix(in srgb, var(--neon-1) 20%, transparent);
-  border-radius: 24px 24px 0 0;
+  padding: 12px 20px;
+  margin: 0 0 25px 0;
+  background: color-mix(in srgb, var(--bg-deep) 55%, transparent);
+  backdrop-filter: blur(14px) saturate(1.3);
+  -webkit-backdrop-filter: blur(14px) saturate(1.3);
+  border: 1px solid color-mix(in srgb, var(--neon-1) 20%, transparent);
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
 }
 .back, .share-detail {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: rgba(0,0,0,0.4);
+  background: rgba(0,0,0,0.45);
   border: 1px solid color-mix(in srgb, var(--neon-1) 30%, transparent);
   padding: 8px 18px;
   border-radius: 40px;
@@ -255,7 +254,7 @@ body.cursor-hover .cursor-ring { width: 60px; height: 60px; border-color: var(--
 .search-container { position: relative; flex: 1; max-width: 350px; }
 .search-container input {
   width: 100%;
-  background: rgba(0,0,0,0.4);
+  background: rgba(0,0,0,0.5);
   border: 1px solid color-mix(in srgb, var(--neon-1) 25%, transparent);
   border-radius: 40px;
   padding: 10px 16px;
@@ -270,17 +269,17 @@ body.cursor-hover .cursor-ring { width: 60px; height: 60px; border-color: var(--
 .search-container input:focus {
   border-color: var(--neon-1);
   box-shadow: 0 0 20px color-mix(in srgb, var(--neon-1) 20%, transparent);
-  background: rgba(0,0,0,0.6);
+  background: rgba(0,0,0,0.7);
 }
 @media (max-width: 768px) {
-  .container { margin: calc(80px + var(--safe-top)) 12px 30px; padding: 15px; }
+  .container { margin: calc(80px + var(--safe-top)) 0 30px; padding: 0 12px; }
   .top-buttons {
-    margin: -15px -15px 20px -15px;
-    padding: 10px 15px;
+    padding: 10px 12px;
     display: grid;
     grid-template-columns: auto 1fr auto;
     gap: 8px;
     align-items: center;
+    margin-bottom: 20px;
   }
   .back, .share-detail { padding: 6px 12px; font-size: 0.75rem; gap: 4px; }
   .search-container { max-width: none; width: 100%; }
@@ -307,7 +306,7 @@ h1 {
   background-clip: text !important;
   color: transparent !important;
   -webkit-text-fill-color: transparent !important;
-  text-shadow: 0 0 40px color-mix(in srgb, var(--neon-1) 30%, transparent) !important;
+  text-shadow: 0 4px 20px rgba(0,0,0,0.9), 0 0 60px color-mix(in srgb, var(--neon-1) 45%, transparent) !important;
   word-break: break-word;
   box-sizing: border-box;
 }
@@ -323,8 +322,10 @@ h1 {
   max-width: 780px;
 }
 .genre-chip {
-  background: color-mix(in srgb, var(--neon-1) 8%, transparent);
-  border: 1px solid color-mix(in srgb, var(--neon-1) 30%, transparent);
+  background: color-mix(in srgb, var(--bg-deep) 60%, transparent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid color-mix(in srgb, var(--neon-1) 40%, transparent);
   padding: 7px 16px;
   border-radius: 30px;
   font-family: var(--font-mono);
@@ -336,10 +337,11 @@ h1 {
   transition: all 0.25s var(--ease-out-expo);
   white-space: nowrap;
   line-height: 1;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.9);
 }
 .genre-chip:hover {
-  background: color-mix(in srgb, var(--neon-1) 15%, transparent);
-  box-shadow: 0 0 18px color-mix(in srgb, var(--neon-1) 30%, transparent);
+  background: color-mix(in srgb, var(--neon-1) 20%, rgba(0,0,0,0.5));
+  box-shadow: 0 0 25px color-mix(in srgb, var(--neon-1) 45%, transparent);
   transform: translateY(-2px);
   color: #fff;
 }
@@ -359,17 +361,24 @@ h1 {
   box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 0 2px color-mix(in srgb, var(--neon-1) 40%, transparent), 0 0 80px color-mix(in srgb, var(--neon-2) 30%, transparent);
 }
 
+/* 🎬 BLOQUES DE CONTENIDO — SEMI-TRANSPARENTES CON BLUR */
 .desc {
-  background: rgba(0,0,0,0.3);
+  background: color-mix(in srgb, var(--bg-deep) 70%, transparent);
+  backdrop-filter: blur(14px) saturate(1.3);
+  -webkit-backdrop-filter: blur(14px) saturate(1.3);
   border-left: 3px solid var(--neon-3);
+  border-top: 1px solid color-mix(in srgb, var(--neon-3) 20%, transparent);
+  border-right: 1px solid color-mix(in srgb, var(--neon-3) 20%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--neon-3) 20%, transparent);
   padding: 18px 22px;
   border-radius: var(--radius-md);
   margin: 0 auto 25px;
   line-height: 1.7;
-  color: var(--text-soft);
+  color: var(--text-main);
   font-size: 0.95rem;
   position: relative;
   max-width: 900px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
 }
 .desc::before {
   content: '»';
@@ -382,16 +391,19 @@ h1 {
   opacity: 0.6;
 }
 
-/* Rating — sin backdrop-filter */
+/* Rating */
 .rating-section {
-  background: linear-gradient(135deg, rgba(0,0,0,0.4), color-mix(in srgb, var(--neon-2) 6%, transparent));
-  border: 1px solid color-mix(in srgb, var(--neon-1) 20%, transparent);
+  background: color-mix(in srgb, var(--bg-deep) 70%, transparent);
+  backdrop-filter: blur(14px) saturate(1.3);
+  -webkit-backdrop-filter: blur(14px) saturate(1.3);
+  border: 1px solid color-mix(in srgb, var(--neon-1) 25%, transparent);
   border-radius: 20px;
   padding: 20px 24px;
   margin: 20px auto;
   max-width: 900px;
   position: relative;
   overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
 }
 .rating-section::before {
   content: '';
@@ -406,11 +418,11 @@ h1 {
   font-size: 2.5rem;
   font-weight: 900;
   color: var(--neon-gold);
-  text-shadow: 0 0 20px color-mix(in srgb, var(--neon-gold) 40%, transparent);
+  text-shadow: 0 0 20px color-mix(in srgb, var(--neon-gold) 40%, transparent), 0 2px 10px rgba(0,0,0,0.9);
   font-family: var(--font-display);
   line-height: 1;
 }
-#voteCountDisplay { color: var(--text-soft); font-family: var(--font-mono); font-size: 0.8rem; letter-spacing: 1px; }
+#voteCountDisplay { color: var(--text-soft); font-family: var(--font-mono); font-size: 0.8rem; letter-spacing: 1px; text-shadow: 0 2px 8px rgba(0,0,0,0.9); }
 .stars-row { margin-top: 15px; display: flex; gap: 4px; align-items: center; }
 .star {
   font-size: 2rem;
@@ -426,19 +438,23 @@ h1 {
 .star.disabled { cursor: not-allowed; opacity: 0.4; }
 #ratingMessage { margin-top: 12px; font-size: 0.8rem; color: var(--neon-1); font-family: var(--font-mono); letter-spacing: 1px; }
 
+/* details (temporadas) */
 details {
   margin: 0 auto 15px;
   max-width: 900px;
-  background: rgba(10, 10, 15, 0.5);
-  border: 1px solid color-mix(in srgb, var(--neon-2) 25%, transparent);
+  background: color-mix(in srgb, var(--bg-deep) 70%, transparent);
+  backdrop-filter: blur(14px) saturate(1.3);
+  -webkit-backdrop-filter: blur(14px) saturate(1.3);
+  border: 1px solid color-mix(in srgb, var(--neon-2) 30%, transparent);
   border-radius: var(--radius-md);
   overflow: hidden;
   transition: background 0.25s, border-color 0.25s, box-shadow 0.25s;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
 }
 details[open] {
-  background: rgba(15, 15, 25, 0.6);
+  background: color-mix(in srgb, var(--bg-deep) 78%, transparent);
   border-color: var(--neon-1);
-  box-shadow: 0 0 25px color-mix(in srgb, var(--neon-1) 12%, transparent);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 25px color-mix(in srgb, var(--neon-1) 18%, transparent);
 }
 summary {
   padding: 16px 20px;
@@ -452,9 +468,10 @@ summary {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: rgba(0,0,0,0.2);
+  background: rgba(0,0,0,0.25);
   text-transform: uppercase;
   transition: color 0.25s, padding-left 0.25s;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.9);
 }
 summary:hover { color: #fff; padding-left: 28px; }
 summary::-webkit-details-marker { display: none; }
@@ -463,8 +480,10 @@ details[open] summary::after { transform: rotate(180deg); color: var(--neon-1); 
 .season-content { padding: 15px; border-top: 1px solid color-mix(in srgb, var(--neon-1) 15%, transparent); }
 .video-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; }
 .ep-btn {
-  background: rgba(0,0,0,0.4);
-  border: 1px solid color-mix(in srgb, var(--neon-2) 25%, transparent);
+  background: color-mix(in srgb, var(--bg-deep) 70%, transparent);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid color-mix(in srgb, var(--neon-2) 30%, transparent);
   border-radius: 12px;
   padding: 12px 5px;
   text-align: center;
@@ -479,16 +498,17 @@ details[open] summary::after { transform: rotate(180deg); color: var(--neon-1); 
   align-items: center;
   gap: 5px;
   cursor: none;
+  text-shadow: 0 2px 6px rgba(0,0,0,0.9);
 }
 .ep-btn:hover {
-  background: color-mix(in srgb, var(--neon-1) 10%, transparent);
+  background: color-mix(in srgb, var(--neon-1) 20%, rgba(0,0,0,0.4));
   border-color: var(--neon-1);
   color: #fff;
   transform: translateY(-3px);
-  box-shadow: 0 10px 25px rgba(0,0,0,0.4), 0 0 25px color-mix(in srgb, var(--neon-1) 20%, transparent);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.4), 0 0 25px color-mix(in srgb, var(--neon-1) 30%, transparent);
 }
 .ep-btn.watched {
-  background: color-mix(in srgb, var(--neon-4) 8%, transparent);
+  background: color-mix(in srgb, var(--neon-4) 12%, rgba(0,0,0,0.4));
   border-color: var(--neon-4);
   color: var(--neon-4);
 }
@@ -516,9 +536,8 @@ details[open] summary::after { transform: rotate(180deg); color: var(--neon-1); 
 .recommendations {
   margin-top: 44px;
   padding-top: 28px;
-  border-top: 1px solid color-mix(in srgb, var(--neon-1) 15%, transparent);
+  border-top: 1px solid color-mix(in srgb, var(--neon-1) 25%, transparent);
   position: relative;
-  /* ⚡ Diferir render de contenido fuera de pantalla */
   content-visibility: auto;
   contain-intrinsic-size: 400px;
 }
@@ -540,6 +559,7 @@ details[open] summary::after { transform: rotate(180deg); color: var(--neon-1); 
   padding-left: 15px;
   text-transform: uppercase;
   font-weight: 900;
+  text-shadow: 0 4px 20px rgba(0,0,0,0.9), 0 0 30px color-mix(in srgb, var(--neon-1) 40%, transparent);
 }
 .rec-grid { display: grid; gap: 15px; }
 @media (min-width: 1200px) { .rec-grid { grid-template-columns: repeat(6, 1fr); } }
@@ -741,7 +761,7 @@ details[open] summary::after { transform: rotate(180deg); color: var(--neon-1); 
 }
 
 /* ============================================================================
-   v28.8 — SISTEMA DE CALIDAD VISUAL OPTIMIZADO (anti-lag)
+   v28.8 — SISTEMA DE CALIDAD VISUAL
    ============================================================================ */
 html {
   --q-blur-aurora: 40px;
@@ -764,7 +784,6 @@ html {
   --q-vignette-strength: 85%;
 }
 
-/* FLUIDA — máximo rendimiento, SIN video oculto (corregido) */
 html[data-quality="fluida"] {
   --q-blur-aurora: 20px;
   --q-aurora-opacity: 0.18;
@@ -786,7 +805,6 @@ html[data-quality="fluida"] {
   --q-vignette-strength: 60%;
 }
 
-/* MEDIA — equilibrio */
 html[data-quality="media"] {
   --q-blur-aurora: 30px;
   --q-aurora-opacity: 0.32;
@@ -808,7 +826,6 @@ html[data-quality="media"] {
   --q-vignette-strength: 78%;
 }
 
-/* ALTA — antes 120px blur (lag), ahora 40px (fluido) */
 html[data-quality="alta"] {
   --q-blur-aurora: 40px;
   --q-aurora-opacity: 0.48;
@@ -902,6 +919,20 @@ html[data-quality="fluida"] #toastSticker, html[data-quality="fluida"] #toast, h
 html[data-quality="fluida"] .theme-dot.active::after { animation: none !important; }
 html[data-quality="fluida"] #userAvatarBtn:hover { box-shadow: none !important; }
 
+/* En fluida, quitar backdrop-filter en los bloques semi-transparentes para ahorrar GPU */
+html[data-quality="fluida"] .desc,
+html[data-quality="fluida"] .rating-section,
+html[data-quality="fluida"] details,
+html[data-quality="fluida"] .ep-btn,
+html[data-quality="fluida"] .genre-chip,
+html[data-quality="fluida"] .top-buttons { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+html[data-quality="fluida"] .desc,
+html[data-quality="fluida"] .rating-section,
+html[data-quality="fluida"] details { background: rgba(4,5,10,0.85) !important; }
+html[data-quality="fluida"] .ep-btn { background: rgba(4,5,10,0.85) !important; }
+html[data-quality="fluida"] .genre-chip { background: rgba(4,5,10,0.85) !important; }
+html[data-quality="fluida"] .top-buttons { background: rgba(4,5,10,0.85) !important; }
+
 /* Chroma key container */
 html:not([data-chroma="on"]) #stageContainer { display: none !important; }
 #stageContainer { position: fixed; inset: 0; z-index: 5; pointer-events: none; display: none; }
@@ -918,8 +949,8 @@ html[data-chroma="on"] #stageContainer { display: block !important; }
 @media (max-width: 768px) { #stageContainer #fgContainer { bottom: 8px; width: clamp(140px, 40vw, 220px); } #stageContainer.fg-left #fgContainer { left: 8px; } #stageContainer.fg-right #fgContainer { right: 8px; } }
 
 /* ============================================================
-   ⚡ VIDEO DE FONDO (galaxia) — CORREGIDO Y OPTIMIZADO
-   Ahora se ve en TODAS las calidades, incluida fluida.
+   ⚡ VIDEO DE FONDO — AHORA AL MISMO BRILLO QUE INDEX
+   (Antes tenía overrides de 0.35–0.55, ahora 0.85 siempre)
    ============================================================ */
 html body #themeBgVideo {
   filter: none !important;
@@ -932,44 +963,42 @@ html body #themeBgVideo {
   pointer-events: none !important;
   will-change: opacity !important;
 }
+/* ✅ Mismo brillo en todas las calidades, video bien visible */
 html body #themeBgVideo.active {
-  opacity: 0.5 !important;
+  opacity: 0.85 !important;
 }
 html[data-quality="fluida"] body #themeBgVideo.active {
-  /* ✅ ANTES: display:none (bug). Ahora SÍ se ve, con opacidad baja */
-  opacity: 0.35 !important;
+  opacity: 0.9 !important;
 }
 html[data-quality="media"] body #themeBgVideo.active {
-  opacity: 0.45 !important;
+  opacity: 0.85 !important;
 }
 html[data-quality="alta"] body #themeBgVideo.active {
-  opacity: 0.55 !important;
+  opacity: 0.85 !important;
 }
 
-/* 2️⃣ Con video activo: apagar / reducir TODO lo demás */
+/* Con video activo: atenuar efectos para que el video se vea */
 html.theme-has-video .aurora {
   filter: blur(20px) !important;
-  opacity: 0.04 !important;
+  opacity: 0.08 !important;
   animation: none !important;
 }
 html.theme-has-video .aurora.a3 { display: none !important; }
 html.theme-has-video .grid-floor {
-  opacity: 0.08 !important;
+  opacity: 0.12 !important;
   animation: none !important;
 }
 html.theme-has-video .noise     { opacity: 0.01 !important; }
-html.theme-has-video .scanlines { opacity: 0.08 !important; }
-html.theme-has-video #particles { opacity: 0.18 !important; }
+html.theme-has-video .scanlines { opacity: 0.1 !important; }
+html.theme-has-video #particles { opacity: 0.22 !important; }
 html.theme-has-video .vignette {
   background: radial-gradient(ellipse at center,
-    transparent 35%,
-    color-mix(in srgb, var(--bg-deep) 90%, transparent) 100%) !important;
+    transparent 32%,
+    color-mix(in srgb, var(--bg-deep) 88%, transparent) 100%) !important;
 }
-html.theme-has-video .container {
-  background: linear-gradient(160deg,
-    color-mix(in srgb, var(--bg-panel) 94%, var(--neon-1) 6%),
-    color-mix(in srgb, var(--bg-panel) 98%, var(--neon-2) 2%)) !important;
-}
+
+/* ⚠️ OJO: Aquí NO hay ningún override del .container.
+   El .container ahora es transparente por defecto. */
 
 /* En fluida: matar SOLO lo pesado, no el video */
 html[data-quality="fluida"] .aurora,
@@ -1460,7 +1489,7 @@ window.showToastSticker = showToast;
 })();
 
 /* ============================================================
-   ⚡ CURSOR — ahora event-driven (no corre 60fps si no hay movimiento)
+   ⚡ CURSOR — event-driven
    ============================================================ */
 (function() {
   const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
@@ -1476,14 +1505,12 @@ window.showToastSticker = showToast;
   let lastMove = 0;
 
   function loop() {
-    // Interpolación
     dx += (mx - dx) * 0.55; dy += (my - dy) * 0.55;
     rx += (mx - rx) * 0.16; ry += (my - ry) * 0.16;
 
     dot.style.transform = `translate(${dx}px, ${dy}px) translate(-50%, -50%)`;
     ring.style.transform = `translate(${rx}px, ${ry}px) translate(-50%, -50%)`;
 
-    // ¿Seguimos necesitando frames?
     const dist = Math.abs(mx - dx) + Math.abs(my - dy) + Math.abs(mx - rx) + Math.abs(my - ry);
     if (dist > 0.5 || performance.now() - lastMove < 200) {
       requestAnimationFrame(loop);
@@ -1507,7 +1534,7 @@ window.showToastSticker = showToast;
 })();
 
 /* ============================================================
-   ⚡ PARTICLES — optimizado: DPR=1, pausa al ocultar pestaña, menos cantidad
+   ⚡ PARTICLES
    ============================================================ */
 (function() {
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -1518,11 +1545,9 @@ window.showToastSticker = showToast;
   const ctx = canvas.getContext('2d', { alpha: true });
   let W, H;
   const isTouch = 'ontouchstart' in window;
-
-  // ✅ Menos partículas y sin retina (son puntos pequeños, no necesitan DPR alto)
   const COUNT = (QUALITY === 'alta') ? (isTouch ? 18 : 32) : (isTouch ? 12 : 20);
   const parts = [];
-  const dpr = 1; // ✅ antes 1.5-2, ahora 1 → 4x menos píxeles a pintar
+  const dpr = 1;
 
   function resize() {
     W = canvas.width = Math.floor(window.innerWidth * dpr);
@@ -1564,7 +1589,6 @@ window.showToastSticker = showToast;
   }
   rafId = requestAnimationFrame(animate);
 
-  // ✅ Pausar cuando la pestaña no está visible
   document.addEventListener('visibilitychange', () => {
     paused = document.hidden;
     if (!paused && rafId === null) rafId = requestAnimationFrame(animate);
@@ -1768,7 +1792,7 @@ document.getElementById('shareNavBtn')?.addEventListener('click', () => {
 });
 
 /* ============================================================
-   CHROMA KEY — optimizado
+   CHROMA KEY
    ============================================================ */
 (function() {
   const fgContainer = document.getElementById('fgContainer');
@@ -1778,10 +1802,7 @@ document.getElementById('shareNavBtn')?.addEventListener('click', () => {
   const fgCtx = fgCanvas.getContext('2d', { willReadFrequently: true });
   const CHROMA_QUALITY = window.__archinimeConfig?.quality || 'media';
 
-  // ✅ Frame-skip más agresivo: menos CPU
   const CHROMA_FRAME_SKIP = CHROMA_QUALITY === 'alta' ? 6 : (CHROMA_QUALITY === 'media' ? 14 : 30);
-
-  // ✅ Canvas reducido: menos píxeles a procesar
   const CHROMA_MAX_W = CHROMA_QUALITY === 'alta' ? 480 : 320;
 
   let currentAnim = null, isTransitioning = false, frameCount = 0, chromaRAF = null;
@@ -1878,7 +1899,6 @@ document.getElementById('shareNavBtn')?.addEventListener('click', () => {
     }
   });
 
-  // ✅ Pausar chroma al ocultar pestaña
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) {
       window.stopChroma();
