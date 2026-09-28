@@ -3,6 +3,7 @@
 // MEJORADO: Descarga única, barra de progreso, soporte múltiples partes
 // SOPORTE: Múltiples opciones, selección automática, títulos dinámicos
 // v4: Feedback visual en botón de descarga + meta description dinámica
+// v5: Sincronización del avatar del NAV (userAvatarBtn, dropdownAvatar, dropdownName)
 
 class VideoPlayer {
   constructor() {
@@ -1291,22 +1292,53 @@ class VideoPlayer {
     }
   }
 
+  // ✅ v5: Ahora también sincroniza el avatar y nombre en el NAV + dropdown
   updateCommentFormVisibility() {
     const user = this.getCurrentUser();
+    const isGuest = !user;
+    const guestImg = '../assets/img/invitado.avif';
+
+    // === Comentarios ===
     const loginMsg = document.getElementById('comentarioLoginMessage');
     const form = document.getElementById('comentarioFormContainer');
-    const avatar = document.getElementById('comentarioUserAvatar');
-    const nameSpan = document.getElementById('comentarioUserName');
+    const comAvatar = document.getElementById('comentarioUserAvatar');
+    const comName = document.getElementById('comentarioUserName');
+
     if (user) {
       if (loginMsg) loginMsg.style.display = 'none';
-      if (form) {
-        form.style.display = 'block';
-        if (avatar) avatar.src = user.photoURL || '../assets/img/invitado.avif';
-        if (nameSpan) nameSpan.innerText = user.displayName || user.email?.split('@')[0] || 'Usuario';
-      }
+      if (form) form.style.display = 'block';
+      if (comAvatar) comAvatar.src = user.photoURL || guestImg;
+      if (comName) comName.innerText = user.displayName || user.email?.split('@')[0] || 'Usuario';
     } else {
       if (loginMsg) loginMsg.style.display = 'block';
       if (form) form.style.display = 'none';
+    }
+
+    // === NAV: avatar principal, dropdown y menú ===
+    const navAvatar  = document.getElementById('userAvatarBtn');
+    const dropAvatar = document.getElementById('dropdownAvatar');
+    const dropName   = document.getElementById('dropdownName');
+    const dropItems  = document.getElementById('userDropdownItems');
+
+    const avatarSrc   = isGuest ? guestImg : (user.photoURL || guestImg);
+    const displayName = isGuest ? 'Invitado' : (user.displayName || user.email?.split('@')[0] || 'Usuario');
+
+    if (navAvatar)  { navAvatar.src = avatarSrc; navAvatar.alt = displayName; }
+    if (dropAvatar) { dropAvatar.src = avatarSrc; }
+    if (dropName)   { dropName.textContent = displayName; }
+
+    if (dropItems) {
+      if (isGuest) {
+        dropItems.innerHTML = `<div class="user-dropdown-item" id="loginBtnItem"><i class="fas fa-sign-in-alt"></i> Iniciar sesión</div>`;
+        document.getElementById('loginBtnItem')?.addEventListener('click', () => this.openLoginModal());
+      } else {
+        dropItems.innerHTML = `<div class="user-dropdown-item" id="logoutBtnItem"><i class="fas fa-sign-out-alt"></i> Cerrar sesión</div>`;
+        document.getElementById('logoutBtnItem')?.addEventListener('click', () => {
+          this.auth.signOut().then(() => {
+            document.getElementById('userDropdown')?.classList.remove('active');
+          });
+        });
+      }
     }
   }
 
