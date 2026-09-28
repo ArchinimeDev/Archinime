@@ -81,7 +81,6 @@ ul { list-style: none; }
 ::-webkit-scrollbar-track { background: var(--bg-deep); }
 ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, var(--neon-1), var(--neon-2)); border-radius: 10px; }
 
-/* Pausar animaciones cuando la pestaña está oculta */
 html.tab-hidden *, html.tab-hidden *::before, html.tab-hidden *::after { animation-play-state: paused !important; }
 
 /* CURSOR */
@@ -199,12 +198,14 @@ body.cursor-hover .cursor-ring { width: 60px; height: 60px; border-color: var(--
   z-index: 1;
   max-width: 1200px;
   margin: calc(110px + var(--safe-top)) auto 60px;
-  padding: 25px 30px;
+  padding: 22px 26px;
   background: linear-gradient(160deg,
-    color-mix(in srgb, var(--bg-panel) 88%, var(--neon-1) 12%),
-    color-mix(in srgb, var(--bg-panel) 94%, var(--neon-2) 6%));
+    color-mix(in srgb, var(--bg-panel) 78%, transparent),
+    color-mix(in srgb, var(--bg-panel) 86%, transparent));
+  backdrop-filter: blur(10px) saturate(1.2);
+  -webkit-backdrop-filter: blur(10px) saturate(1.2);
   border-radius: 24px;
-  border: 1px solid color-mix(in srgb, var(--neon-1) 20%, var(--line));
+  border: 1px solid color-mix(in srgb, var(--neon-1) 22%, var(--line));
   box-shadow:
     0 20px 60px rgba(0,0,0,0.5),
     inset 0 1px 0 color-mix(in srgb, var(--neon-1) 18%, transparent),
@@ -213,95 +214,113 @@ body.cursor-hover .cursor-ring { width: 60px; height: 60px; border-color: var(--
   contain: layout style;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 16px;
 }
 @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-@media (max-width: 768px) {
-  .container { margin: calc(80px + var(--safe-top)) 12px 30px; padding: 15px; gap: 14px; }
-}
 
-/* Barra superior del reproductor */
-.top-buttons {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-  margin: -25px -30px 0 -30px;
-  padding: 15px 25px;
-  background: linear-gradient(135deg, color-mix(in srgb, var(--neon-1) 8%, transparent), color-mix(in srgb, var(--neon-2) 4%, transparent));
-  border-bottom: 1px solid color-mix(in srgb, var(--neon-1) 20%, transparent);
-  border-radius: 24px 24px 0 0;
-}
 @media (max-width: 768px) {
-  .top-buttons {
-    margin: -15px -15px 0 -15px;
-    padding: 10px 15px;
-    display: grid;
-    grid-template-columns: auto 1fr;
-    gap: 8px;
-    align-items: center;
+  .container {
+    margin: calc(80px + var(--safe-top)) 10px 30px;
+    padding: 14px;
+    gap: 12px;
+    /* 🎨 Móvil: fondo mucho más transparente para que se vea el fondo de atrás */
+    background: linear-gradient(160deg,
+      color-mix(in srgb, var(--bg-panel) 62%, transparent),
+      color-mix(in srgb, var(--bg-panel) 72%, transparent)) !important;
+    backdrop-filter: blur(12px) saturate(1.3);
+    -webkit-backdrop-filter: blur(12px) saturate(1.3);
   }
 }
 
-.back {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(0,0,0,0.4);
-  border: 1px solid color-mix(in srgb, var(--neon-1) 30%, transparent);
-  padding: 8px 18px;
-  border-radius: 40px;
-  color: var(--neon-1);
-  font-weight: 600;
-  font-size: 0.9rem;
-  cursor: none;
-  transition: all 0.25s var(--ease-out-expo);
-  white-space: nowrap;
-}
-.back:hover {
-  background: color-mix(in srgb, var(--neon-1) 12%, transparent);
-  box-shadow: 0 0 20px color-mix(in srgb, var(--neon-1) 25%, transparent);
-  transform: translateY(-2px);
-  border-color: var(--neon-1);
-}
-@media (max-width: 768px) { .back { padding: 6px 12px; font-size: 0.75rem; gap: 4px; } }
-
-/* Selector de servidores */
-.options {
+/* Cabecera compacta con selector de servidor */
+.player-header {
   display: flex;
-  flex: 1;
-  justify-content: flex-end;
+  justify-content: center;
   align-items: center;
-  max-width: 320px;
-}
-#serverSelect {
   width: 100%;
-  padding: 10px 40px 10px 18px;
-  background: rgba(0,0,0,0.5);
-  border: 1px solid color-mix(in srgb, var(--neon-1) 30%, transparent);
-  border-radius: 40px;
-  color: #fff;
-  font-size: 0.85rem;
-  font-family: var(--font-body);
-  cursor: none;
-  appearance: none;
-  -webkit-appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2300f0ff'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 14px center;
-  background-size: 16px;
-  transition: border-color 0.25s, box-shadow 0.25s, background 0.25s;
+  padding: 2px 0 4px;
 }
+.player-header .options {
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* 🎨 SELECTOR DE SERVIDORES — Rediseñado con estilo Archinime */
+#serverOptions select,
+#serverSelect {
+  width: 100% !important;
+  max-width: 420px !important;
+  padding: 12px 44px 12px 22px !important;
+  background:
+    linear-gradient(135deg,
+      color-mix(in srgb, var(--neon-1) 14%, rgba(0,0,0,0.55)),
+      color-mix(in srgb, var(--neon-2) 10%, rgba(0,0,0,0.55))) !important;
+  border: 1px solid color-mix(in srgb, var(--neon-1) 45%, transparent) !important;
+  border-radius: 100px !important;
+  color: #fff !important;
+  font-family: var(--font-display) !important;
+  font-size: 0.82rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 1.5px !important;
+  text-transform: uppercase !important;
+  text-align: center !important;
+  text-align-last: center !important;
+  cursor: none !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  background-image:
+    linear-gradient(135deg,
+      color-mix(in srgb, var(--neon-1) 14%, rgba(0,0,0,0.55)),
+      color-mix(in srgb, var(--neon-2) 10%, rgba(0,0,0,0.55))),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2300f0ff'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2.5' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat, no-repeat !important;
+  background-position: 0 0, right 18px center !important;
+  background-size: 100% 100%, 14px 14px !important;
+  box-shadow:
+    0 0 22px color-mix(in srgb, var(--neon-1) 18%, transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--neon-1) 25%, transparent) !important;
+  transition: all 0.3s var(--ease-out-expo) !important;
+  outline: none !important;
+}
+#serverOptions select:hover,
+#serverSelect:hover {
+  border-color: var(--neon-1) !important;
+  box-shadow:
+    0 0 35px color-mix(in srgb, var(--neon-1) 35%, transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--neon-1) 35%, transparent) !important;
+  transform: translateY(-1px) !important;
+  filter: brightness(1.1) !important;
+}
+#serverOptions select:focus,
 #serverSelect:focus {
-  outline: none;
-  border-color: var(--neon-1);
-  box-shadow: 0 0 25px color-mix(in srgb, var(--neon-1) 25%, transparent);
-  background-color: rgba(0,0,0,0.7);
+  border-color: var(--neon-1) !important;
+  box-shadow:
+    0 0 40px color-mix(in srgb, var(--neon-1) 45%, transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--neon-1) 40%, transparent) !important;
 }
-#serverSelect option { background: #0a0c14; color: #fff; }
-@media (max-width: 600px) { #serverSelect { font-size: 16px; } }
-@media (max-width: 768px) { #serverSelect { font-size: 0.75rem; padding: 8px 34px 8px 14px; background-position: right 10px center; background-size: 14px; } }
+#serverOptions select option,
+#serverSelect option {
+  background: #0a0c14 !important;
+  color: #fff !important;
+  font-family: var(--font-body) !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+  font-weight: 500 !important;
+  padding: 12px !important;
+}
+@media (max-width: 768px) {
+  #serverOptions select,
+  #serverSelect {
+    font-size: 0.72rem !important;
+    padding: 10px 38px 10px 16px !important;
+    background-position: 0 0, right 14px center !important;
+    background-size: 100% 100%, 13px 13px !important;
+    letter-spacing: 1px !important;
+  }
+}
 
 /* Player wrapper */
 .player-wrapper {
@@ -312,11 +331,11 @@ body.cursor-hover .cursor-ring { width: 60px; height: 60px; border-color: var(--
   background: #000;
   overflow: hidden;
   border-radius: var(--radius-md);
-  border: 1px solid color-mix(in srgb, var(--neon-1) 25%, var(--line));
+  border: 1px solid color-mix(in srgb, var(--neon-1) 30%, var(--line));
   box-shadow:
     0 20px 50px rgba(0,0,0,0.7),
-    0 0 40px color-mix(in srgb, var(--neon-1) 10%, transparent),
-    0 0 0 1px color-mix(in srgb, var(--neon-2) 18%, transparent) inset;
+    0 0 40px color-mix(in srgb, var(--neon-1) 12%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--neon-2) 20%, transparent) inset;
   contain: layout style;
 }
 .player-wrapper iframe,
@@ -464,8 +483,8 @@ body.cursor-hover .cursor-ring { width: 60px; height: 60px; border-color: var(--
    COMENTARIOS
    ============================================ */
 .comentarios-section {
-  margin-top: 20px;
-  padding-top: 24px;
+  margin-top: 12px;
+  padding-top: 22px;
   border-top: 1px solid color-mix(in srgb, var(--neon-1) 15%, transparent);
   position: relative;
 }
@@ -481,8 +500,8 @@ body.cursor-hover .cursor-ring { width: 60px; height: 60px; border-color: var(--
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 22px;
-  padding-bottom: 14px;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
   border-bottom: 1px solid color-mix(in srgb, var(--neon-1) 12%, transparent);
 }
 .comentarios-header i {
@@ -544,9 +563,9 @@ body.cursor-hover .cursor-ring { width: 60px; height: 60px; border-color: var(--
 .comentario-form-container {
   background: rgba(0,0,0,0.35);
   border-radius: var(--radius-md);
-  padding: 22px;
+  padding: 20px;
   border: 1px solid color-mix(in srgb, var(--neon-1) 25%, transparent);
-  margin-bottom: 26px;
+  margin-bottom: 24px;
   position: relative;
   overflow: hidden;
 }
@@ -664,7 +683,6 @@ body.cursor-hover .cursor-ring { width: 60px; height: 60px; border-color: var(--
 }
 .empty-comments i { display: block; font-size: 2rem; margin-bottom: 12px; color: var(--neon-1); }
 
-/* Preview del sticker en comentario */
 .comentario-sticker-preview {
   margin: 10px 0;
   padding: 10px;
@@ -715,7 +733,6 @@ body.cursor-hover .cursor-ring { width: 60px; height: 60px; border-color: var(--
 }
 .remove-sticker-btn:hover { transform: scale(1.15); }
 
-/* Panel de stickers */
 .sticker-panel-full {
   display: none;
   background: rgba(0,0,0,0.4);
@@ -1107,12 +1124,76 @@ html[data-quality="fluida"] #toastSticker, html[data-quality="fluida"] #toast, h
 html[data-quality="fluida"] .theme-dot.active::after { animation: none !important; }
 html[data-quality="fluida"] #userAvatarBtn:hover { box-shadow: none !important; }
 html[data-quality="fluida"] .btn:hover { box-shadow: none !important; transform: none !important; }
-html[data-quality="fluida"] .back:hover { box-shadow: none !important; transform: none !important; }
 html[data-quality="fluida"] .logo-blocker { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
 html[data-quality="fluida"] .player-wrapper { box-shadow: 0 10px 30px rgba(0,0,0,0.6) !important; }
 html[data-quality="fluida"] .aurora, html[data-quality="fluida"] .grid-floor,
 html[data-quality="fluida"] .noise, html[data-quality="fluida"] .scanlines,
 html[data-quality="fluida"] #particles { display: none !important; }
+
+/* ============================================================================
+   🎬 VIDEO DE FONDO — SIEMPRE VISIBLE EN MÓVIL
+   Antes en fluida se ocultaba por error. Ahora se mantiene visible.
+   ============================================================================ */
+html body #themeBgVideo {
+  filter: none !important;
+  -webkit-filter: none !important;
+  transform: translate3d(0, 0, 0) !important;
+  backface-visibility: hidden !important;
+  opacity: 0 !important;
+  transition: opacity 0.8s ease !important;
+  contain: layout style paint !important;
+  pointer-events: none !important;
+  will-change: opacity !important;
+}
+html body #themeBgVideo.active {
+  opacity: 0.55 !important;
+}
+html[data-quality="fluida"] body #themeBgVideo.active {
+  /* En fluida, el video sigue visible (es el único fondo que queda) */
+  opacity: 0.65 !important;
+}
+html[data-quality="media"] body #themeBgVideo.active {
+  opacity: 0.5 !important;
+}
+html[data-quality="alta"] body #themeBgVideo.active {
+  opacity: 0.55 !important;
+}
+
+/* Con video activo, atenuar el resto */
+html.theme-has-video .aurora { opacity: 0.06 !important; animation: none !important; }
+html.theme-has-video .grid-floor { opacity: 0.1 !important; animation: none !important; }
+html.theme-has-video .noise { opacity: 0.01 !important; }
+html.theme-has-video .scanlines { opacity: 0.08 !important; }
+html.theme-has-video #particles { opacity: 0.18 !important; }
+
+/* ============================================================================
+   📱 MÓVIL — Ajustes específicos
+   ============================================================================ */
+@media (max-width: 768px) {
+  /* El video de fondo se ve mejor en móvil */
+  html body #themeBgVideo.active { opacity: 0.75 !important; }
+  html[data-quality="fluida"] body #themeBgVideo.active { opacity: 0.75 !important; }
+
+  /* El contenedor es más transparente para dejar ver el fondo */
+  .container {
+    background: linear-gradient(160deg,
+      color-mix(in srgb, var(--bg-panel) 60%, transparent),
+      color-mix(in srgb, var(--bg-panel) 72%, transparent)) !important;
+    backdrop-filter: blur(10px) saturate(1.2);
+    -webkit-backdrop-filter: blur(10px) saturate(1.2);
+  }
+
+  /* El player-wrapper mantiene su negro sólido para que el video del anime se vea bien */
+  .player-wrapper {
+    background: #000 !important;
+    backdrop-filter: none !important;
+  }
+}
+
+/* Cuando NO hay video (cyan/magenta/emerald), mostramos aurora/grid con más fuerza
+   (el JS fuerza data-quality="alta" para estos temas) */
+html:not(.theme-has-video) .aurora { opacity: var(--q-aurora-opacity) !important; }
+html:not(.theme-has-video) .grid-floor { opacity: var(--q-grid-opacity) !important; }
 </style>
 </head>
 <body>
@@ -1161,10 +1242,8 @@ html[data-quality="fluida"] #particles { display: none !important; }
   </a>
 
   <div class="nav-actions">
-    <button id="backNavBtn" class="cyber-btn-icon" title="Volver" aria-label="Volver" onclick="history.length > 1 ? history.back() : location.href='../index.html'"><i class="fas fa-arrow-left"></i></button>
     <div class="theme-dots" role="group" aria-label="Cambiar tema de color"></div>
     <button id="configBtn" class="config-nav-btn" title="Configuración" aria-label="Configuración"><i class="fas fa-sliders-h"></i></button>
-    <button id="cmdNavBtn" class="cyber-btn-icon" title="Consola (Ctrl+K)" aria-label="Consola" data-cmd-open><i class="fas fa-terminal"></i></button>
     <div class="user-menu">
       <img id="userAvatarBtn" src="../assets/img/invitado.avif" alt="Usuario">
       <div id="userDropdown" class="user-dropdown">
@@ -1182,8 +1261,7 @@ html[data-quality="fluida"] #particles { display: none !important; }
 </nav>
 
 <div class="container" id="mainContainer">
-  <div class="top-buttons">
-    <a href="../index.html" id="backLink" class="back"><i class="fas fa-arrow-left"></i> Volver</a>
+  <div class="player-header">
     <div class="options" id="serverOptions"></div>
   </div>
 
@@ -1226,7 +1304,7 @@ html[data-quality="fluida"] #particles { display: none !important; }
       </div>
 
       <div class="comentario-input-wrapper">
-        <textarea id="comentarioTexto" placeholder="Escribe un comentario... (Ctrl+Enter para enviar)" maxlength="500"></textarea>
+        <textarea id="comentarioTexto" placeholder="Escribe un comentario..." maxlength="500"></textarea>
         <button type="button" class="sticker-btn" onclick="window.videoPlayer?.toggleStickerPanel()" title="Stickers">
           <i class="fas fa-smile"></i>
         </button>
@@ -1792,7 +1870,6 @@ window.showToastSticker = showToast;
       }
     }, 150);
   }
-  document.querySelectorAll('[data-cmd-open]').forEach(b => b.addEventListener('click', openCmd));
   cmdOverlay.addEventListener('click', e => { if (e.target === cmdOverlay) closeCmd(); });
   cmdInput.addEventListener('input', e => filterCmd(e.target.value));
   cmdInput.addEventListener('keydown', e => {
@@ -1898,18 +1975,44 @@ if ('serviceWorker' in navigator) {
   });
 }
 
-/* Ctrl+Enter para enviar comentario */
-document.addEventListener('DOMContentLoaded', () => {
-  const ta = document.getElementById('comentarioTexto');
-  if (ta) {
-    ta.addEventListener('keydown', (e) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-        e.preventDefault();
-        if (window.videoPlayer?.enviarComentario) window.videoPlayer.enviarComentario();
-      }
-    });
+/* ============================================================
+   🎨 THEME QUALITY OVERRIDE
+   Temas SIN video (cyan, magenta, emerald) → siempre calidad ALTA.
+   Temas CON video (galaxy) → usa la calidad elegida por el usuario.
+   ============================================================ */
+(function() {
+  const userQuality = (window.__archinimeConfig && window.__archinimeConfig.quality) || 'media';
+
+  function applyEffectiveQuality() {
+    const themes = window.ArchinimeThemes;
+    if (!themes || typeof themes.getCurrent !== 'function') return;
+    const currentId = themes.getCurrent();
+    const theme = themes.get ? themes.get(currentId) : null;
+    const hasVideo = !!(theme && theme.bgVideo);
+    const effective = hasVideo ? userQuality : 'alta';
+
+    if (document.documentElement.dataset.quality !== effective) {
+      document.documentElement.dataset.quality = effective;
+      console.log('[theme-quality] Aplicado: ' + effective + ' (tema: ' + currentId + ', tiene video: ' + hasVideo + ')');
+    }
   }
-});
+
+  // Escuchar cambios de tema
+  window.addEventListener('archinime:theme-changed', applyEffectiveQuality);
+
+  // Aplicar al arranque (esperando por si themes.js aún no cargó)
+  function tryInit(attempts) {
+    if (window.ArchinimeThemes && typeof window.ArchinimeThemes.getCurrent === 'function') {
+      applyEffectiveQuality();
+    } else if (attempts > 0) {
+      setTimeout(() => tryInit(attempts - 1), 100);
+    }
+  }
+  tryInit(20);
+
+  // Exponer para debug
+  window.__applyEffectiveQuality = applyEffectiveQuality;
+})();
 
 console.log('%c✅ Archinime Player v28.8 · Quality: ' + (window.__archinimeConfig?.quality || 'media'), 'color:#00f0ff;font-family:monospace;font-weight:bold;');
 </script>
