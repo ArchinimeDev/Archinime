@@ -40,49 +40,45 @@
       isDefault: true,
       bgVideo: 'https://cdn.jsdelivr.net/gh/ArchinimeDev/Archinime@main/assets/videos/galaxia.mp4',
       vars: {
-        // Violeta neón puro — brilla con fuerza sobre el fondo morado
-        '--neon-1': '#bf4dff',
-        // Cian neón clásico — contraste fuerte y limpio sobre la galaxia
-        '--neon-2': '#00f0ff',
-        // Rosa neón intenso — vibrante, tipo hot pink fluorescente
-        '--neon-3': '#ff2eb8',
-        // Amarillo neón intenso — acento final brillante
-        '--neon-4': '#ffe600',
-        // Fondo violeta muy oscuro, coherente con el video
-        '--bg-deep': '#08051a'
+        '--neon-1': '#bf4dff',   // Violeta neón
+        '--neon-2': '#00f0ff',   // Cian clásico
+        '--neon-3': '#ff2eb8',   // Rosa hot pink
+        '--neon-4': '#ffe600',   // Amarillo neón
+        '--bg-deep': '#08051a'   // Fondo violeta oscuro
       }
     },
 
-    cyan: {
-      id: 'cyan',
-      name: 'Cyan',
-      swatch: '#00f0ff',
-      vars: {} // usa los valores de :root
-    },
-
-    magenta: {
-      id: 'magenta',
-      name: 'Magenta',
-      swatch: '#ff1a6b',
+    // =========================================================
+    // ⚡ VELOCITY — VELOCIDAD LUZ NEÓN (video + paleta energética)
+    // =========================================================
+    velocity: {
+      id: 'velocity',
+      name: 'Velocity',
+      swatch: '#ff3d00',
+      bgVideo: 'https://cdn.jsdelivr.net/gh/ArchinimeDev/Archinime@main/assets/videos/Fondo%20video%20Velocidad%20luz%20ne%C3%B3n%20brillante%20HD.mp4',
       vars: {
-        '--neon-1': '#ff1a6b',
-        '--neon-2': '#ff9a00',
-        '--neon-3': '#b114ff',
-        '--neon-4': '#ffd700',
-        '--bg-deep': '#0a050a'
+        '--neon-1': '#ff3d00',   // Naranja eléctrico
+        '--neon-2': '#00e5ff',   // Cian brillante
+        '--neon-3': '#ff00e5',   // Magenta neón
+        '--neon-4': '#ffee00',   // Amarillo eléctrico
+        '--bg-deep': '#0a0208'   // Fondo cálido oscuro
       }
     },
 
-    emerald: {
-      id: 'emerald',
-      name: 'Emerald',
-      swatch: '#7dff5c',
+    // =========================================================
+    // 🎉 PARTY — LUCES DE COLORES PARA FIESTAS (video + paleta multicolor)
+    // =========================================================
+    party: {
+      id: 'party',
+      name: 'Party',
+      swatch: '#ff0080',
+      bgVideo: 'https://cdn.jsdelivr.net/gh/ArchinimeDev/Archinime@main/assets/videos/Luces%20de%20colores%20para%20fiestas%20%F0%9F%8C%88%20FONDO%20de%20PANTALLA%20con%20MOVIMIENTO.mp4',
       vars: {
-        '--neon-1': '#7dff5c',
-        '--neon-2': '#00f0ff',
-        '--neon-3': '#00ff9d',
-        '--neon-4': '#ffd700',
-        '--bg-deep': '#030806'
+        '--neon-1': '#ff0080',   // Rosa fucsia intenso
+        '--neon-2': '#00ffea',   // Turquesa brillante
+        '--neon-3': '#b100ff',   // Púrpura eléctrico
+        '--neon-4': '#ffea00',   // Amarillo fiesta
+        '--bg-deep': '#06030d'   // Fondo nocturno profundo
       }
     }
 
@@ -121,14 +117,13 @@
         transform: translateZ(0);
 
         /* 🎬 FILTRO UNIFICADO:
-           El video se ve IGUAL en fluida, media y alta.
-           Antes solo fluida tenía este filtro; ahora se aplica siempre. */
+           El video se ve IGUAL en fluida, media y alta. */
         filter: brightness(0.55) saturate(1.05);
       }
       #${VIDEO_EL_ID}.active { opacity: 1; }
 
       /* Cuando hay video activo, suavizamos el resto de efectos
-         para que la galaxia respire y los textos se lean bien */
+         para que el video respire y los textos se lean bien */
       html.theme-has-video .aurora     { opacity: 0.12 !important; }
       html.theme-has-video .grid-floor { opacity: 0.18 !important; }
       html.theme-has-video .vignette {
