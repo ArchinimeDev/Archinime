@@ -191,8 +191,7 @@ body.cursor-hover .cursor-ring { width: 60px; height: 60px; border-color: var(--
 }
 
 /* ============================================
-   CONTAINER — AHORA TRANSPARENTE
-   El contenido flota sobre el video de fondo.
+   CONTAINER — TRANSPARENTE
    ============================================ */
 .container {
   position: relative;
@@ -221,43 +220,87 @@ body.cursor-hover .cursor-ring { width: 60px; height: 60px; border-color: var(--
   }
 }
 
-/* 🎨 PANEL SUPERIOR — SELECTOR DE SERVIDORES (con blur) */
+/* 🎨 PLAYER HEADER — CONTROLES UNIFICADOS (Volver + Servidor) */
 .player-header {
   display: flex;
-  justify-content: center;
-  align-items: center;
+  align-items: stretch;
+  gap: 10px;
   width: 100%;
-  padding: 12px 16px;
-  background: color-mix(in srgb, var(--bg-deep) 62%, transparent);
+  max-width: 620px;
+  margin: 0 auto;
+  padding: 10px;
+  background: color-mix(in srgb, var(--bg-deep) 70%, transparent);
   backdrop-filter: blur(14px) saturate(1.3);
   -webkit-backdrop-filter: blur(14px) saturate(1.3);
-  border: 1px solid color-mix(in srgb, var(--neon-1) 22%, transparent);
-  border-radius: 16px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-}
-.player-header .options {
-  width: 100%;
-  max-width: 480px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  border: 1px solid color-mix(in srgb, var(--neon-1) 20%, transparent);
+  border-radius: 100px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.45);
 }
 
-/* 🎨 SELECTOR DE SERVIDORES */
+/* 🎯 Botón Volver — mismo estilo que el selector */
+.back-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 22px;
+  min-height: 46px;
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--neon-1) 12%, rgba(0,0,0,0.55)),
+    color-mix(in srgb, var(--neon-2) 8%, rgba(0,0,0,0.55)));
+  border: 1px solid color-mix(in srgb, var(--neon-1) 40%, transparent);
+  border-radius: 100px;
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  cursor: none;
+  flex-shrink: 0;
+  white-space: nowrap;
+  transition: all 0.25s var(--ease-out-expo);
+  box-shadow:
+    0 0 20px color-mix(in srgb, var(--neon-1) 15%, transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--neon-1) 25%, transparent);
+  text-decoration: none;
+}
+.back-nav-btn:hover {
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--neon-1) 25%, rgba(0,0,0,0.5)),
+    color-mix(in srgb, var(--neon-2) 18%, rgba(0,0,0,0.5)));
+  border-color: var(--neon-1);
+  box-shadow:
+    0 0 32px color-mix(in srgb, var(--neon-1) 40%, transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--neon-1) 40%, transparent);
+  transform: translateY(-1px);
+}
+.back-nav-btn i { font-size: 0.85rem; }
+
+/* Selector de servidor — MISMO alto y estilo que el botón Volver */
+.player-header .options {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  min-width: 0;
+}
+
 #serverOptions select,
 #serverSelect {
   width: 100% !important;
-  max-width: 420px !important;
-  padding: 12px 44px 12px 22px !important;
+  max-width: none !important;
+  min-height: 46px;
+  padding: 0 44px 0 24px !important;
   background:
     linear-gradient(135deg,
-      color-mix(in srgb, var(--neon-1) 14%, rgba(0,0,0,0.55)),
-      color-mix(in srgb, var(--neon-2) 10%, rgba(0,0,0,0.55))) !important;
-  border: 1px solid color-mix(in srgb, var(--neon-1) 45%, transparent) !important;
+      color-mix(in srgb, var(--neon-1) 12%, rgba(0,0,0,0.55)),
+      color-mix(in srgb, var(--neon-2) 8%, rgba(0,0,0,0.55))) !important;
+  border: 1px solid color-mix(in srgb, var(--neon-1) 40%, transparent) !important;
   border-radius: 100px !important;
   color: #fff !important;
   font-family: var(--font-display) !important;
-  font-size: 0.82rem !important;
+  font-size: 0.78rem !important;
   font-weight: 800 !important;
   letter-spacing: 1.5px !important;
   text-transform: uppercase !important;
@@ -268,14 +311,14 @@ body.cursor-hover .cursor-ring { width: 60px; height: 60px; border-color: var(--
   -webkit-appearance: none !important;
   background-image:
     linear-gradient(135deg,
-      color-mix(in srgb, var(--neon-1) 14%, rgba(0,0,0,0.55)),
-      color-mix(in srgb, var(--neon-2) 10%, rgba(0,0,0,0.55))),
+      color-mix(in srgb, var(--neon-1) 12%, rgba(0,0,0,0.55)),
+      color-mix(in srgb, var(--neon-2) 8%, rgba(0,0,0,0.55))),
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2300f0ff'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2.5' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E") !important;
   background-repeat: no-repeat, no-repeat !important;
-  background-position: 0 0, right 18px center !important;
+  background-position: 0 0, right 20px center !important;
   background-size: 100% 100%, 14px 14px !important;
   box-shadow:
-    0 0 22px color-mix(in srgb, var(--neon-1) 18%, transparent),
+    0 0 20px color-mix(in srgb, var(--neon-1) 15%, transparent),
     inset 0 1px 0 color-mix(in srgb, var(--neon-1) 25%, transparent) !important;
   transition: all 0.3s var(--ease-out-expo) !important;
   outline: none !important;
@@ -284,16 +327,15 @@ body.cursor-hover .cursor-ring { width: 60px; height: 60px; border-color: var(--
 #serverSelect:hover {
   border-color: var(--neon-1) !important;
   box-shadow:
-    0 0 35px color-mix(in srgb, var(--neon-1) 35%, transparent),
-    inset 0 1px 0 color-mix(in srgb, var(--neon-1) 35%, transparent) !important;
+    0 0 32px color-mix(in srgb, var(--neon-1) 35%, transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--neon-1) 40%, transparent) !important;
   transform: translateY(-1px) !important;
-  filter: brightness(1.1) !important;
 }
 #serverOptions select:focus,
 #serverSelect:focus {
   border-color: var(--neon-1) !important;
   box-shadow:
-    0 0 40px color-mix(in srgb, var(--neon-1) 45%, transparent),
+    0 0 38px color-mix(in srgb, var(--neon-1) 45%, transparent),
     inset 0 1px 0 color-mix(in srgb, var(--neon-1) 40%, transparent) !important;
 }
 #serverOptions select option,
@@ -306,18 +348,37 @@ body.cursor-hover .cursor-ring { width: 60px; height: 60px; border-color: var(--
   font-weight: 500 !important;
   padding: 12px !important;
 }
+
 @media (max-width: 768px) {
+  .player-header {
+    max-width: none;
+    padding: 8px;
+    gap: 6px;
+    border-radius: 100px;
+  }
+  .back-nav-btn {
+    padding: 0 14px;
+    min-height: 42px;
+    font-size: 0.68rem;
+    letter-spacing: 1px;
+    gap: 6px;
+  }
+  .back-nav-btn .back-label {
+    display: none;
+  }
+  .back-nav-btn i { font-size: 0.95rem; }
   #serverOptions select,
   #serverSelect {
-    font-size: 0.72rem !important;
-    padding: 10px 38px 10px 16px !important;
-    background-position: 0 0, right 14px center !important;
-    background-size: 100% 100%, 13px 13px !important;
+    min-height: 42px;
+    font-size: 0.7rem !important;
+    padding: 0 36px 0 18px !important;
+    background-position: 0 0, right 16px center !important;
+    background-size: 100% 100%, 12px 12px !important;
     letter-spacing: 1px !important;
   }
 }
 
-/* 🎬 PLAYER — se mantiene negro sólido (es el video en sí) */
+/* 🎬 PLAYER */
 .player-wrapper {
   position: relative;
   padding-bottom: 56.25%;
@@ -394,7 +455,6 @@ body.cursor-hover .cursor-ring { width: 60px; height: 60px; border-color: var(--
 }
 @media (max-width: 768px) { .logo-blocker { height: 20%; min-height: 55px; padding-top: 4%; } }
 
-/* 📝 TÍTULO DEL EPISODIO — sin caja, solo texto sobre el video */
 #epTitle {
   text-align: center;
   margin: 4px auto 0;
@@ -413,7 +473,6 @@ body.cursor-hover .cursor-ring { width: 60px; height: 60px; border-color: var(--
   filter: drop-shadow(0 4px 14px rgba(0,0,0,0.95));
 }
 
-/* 🎛️ CONTROLES (Ant / Descargar / Sig) */
 .controls {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
@@ -478,7 +537,7 @@ body.cursor-hover .cursor-ring { width: 60px; height: 60px; border-color: var(--
 }
 
 /* ============================================
-   🎨 ZONA DE COMENTARIOS — con blur, flotando sobre el video
+   COMENTARIOS
    ============================================ */
 .comentarios-section {
   margin-top: 12px;
@@ -981,7 +1040,7 @@ body.cursor-hover .cursor-ring { width: 60px; height: 60px; border-color: var(--
 #configModal .config-option-desc { font-size: 0.62rem; color: #4a5266; line-height: 1.3; }
 #configModal .config-option.active .config-option-desc { color: #8a90a0; }
 
-/* FIX: THEME DOTS EN EL MODAL DE CONFIG */
+/* THEME DOTS EN EL MODAL */
 #configModal .config-theme-dots {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -1102,27 +1161,26 @@ html[data-chroma="on"] #stageContainer { display: block !important; }
 }
 
 /* ============================================================================
-   v28.8 — SISTEMA DE CALIDAD VISUAL
+   v28.9 — SISTEMA DE CALIDAD VISUAL OPTIMIZADO
    ============================================================================ */
 html {
-  --q-blur-aurora: 40px;
-  --q-aurora-opacity: 0.42;
-  --q-aurora-anim: 24s;
-  --q-grid-opacity: 0.4;
+  --q-blur-aurora: 32px;
+  --q-aurora-opacity: 0.4;
+  --q-aurora-anim: 40s;
+  --q-grid-opacity: 0.35;
   --q-grid-size: 60px;
-  --q-grid-anim: 24s;
-  --q-noise-opacity: 0.035;
-  --q-scanlines-opacity: 0.5;
-  --q-hud-opacity: 1;
-  --q-backdrop-blur: 10px;
-  --q-backdrop-sat: 1.3;
-  --q-neon-glow: 1;
+  --q-grid-anim: 40s;
+  --q-noise-opacity: 0.025;
+  --q-scanlines-opacity: 0.35;
+  --q-hud-opacity: 0.7;
+  --q-backdrop-blur: 8px;
+  --q-backdrop-sat: 1.2;
+  --q-neon-glow: 0.8;
   --q-reveal-dur: 0.7s;
-  --q-nav-bg: color-mix(in srgb, var(--bg-deep) 55%, transparent);
-  --q-nav-bg-scrolled: color-mix(in srgb, var(--bg-deep) 88%, transparent);
-  --q-glass-bg: color-mix(in srgb, var(--bg-panel) 78%, transparent);
+  --q-nav-bg: color-mix(in srgb, var(--bg-deep) 62%, transparent);
+  --q-nav-bg-scrolled: color-mix(in srgb, var(--bg-deep) 90%, transparent);
   --q-panel-bg: color-mix(in srgb, var(--bg-panel) 92%, transparent);
-  --q-vignette-strength: 85%;
+  --q-vignette-strength: 82%;
 }
 html[data-quality="fluida"] {
   --q-blur-aurora: 20px; --q-aurora-opacity: 0.18; --q-aurora-anim: 0s;
@@ -1131,79 +1189,154 @@ html[data-quality="fluida"] {
   --q-backdrop-blur: 0px; --q-backdrop-sat: 1; --q-neon-glow: 0;
   --q-reveal-dur: 0.35s;
   --q-nav-bg: var(--bg-deep); --q-nav-bg-scrolled: var(--bg-deep);
-  --q-glass-bg: var(--bg-panel); --q-panel-bg: var(--bg-panel);
+  --q-panel-bg: var(--bg-panel);
   --q-vignette-strength: 60%;
 }
 html[data-quality="media"] {
-  --q-blur-aurora: 30px; --q-aurora-opacity: 0.32; --q-aurora-anim: 32s;
-  --q-grid-opacity: 0.22; --q-grid-size: 54px; --q-grid-anim: 30s;
-  --q-noise-opacity: 0.02; --q-scanlines-opacity: 0.2; --q-hud-opacity: 0.6;
+  --q-blur-aurora: 26px; --q-aurora-opacity: 0.3; --q-aurora-anim: 0s;
+  --q-grid-opacity: 0.2; --q-grid-size: 54px; --q-grid-anim: 0s;
+  --q-noise-opacity: 0.015; --q-scanlines-opacity: 0.15; --q-hud-opacity: 0.5;
   --q-backdrop-blur: 6px; --q-backdrop-sat: 1.2; --q-neon-glow: 0.5;
   --q-reveal-dur: 0.55s;
   --q-nav-bg: color-mix(in srgb, var(--bg-deep) 82%, transparent);
   --q-nav-bg-scrolled: color-mix(in srgb, var(--bg-deep) 96%, transparent);
-  --q-glass-bg: color-mix(in srgb, var(--bg-panel) 92%, transparent);
   --q-panel-bg: color-mix(in srgb, var(--bg-panel) 96%, transparent);
   --q-vignette-strength: 78%;
 }
 html[data-quality="alta"] {
-  --q-blur-aurora: 40px; --q-aurora-opacity: 0.48; --q-aurora-anim: 22s;
-  --q-grid-opacity: 0.42; --q-grid-size: 60px; --q-grid-anim: 20s;
-  --q-noise-opacity: 0.04; --q-scanlines-opacity: 0.55; --q-hud-opacity: 1;
-  --q-backdrop-blur: 10px; --q-backdrop-sat: 1.5; --q-neon-glow: 1.2;
-  --q-reveal-dur: 0.8s;
-  --q-nav-bg: color-mix(in srgb, var(--bg-deep) 48%, transparent);
-  --q-nav-bg-scrolled: color-mix(in srgb, var(--bg-deep) 84%, transparent);
-  --q-glass-bg: color-mix(in srgb, var(--bg-panel) 74%, transparent);
-  --q-panel-bg: color-mix(in srgb, var(--bg-panel) 90%, transparent);
-  --q-vignette-strength: 86%;
+  --q-blur-aurora: 32px;
+  --q-aurora-opacity: 0.4;
+  --q-aurora-anim: 0s;
+  --q-grid-opacity: 0.32;
+  --q-grid-size: 60px;
+  --q-grid-anim: 0s;
+  --q-noise-opacity: 0.02;
+  --q-scanlines-opacity: 0.3;
+  --q-hud-opacity: 0.8;
+  --q-backdrop-blur: 8px;
+  --q-backdrop-sat: 1.3;
+  --q-neon-glow: 1;
+  --q-reveal-dur: 0.7s;
+  --q-nav-bg: color-mix(in srgb, var(--bg-deep) 55%, transparent);
+  --q-nav-bg-scrolled: color-mix(in srgb, var(--bg-deep) 88%, transparent);
+  --q-panel-bg: color-mix(in srgb, var(--bg-panel) 92%, transparent);
+  --q-vignette-strength: 84%;
 }
+
 .aurora { filter: blur(var(--q-blur-aurora)) !important; opacity: var(--q-aurora-opacity) !important; animation-duration: var(--q-aurora-anim) !important; }
-html[data-quality="fluida"] .aurora, html[data-quality="media"] .aurora { animation: none !important; }
+html[data-quality="fluida"] .aurora,
+html[data-quality="media"] .aurora,
+html[data-quality="alta"] .aurora { animation: none !important; }
+
 .grid-floor { opacity: var(--q-grid-opacity) !important; background-size: var(--q-grid-size) var(--q-grid-size) !important; animation-duration: var(--q-grid-anim) !important; }
-html[data-quality="fluida"] .grid-floor, html[data-quality="media"] .grid-floor { animation: none !important; }
+html[data-quality="fluida"] .grid-floor,
+html[data-quality="media"] .grid-floor,
+html[data-quality="alta"] .grid-floor { animation: none !important; }
+
 .noise { opacity: var(--q-noise-opacity) !important; }
 html[data-quality="fluida"] .noise { display: none !important; }
+
 .scanlines { opacity: var(--q-scanlines-opacity) !important; }
 html[data-quality="fluida"] .scanlines { display: none !important; }
-html[data-quality="media"] .scanlines { mix-blend-mode: normal; }
+html[data-quality="media"] .scanlines,
+html[data-quality="alta"] .scanlines { mix-blend-mode: normal; }
+
 .hud-frame { opacity: var(--q-hud-opacity) !important; }
 html[data-quality="fluida"] .hud-frame { display: none !important; }
+
 .vignette { background: radial-gradient(ellipse at center, transparent 40%, color-mix(in srgb, var(--bg-deep) var(--q-vignette-strength), transparent) 100%) !important; }
 .nav { background: var(--q-nav-bg) !important; backdrop-filter: blur(var(--q-backdrop-blur)) saturate(var(--q-backdrop-sat)) !important; -webkit-backdrop-filter: blur(var(--q-backdrop-blur)) saturate(var(--q-backdrop-sat)) !important; }
 .nav.scrolled { background: var(--q-nav-bg-scrolled) !important; }
+
 .user-dropdown, .cmd-panel { backdrop-filter: blur(var(--q-backdrop-blur)) saturate(var(--q-backdrop-sat)) !important; -webkit-backdrop-filter: blur(var(--q-backdrop-blur)) saturate(var(--q-backdrop-sat)) !important; background: var(--q-panel-bg) !important; }
 .auth-modal, .profile-modal { backdrop-filter: blur(calc(var(--q-backdrop-blur) * 0.6)) !important; -webkit-backdrop-filter: blur(calc(var(--q-backdrop-blur) * 0.6)) !important; }
 .cmd-overlay { backdrop-filter: blur(calc(var(--q-backdrop-blur) * 0.6)) !important; -webkit-backdrop-filter: blur(calc(var(--q-backdrop-blur) * 0.6)) !important; }
 #configModal { backdrop-filter: blur(calc(var(--q-backdrop-blur) * 0.7)) !important; -webkit-backdrop-filter: blur(calc(var(--q-backdrop-blur) * 0.7)) !important; }
-html[data-quality="fluida"] .nav, html[data-quality="fluida"] .nav.scrolled,
-html[data-quality="fluida"] .user-dropdown, html[data-quality="fluida"] .cmd-panel,
-html[data-quality="fluida"] .cmd-overlay, html[data-quality="fluida"] .auth-modal,
-html[data-quality="fluida"] .profile-modal, html[data-quality="fluida"] #configModal { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; background: var(--bg-deep) !important; }
-html[data-quality="fluida"] .user-dropdown, html[data-quality="fluida"] .cmd-panel { background: var(--bg-panel) !important; }
+
+.player-header,
+.comentarios-section,
+.comentario-form-container,
+.comentario-login-message,
+.sticker-panel-full,
+.btn {
+  backdrop-filter: blur(var(--q-backdrop-blur)) saturate(var(--q-backdrop-sat));
+  -webkit-backdrop-filter: blur(var(--q-backdrop-blur)) saturate(var(--q-backdrop-sat));
+}
+
+html[data-quality="fluida"] .nav,
+html[data-quality="fluida"] .nav.scrolled,
+html[data-quality="fluida"] .user-dropdown,
+html[data-quality="fluida"] .cmd-panel,
+html[data-quality="fluida"] .cmd-overlay,
+html[data-quality="fluida"] .auth-modal,
+html[data-quality="fluida"] .profile-modal,
+html[data-quality="fluida"] #configModal { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; background: var(--bg-deep) !important; }
+html[data-quality="fluida"] .user-dropdown,
+html[data-quality="fluida"] .cmd-panel { background: var(--bg-panel) !important; }
+
+html[data-quality="alta"] .comentario-login-message,
+html[data-quality="alta"] .comentario-form-container,
+html[data-quality="alta"] .sticker-panel-full,
+html[data-quality="alta"] .btn,
+html[data-quality="alta"] .user-dropdown,
+html[data-quality="alta"] .cmd-panel {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+html[data-quality="alta"] .comentario-login-message,
+html[data-quality="alta"] .comentario-form-container,
+html[data-quality="alta"] .sticker-panel-full {
+  background: color-mix(in srgb, var(--bg-deep) 82%, transparent) !important;
+}
+html[data-quality="alta"] .btn {
+  background: color-mix(in srgb, var(--bg-deep) 85%, transparent) !important;
+}
+html[data-quality="alta"] .user-dropdown,
+html[data-quality="alta"] .cmd-panel {
+  background: color-mix(in srgb, var(--bg-panel) 98%, transparent) !important;
+}
+
 html[data-quality="fluida"] .nav-logo .logo-img { animation: none !important; filter: none !important; }
 html[data-quality="fluida"] .nav-logo .dot { animation: none !important; box-shadow: none !important; }
 html[data-quality="fluida"] .nav-logo .txt { animation: none !important; background-image: linear-gradient(135deg, #fff, var(--neon-1)) !important; -webkit-background-clip: text !important; background-clip: text !important; -webkit-text-fill-color: transparent !important; color: transparent !important; }
 html[data-quality="fluida"] .nav-status .status-led { animation: none !important; box-shadow: none !important; }
+
+html[data-quality="alta"] .nav-logo .logo-img { animation: none !important; filter: drop-shadow(0 0 10px color-mix(in srgb, var(--neon-1) 55%, transparent)) !important; }
+html[data-quality="alta"] .nav-logo .dot { animation: none !important; }
+html[data-quality="alta"] .nav-logo .txt { animation: none !important; background-position: 0% 50% !important; }
+html[data-quality="alta"] .nav-status .status-led { animation: none !important; }
+html[data-quality="alta"] .theme-dot.active::after { animation: none !important; }
+html[data-quality="alta"] #pwaNotif .pwa-icon { animation: none !important; }
+
 .cursor-dot { box-shadow: 0 0 calc(12px * var(--q-neon-glow)) var(--neon-1) !important; }
 html[data-quality="fluida"] .cursor-dot { box-shadow: none !important; }
 html[data-quality="fluida"] .cursor-ring { border-color: color-mix(in srgb, var(--neon-1) 40%, transparent) !important; }
-html[data-quality="fluida"] .cyber-btn-icon:hover, html[data-quality="fluida"] .config-nav-btn:hover { box-shadow: none !important; transform: none !important; }
+
+html[data-quality="fluida"] .cyber-btn-icon:hover,
+html[data-quality="fluida"] .config-nav-btn:hover { box-shadow: none !important; transform: none !important; }
+
 html[data-quality="fluida"] #pwaNotif { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; box-shadow: 0 10px 30px rgba(0,0,0,0.6) !important; }
 html[data-quality="fluida"] #pwaNotif .pwa-icon { animation: none !important; box-shadow: none !important; }
-html[data-quality="fluida"] .loader-logo path, html[data-quality="fluida"] .loader-logo circle, html[data-quality="fluida"] .loader-logo line { filter: none !important; }
-html[data-quality="fluida"] .loader-progress-bar, html[data-quality="fluida"] .progress-bar { box-shadow: none !important; }
-html[data-quality="fluida"] #toastSticker, html[data-quality="fluida"] #toast, html[data-quality="fluida"] #toastComent { box-shadow: none !important; }
-html[data-quality="fluida"] .theme-dot.active::after { animation: none !important; }
+html[data-quality="fluida"] .loader-logo path,
+html[data-quality="fluida"] .loader-logo circle,
+html[data-quality="fluida"] .loader-logo line { filter: none !important; }
+html[data-quality="fluida"] .loader-progress-bar,
+html[data-quality="fluida"] .progress-bar { box-shadow: none !important; }
+html[data-quality="fluida"] #toastSticker,
+html[data-quality="fluida"] #toast,
+html[data-quality="fluida"] #toastComent { box-shadow: none !important; }
 html[data-quality="fluida"] #userAvatarBtn:hover { box-shadow: none !important; }
 html[data-quality="fluida"] .btn:hover { box-shadow: none !important; transform: none !important; }
+html[data-quality="fluida"] .back-nav-btn:hover { box-shadow: none !important; transform: none !important; }
 html[data-quality="fluida"] .logo-blocker { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
 html[data-quality="fluida"] .player-wrapper { box-shadow: 0 10px 30px rgba(0,0,0,0.6) !important; }
-html[data-quality="fluida"] .aurora, html[data-quality="fluida"] .grid-floor,
-html[data-quality="fluida"] .noise, html[data-quality="fluida"] .scanlines,
+html[data-quality="fluida"] .aurora,
+html[data-quality="fluida"] .grid-floor,
+html[data-quality="fluida"] .noise,
+html[data-quality="fluida"] .scanlines,
 html[data-quality="fluida"] #particles { display: none !important; }
 
-/* En fluida, quitar backdrop-filter en bloques semi-transparentes (ahorrar GPU) */
+/* En fluida, quitar backdrop-filter en bloques semi-transparentes */
 html[data-quality="fluida"] .player-header,
 html[data-quality="fluida"] .comentarios-section,
 html[data-quality="fluida"] .comentario-form-container,
@@ -1217,8 +1350,16 @@ html[data-quality="fluida"] .comentario-login-message,
 html[data-quality="fluida"] .sticker-panel-full { background: rgba(4,5,10,0.85) !important; }
 html[data-quality="fluida"] .btn { background: rgba(4,5,10,0.85) !important; }
 
+/* content-visibility para secciones fuera de pantalla */
+.comentarios-section,
+.sticker-panel-full {
+  content-visibility: auto;
+  contain-intrinsic-size: 400px;
+}
+.player-wrapper { contain: layout style paint; }
+
 /* ============================================================================
-   🎬 VIDEO DE FONDO — mismo brillo que index / anime-detail
+   🎬 VIDEO DE FONDO
    ============================================================================ */
 html body #themeBgVideo {
   filter: none !important;
@@ -1231,7 +1372,6 @@ html body #themeBgVideo {
   pointer-events: none !important;
   will-change: opacity !important;
 }
-/* ✅ Mismo brillo en todas las calidades */
 html body #themeBgVideo.active { opacity: 0.85 !important; }
 html[data-quality="fluida"] body #themeBgVideo.active { opacity: 0.9 !important; }
 html[data-quality="media"] body #themeBgVideo.active { opacity: 0.85 !important; }
@@ -1240,11 +1380,11 @@ html[data-quality="alta"] body #themeBgVideo.active { opacity: 0.85 !important; 
 html.theme-has-video .aurora { opacity: 0.08 !important; animation: none !important; }
 html.theme-has-video .grid-floor { opacity: 0.12 !important; animation: none !important; }
 html.theme-has-video .noise { opacity: 0.01 !important; }
-html.theme-has-video .scanlines { opacity: 0.1 !important; }
-html.theme-has-video #particles { opacity: 0.22 !important; }
+html.theme-has-video .scanlines { opacity: 0.08 !important; }
+html.theme-has-video #particles { opacity: 0.15 !important; }
 
 /* ============================================================================
-   📱 MÓVIL — sin override de container opaco
+   📱 MÓVIL
    ============================================================================ */
 @media (max-width: 768px) {
   html body #themeBgVideo.active { opacity: 0.9 !important; }
@@ -1305,10 +1445,6 @@ html:not(.theme-has-video) .grid-floor { opacity: var(--q-grid-opacity) !importa
   </a>
 
   <div class="nav-actions">
-    <button id="backNavBtn" class="cyber-btn-icon" title="Volver al anime" aria-label="Volver"
-      onclick="history.length > 1 ? history.back() : location.href='../index.html'">
-      <i class="fas fa-arrow-left"></i>
-    </button>
     <div class="theme-dots" role="group" aria-label="Cambiar tema de color"></div>
     <button id="configBtn" class="config-nav-btn" title="Configuración" aria-label="Configuración"><i class="fas fa-sliders-h"></i></button>
     <div class="user-menu">
@@ -1329,6 +1465,10 @@ html:not(.theme-has-video) .grid-floor { opacity: var(--q-grid-opacity) !importa
 
 <div class="container" id="mainContainer">
   <div class="player-header">
+    <a href="#" id="backToDetail" class="back-nav-btn" title="Volver al anime" aria-label="Volver al anime">
+      <i class="fas fa-arrow-left"></i>
+      <span class="back-label">Volver</span>
+    </a>
     <div class="options" id="serverOptions"></div>
   </div>
 
@@ -1458,14 +1598,6 @@ html:not(.theme-has-video) .grid-floor { opacity: var(--q-grid-opacity) !importa
 
     <div class="config-group">
       <div class="config-group-label">Efectos</div>
-      <div class="config-toggle-row" id="toggleChroma" data-key="chroma">
-        <div class="config-toggle-info"><i class="fas fa-mask"></i><div><div class="config-toggle-name">Animaciones Chroma</div><div class="config-toggle-desc">Personajes con fondo verde removido</div></div></div>
-        <div class="config-switch"></div>
-      </div>
-      <div class="config-toggle-row" id="toggleParticles" data-key="particles">
-        <div class="config-toggle-info"><i class="fas fa-star"></i><div><div class="config-toggle-name">Partículas</div><div class="config-toggle-desc">Puntos flotantes de fondo</div></div></div>
-        <div class="config-switch"></div>
-      </div>
       <div class="config-toggle-row" id="toggleCursor" data-key="cursor">
         <div class="config-toggle-info"><i class="fas fa-mouse-pointer"></i><div><div class="config-toggle-name">Efecto de cursor</div><div class="config-toggle-desc">Punto y anillo neón (solo PC)</div></div></div>
         <div class="config-switch"></div>
@@ -1484,9 +1616,6 @@ html:not(.theme-has-video) .grid-floor { opacity: var(--q-grid-opacity) !importa
       <div class="cmd-item" data-cmd="catalog"><div class="cmd-item-icon"><i class="fas fa-film"></i></div><div class="cmd-item-text"><div class="cmd-item-title">Ver Catálogo</div><div class="cmd-item-desc">Explorar todos los animes</div></div><span class="cmd-item-shortcut">C</span></div>
       <div class="cmd-item" data-cmd="config"><div class="cmd-item-icon"><i class="fas fa-sliders-h"></i></div><div class="cmd-item-text"><div class="cmd-item-title">Configuración</div><div class="cmd-item-desc">Calidad visual y efectos</div></div><span class="cmd-item-shortcut">K</span></div>
       <div class="cmd-item" data-cmd="top"><div class="cmd-item-icon"><i class="fas fa-arrow-up"></i></div><div class="cmd-item-text"><div class="cmd-item-title">Ir arriba</div><div class="cmd-item-desc">Scroll al top</div></div><span class="cmd-item-shortcut">↑</span></div>
-      <div class="cmd-item" data-cmd="theme-cyan"><div class="cmd-item-icon" style="color:#00f0ff;border-color:rgba(0,240,255,0.3);background:rgba(0,240,255,0.1);"><i class="fas fa-palette"></i></div><div class="cmd-item-text"><div class="cmd-item-title">Tema Cyan</div><div class="cmd-item-desc">Paleta clásica</div></div><span class="cmd-item-shortcut">1</span></div>
-      <div class="cmd-item" data-cmd="theme-magenta"><div class="cmd-item-icon" style="color:#ff1a6b;border-color:rgba(255,26,107,0.3);background:rgba(255,26,107,0.1);"><i class="fas fa-palette"></i></div><div class="cmd-item-text"><div class="cmd-item-title">Tema Magenta</div><div class="cmd-item-desc">Paleta vibrante</div></div><span class="cmd-item-shortcut">2</span></div>
-      <div class="cmd-item" data-cmd="theme-emerald"><div class="cmd-item-icon" style="color:#7dff5c;border-color:rgba(125,255,92,0.3);background:rgba(125,255,92,0.1);"><i class="fas fa-palette"></i></div><div class="cmd-item-text"><div class="cmd-item-title">Tema Emerald</div><div class="cmd-item-desc">Paleta natural</div></div><span class="cmd-item-shortcut">3</span></div>
     </div>
     <div class="cmd-footer"><span>↵ Enter</span><span>ESC cerrar</span></div>
   </div>
@@ -1559,7 +1688,29 @@ html:not(.theme-has-video) .grid-floor { opacity: var(--q-grid-opacity) !importa
 
 <script>
 /* ============================================================
-   CONFIG v28.8
+   ⬅️ BOTÓN VOLVER → anime-detail.html?id=XX
+   Lee el ?anime=XX de la URL y construye el link.
+   ============================================================ */
+(function() {
+  'use strict';
+  const backBtn = document.getElementById('backToDetail');
+  if (!backBtn) return;
+
+  const params = new URLSearchParams(location.search);
+  const animeId = params.get('anime');
+
+  if (animeId) {
+    backBtn.href = `anime-detail.html?id=${encodeURIComponent(animeId)}`;
+  } else {
+    // Sin id de anime → a index como fallback
+    backBtn.href = '../index.html';
+  }
+})();
+</script>
+
+<script>
+/* ============================================================
+   CONFIG v28.9
    ============================================================ */
 (function() {
   'use strict';
@@ -1596,17 +1747,24 @@ html:not(.theme-has-video) .grid-floor { opacity: var(--q-grid-opacity) !importa
     return 'media';
   }
 
-  const configPorDefecto = { quality: null, chroma: false, particles: null, cursor: false };
+  const configPorDefecto = { quality: null, chroma: false, particles: false, cursor: false };
 
   function cargarConfig() {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) return Object.assign({}, configPorDefecto, JSON.parse(raw));
+      if (raw) {
+        const parsed = Object.assign({}, configPorDefecto, JSON.parse(raw));
+        parsed.chroma = false;
+        parsed.particles = false;
+        return parsed;
+      }
       for (const key of LEGACY_KEYS) {
         const old = localStorage.getItem(key);
         if (old) {
           const parsed = JSON.parse(old);
-          return Object.assign({}, configPorDefecto, parsed, { cursor: false });
+          return Object.assign({}, configPorDefecto, parsed, {
+            chroma: false, particles: false, cursor: false
+          });
         }
       }
     } catch(e) {}
@@ -1619,33 +1777,31 @@ html:not(.theme-has-video) .grid-floor { opacity: var(--q-grid-opacity) !importa
   if (!config) {
     config = Object.assign({}, configPorDefecto, {
       quality: detectedQuality,
-      particles: detectedQuality !== 'fluida',
-      cursor: false
+      chroma: false, particles: false, cursor: false
     });
     guardarConfig(config);
   }
   if (!config.quality) config.quality = detectedQuality;
   if (config.cursor === undefined) config.cursor = false;
+  config.chroma = false;
+  config.particles = false;
 
   window.__archinimeConfig = config;
 
   function aplicarConfig() {
     const html = document.documentElement;
     html.dataset.quality = config.quality;
-    if (config.chroma) html.dataset.chroma = 'on';
-    else html.removeAttribute('data-chroma');
+    html.removeAttribute('data-chroma');
     if (config.cursor === true) html.classList.remove('custom-cursor-off');
     else html.classList.add('custom-cursor-off');
     const canvas = document.getElementById('particles');
-    if (canvas) canvas.style.display = config.particles ? '' : 'none';
+    if (canvas) canvas.style.display = 'none';
     window.dispatchEvent(new CustomEvent('archinime:config-changed', { detail: config }));
   }
   aplicarConfig();
 
   const modal = document.getElementById('configModal');
   const qualityOptions = document.querySelectorAll('#qualityOptions .config-option');
-  const toggleChroma = document.getElementById('toggleChroma');
-  const toggleParticles = document.getElementById('toggleParticles');
   const toggleCursor = document.getElementById('toggleCursor');
   const detectedLabel = document.getElementById('detectedQuality');
 
@@ -1659,8 +1815,6 @@ html:not(.theme-has-video) .grid-floor { opacity: var(--q-grid-opacity) !importa
   function pintarUI() {
     if (!draft) return;
     qualityOptions.forEach(opt => opt.classList.toggle('active', opt.dataset.quality === draft.quality));
-    toggleChroma?.classList.toggle('active', !!draft.chroma);
-    toggleParticles?.classList.toggle('active', !!draft.particles);
     toggleCursor?.classList.toggle('active', draft.cursor === true);
   }
 
@@ -1692,16 +1846,17 @@ html:not(.theme-has-video) .grid-floor { opacity: var(--q-grid-opacity) !importa
     });
   });
 
-  function bindToggle(el, key) {
-    if (!el) return;
-    el.addEventListener('click', () => { draft[key] = !draft[key]; pintarUI(); });
+  if (toggleCursor) {
+    toggleCursor.addEventListener('click', () => {
+      draft.cursor = !draft.cursor;
+      pintarUI();
+    });
   }
-  bindToggle(toggleChroma, 'chroma');
-  bindToggle(toggleParticles, 'particles');
-  bindToggle(toggleCursor, 'cursor');
 
   window.saveConfigAndClose = function() {
     config = Object.assign({}, draft);
+    config.chroma = false;
+    config.particles = false;
     guardarConfig(config);
     window.__archinimeConfig = config;
     aplicarConfig();
@@ -1792,68 +1947,10 @@ window.showToastSticker = showToast;
   }, { passive: true });
 
   document.addEventListener('mouseover', e => {
-    if (e.target.closest('[data-hover], a, button, input, textarea, select, .sticker-item, .sticker-tab, .btn, .config-theme-dot')) document.body.classList.add('cursor-hover');
+    if (e.target.closest('[data-hover], a, button, input, textarea, select, .sticker-item, .sticker-tab, .btn, .config-theme-dot, .back-nav-btn')) document.body.classList.add('cursor-hover');
   });
   document.addEventListener('mouseout', e => {
-    if (e.target.closest('[data-hover], a, button, input, textarea, select, .sticker-item, .sticker-tab, .btn, .config-theme-dot')) document.body.classList.remove('cursor-hover');
-  });
-})();
-
-/* PARTICLES */
-(function() {
-  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const QUALITY = window.__archinimeConfig?.quality || 'media';
-  if (prefersReduced || QUALITY === 'fluida') return;
-  const canvas = document.getElementById('particles');
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d', { alpha: true });
-  let W, H;
-  const isTouch = 'ontouchstart' in window;
-  const COUNT = (QUALITY === 'alta') ? (isTouch ? 18 : 32) : (isTouch ? 12 : 20);
-  const parts = [];
-  const dpr = 1;
-
-  function resize() {
-    W = canvas.width = Math.floor(window.innerWidth * dpr);
-    H = canvas.height = Math.floor(window.innerHeight * dpr);
-    canvas.style.width = window.innerWidth + 'px';
-    canvas.style.height = window.innerHeight + 'px';
-  }
-  resize();
-  let rt;
-  window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(resize, 250); }, { passive: true });
-
-  for (let i = 0; i < COUNT; i++) {
-    parts.push({
-      x: Math.random() * W, y: Math.random() * H,
-      r: (Math.random() * 1.6 + 0.3) * dpr,
-      vx: (Math.random() - 0.5) * 0.28 * dpr,
-      vy: (Math.random() - 0.5) * 0.28 * dpr,
-      hue: Math.random() > 0.5 ? 185 : 295,
-      alpha: Math.random() * 0.4 + 0.15
-    });
-  }
-
-  let paused = false, rafId = null;
-  function animate() {
-    if (paused) { rafId = null; return; }
-    ctx.clearRect(0, 0, W, H);
-    for (const p of parts) {
-      p.x += p.vx; p.y += p.vy;
-      if (p.x < 0 || p.x > W) p.vx *= -1;
-      if (p.y < 0 || p.y > H) p.vy *= -1;
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-      ctx.fillStyle = `hsla(${p.hue}, 100%, 65%, ${p.alpha})`;
-      ctx.fill();
-    }
-    rafId = requestAnimationFrame(animate);
-  }
-  rafId = requestAnimationFrame(animate);
-
-  document.addEventListener('visibilitychange', () => {
-    paused = document.hidden;
-    if (!paused && rafId === null) rafId = requestAnimationFrame(animate);
+    if (e.target.closest('[data-hover], a, button, input, textarea, select, .sticker-item, .sticker-tab, .btn, .config-theme-dot, .back-nav-btn')) document.body.classList.remove('cursor-hover');
   });
 })();
 
@@ -1930,9 +2027,6 @@ window.showToastSticker = showToast;
         case 'inicio': window.location.href = '../index.html'; break;
         case 'catalog': window.location.href = '../index.html#catalog'; break;
         case 'config': if (typeof window.openConfigModal === 'function') window.openConfigModal(); break;
-        case 'theme-cyan': if (typeof window.cambiarTema === 'function') window.cambiarTema('cyan'); break;
-        case 'theme-magenta': if (typeof window.cambiarTema === 'function') window.cambiarTema('magenta'); break;
-        case 'theme-emerald': if (typeof window.cambiarTema === 'function') window.cambiarTema('emerald'); break;
         case 'top': window.scrollTo({ top: 0, behavior: 'smooth' }); break;
       }
     }, 150);
@@ -2044,8 +2138,6 @@ if ('serviceWorker' in navigator) {
 
 /* ============================================================
    🎨 THEME QUALITY OVERRIDE
-   Temas SIN video (cyan, magenta, emerald) → siempre ALTA.
-   Temas CON video (galaxy) → usa la calidad elegida por el usuario.
    ============================================================ */
 (function() {
   const userQuality = (window.__archinimeConfig && window.__archinimeConfig.quality) || 'media';
@@ -2078,7 +2170,7 @@ if ('serviceWorker' in navigator) {
   window.__applyEffectiveQuality = applyEffectiveQuality;
 })();
 
-console.log('%c✅ Archinime Player v28.8 · Quality: ' + (window.__archinimeConfig?.quality || 'media'), 'color:#00f0ff;font-family:monospace;font-weight:bold;');
+console.log('%c✅ Archinime Player v28.9 · optimized · Quality: ' + (window.__archinimeConfig?.quality || 'media'), 'color:#00f0ff;font-family:monospace;font-weight:bold;');
 </script>
 
 </body>
