@@ -3,6 +3,7 @@
 // INCLUYE: Búsqueda rápida, votaciones, historial de visualización
 // CORREGIDO: Ruta de música ahora usa ../assets/music/
 // v4: volumen de música a 1.0 (100%)
+// v5: reutiliza auth/db de app-core.js (evita redeclaración y SyntaxError)
 
 function escapeHtml(text) {
   if (!text) return text;
@@ -14,17 +15,11 @@ function escapeHtml(text) {
     .replace(/'/g, '&#039;');
 }
 
-const firebaseConfig = {
-  apiKey: "AIzaSyBpzYARIxaJijLbbL-2S6F9MWecbAbvK_I",
-  authDomain: "login-admin-archinime.firebaseapp.com",
-  projectId: "login-admin-archinime",
-  storageBucket: "login-admin-archinime.firebasestorage.app",
-  messagingSenderId: "938164660242",
-  appId: "1:938164660242:web:648e0dce0e0d18dd78d0cb"
-};
-if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.firestore();
+// ========== FIREBASE ==========
+// app-core.js ya inicializó Firebase y expuso auth/db en window.
+// Reutilizamos esa instancia para no redeclarar firebaseConfig, auth ni db.
+const auth = window.auth;
+const db   = window.db;
 
 let audioCtx = null;
 function initAudio() {
@@ -62,10 +57,10 @@ function playTrack(idx) {
   if (!playlist.length) return;
   if (currentAudio) { currentAudio.pause(); currentAudio.onended = null; }
   let track = playlist[idx];
-  // ✅ RUTA CORREGIDA: usar ../assets/music/
+  // RUTA CORREGIDA: usar ../assets/music/
   const fullUrl = track.startsWith('http') ? track : `../assets/music/${track}`;
   currentAudio = new Audio(fullUrl);
-  // ✅ v4: volumen al 100%
+  // v4: volumen al 100%
   currentAudio.volume = 1.0;
   currentAudio.loop = false;
   currentAudio.onended = () => {
@@ -209,7 +204,7 @@ window.toggleSeason = async function(details, animeId, seasonIdx) {
       btn.href = `video-player.html?anime=${animeId}&s=${seasonNum}&e=${epNum}`;
       btn.className = 'ep-btn' + (isWatched ? ' watched' : '');
       btn.onmouseenter = () => playUISound('hover');
-      
+
       const action = document.createElement('button');
       action.className = 'ep-action-btn';
       action.innerHTML = isWatched ? '<i class="fas fa-trash-alt"></i>' : '<i class="fas fa-check-circle"></i>';
@@ -220,7 +215,7 @@ window.toggleSeason = async function(details, animeId, seasonIdx) {
         await reloadSeason(details, animeId, seasonIdx);
       };
       btn.appendChild(action);
-      
+
       const span = document.createElement('span');
       span.textContent = `▶ ${ep.title || `Episodio ${epNum}`}`;
       btn.appendChild(span);
@@ -287,11 +282,11 @@ function renderStars(currentValue = 0) {
     star.className = 'fas fa-star star';
     if (currentValue >= i) star.classList.add('selected');
     star.setAttribute('data-value', i);
-    
+
     star.addEventListener('mouseenter', () => highlightStars(i));
     star.addEventListener('mouseleave', () => resetStars(currentUserRating || 0));
     star.addEventListener('click', () => voteAnime(i));
-    
+
     container.appendChild(star);
   }
 }
@@ -319,18 +314,18 @@ async function voteAnime(newVal) {
 
   const ratingRef = db.collection('animeRatings').doc(String(currentAnimeId));
   const userRef = ratingRef.collection('userRatings').doc(currentUserId);
-  
+
   try {
     await db.runTransaction(async (t) => {
       const ratingDoc = await t.get(ratingRef);
       const userDoc = await t.get(userRef);
-      
+
       let oldValue = userDoc.exists ? userDoc.data().value : null;
       let currentAvg = ratingDoc.exists ? ratingDoc.data().avg : 0;
       let currentCount = ratingDoc.exists ? ratingDoc.data().count : 0;
-      
+
       let newAvg, newCount;
-      
+
       if (oldValue !== null && oldValue === newVal) {
         if (currentCount === 1) {
           newAvg = 0;
@@ -373,7 +368,7 @@ async function voteAnime(newVal) {
         document.getElementById('ratingMessage').innerHTML = '<i class="fas fa-check-circle"></i> ¡Gracias por tu voto!';
       }
     });
-    
+
     updateRatingDisplay();
     renderStars(currentUserRating || 0);
     setTimeout(() => {
@@ -412,7 +407,7 @@ async function renderRecommendations(currentId) {
     const allAnimes = (typeof catalogoArray !== 'undefined') ? catalogoArray : [];
     const others = allAnimes.filter(a => String(a.id) !== String(currentId));
     const random = others.sort(() => 0.5 - Math.random()).slice(0, 12);
-    
+
     if (!random.length) {
       grid.innerHTML = '<p style="color:#666;">Sin recomendaciones</p>';
       return;
@@ -493,7 +488,7 @@ async function renderMainContent() {
   renderStars(0);
   await renderRecommendations(animeId);
   await loadAnimeRating(animeId);
-  
+
   if (currentUserId) {
     await loadUserRating(animeId, currentUserId);
   }
@@ -581,13 +576,13 @@ function initSearch() {
   searchInput.addEventListener('input', function() {
     const q = this.value.trim().toLowerCase();
     if (!q) { hideDropdown(); return; }
-    
+
     const matches = searchCache.filter(item => {
       if (String(item.id) === String(currentAnimeId)) return false;
       const titlesToCheck = [item.title, ...(item.aliases || [])];
       return titlesToCheck.some(t => t.toLowerCase().startsWith(q));
     }).slice(0, 10);
-    
+
     showDropdown(matches);
   });
 
@@ -610,7 +605,7 @@ function initAuthListener() {
     ArchinimeState.on('currentUser', async (user) => {
       const previousUserId = currentUserId;
       currentUserId = user ? user.uid : null;
-      
+
       if (currentAnimeId && animeData) {
         if (currentUserId && !previousUserId) {
           await loadUserRating(currentAnimeId, currentUserId);
@@ -619,7 +614,7 @@ function initAuthListener() {
           currentUserRating = null;
           renderStars(0);
         }
-        
+
         const details = document.querySelectorAll('details');
         for (let d of details) {
           if (d.open) {
@@ -635,7 +630,7 @@ function initAuthListener() {
     auth.onAuthStateChanged(async (user) => {
       const previousUserId = currentUserId;
       currentUserId = user ? user.uid : null;
-      
+
       if (currentAnimeId && animeData) {
         if (currentUserId && !previousUserId) {
           await loadUserRating(currentAnimeId, currentUserId);
@@ -644,7 +639,7 @@ function initAuthListener() {
           currentUserRating = null;
           renderStars(0);
         }
-        
+
         const details = document.querySelectorAll('details');
         for (let d of details) {
           if (d.open) {
@@ -692,20 +687,20 @@ function waitForCatalog() {
     document.getElementById('contenido').innerHTML = "<h2 style='text-align:center;padding:50px;'>ID de anime no proporcionado</h2>";
     return;
   }
-  
+
   if (typeof catalogoArray === 'undefined') {
     document.getElementById('contenido').innerHTML = "<h2 style='text-align:center;padding:50px;'>Error: Catálogo no cargado</h2>";
     return;
   }
-  
+
   const foundAnime = catalogoArray.find(a => String(a.id) === String(animeId));
   if (!foundAnime) {
     document.getElementById('contenido').innerHTML = "<h2 style='text-align:center;padding:50px;'>Anime no encontrado</h2>";
     return;
   }
-  
+
   animeData = foundAnime;
-  
+
   try {
     await renderMainContent();
     initSearch();
