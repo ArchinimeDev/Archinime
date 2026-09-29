@@ -1042,7 +1042,7 @@ html[data-quality="alta"] .scanlines { display: none !important; }
   </a>
 
   <div class="nav-actions">
-    <!-- Botón de compartir del nav eliminado (queda solo el del top-buttons) -->
+    <!-- Botón compartir del nav eliminado (solo queda el de top-buttons) -->
     <div class="theme-dots" role="group" aria-label="Cambiar tema de color"></div>
     <button id="configBtn" class="config-nav-btn" title="Configuración" aria-label="Configuración"><i class="fas fa-sliders-h"></i></button>
     <div class="user-menu">
@@ -1175,6 +1175,7 @@ html[data-quality="alta"] .scanlines { display: none !important; }
 </div>
 
 <script src="../js/core/themes.js"></script>
+<script src="../js/core/state.js"></script>
 <script src="../js/core/app-core.js"></script>
 <script src="../data/catalogo.js"></script>
 <script src="../data/videos.js"></script>
@@ -1215,7 +1216,6 @@ html[data-quality="alta"] .scanlines { display: none !important; }
   const STORAGE_KEY = 'archinime_config_v29';
   const LEGACY_KEYS = ['archinime_config_v28','archinime_config_v27','archinime_config_v26'];
 
-  // Calidad fija y obligatoria
   const FIXED_QUALITY = 'alta';
 
   const configPorDefecto = {
@@ -1441,40 +1441,100 @@ window.showToast = showToast;
 })();
 
 /* ============================================================
-   USER / AUTH
+   USER / AUTH — con delegación de eventos
+   Los listeners van en document para que sobrevivan aunque
+   app-core.js regenere los elementos del dropdown.
    ============================================================ */
 (function() {
-  const userAvatarBtn = document.getElementById('userAvatarBtn');
-  const userDropdown = document.getElementById('userDropdown');
-  const loginBtnItem = document.getElementById('loginBtnItem');
-  const profileDropdownBtn = document.getElementById('profileDropdownBtn');
+  'use strict';
 
-  if (userAvatarBtn) {
-    userAvatarBtn.addEventListener('click', e => {
-      e.stopPropagation();
-      userDropdown.classList.toggle('active');
-    });
+  // --- Helper: abrir modal de auth con fallbacks ---
+  function abrirAuthModal() {
+    if (typeof window.showAuthModal === 'function') {
+      try { window.showAuthModal(); return; } catch (_) {}
+    }
+    const modal = document.getElementById('authModal');
+    if (modal) {
+      modal.classList.add('show');
+      document.body.style.overflow = 'hidden';
+      document.body.classList.add('modal-open');
+    }
   }
-  document.addEventListener('click', e => {
-    if (!e.target.closest('.user-menu')) userDropdown?.classList.remove('active');
-  });
-  loginBtnItem?.addEventListener('click', () => {
-    if (typeof window.showAuthModal === 'function') window.showAuthModal();
-  });
-  profileDropdownBtn?.addEventListener('click', () => {
-    if (typeof window.showProfileModal === 'function') window.showProfileModal();
-    else if (typeof window.showAuthModal === 'function') window.showAuthModal();
-    userDropdown?.classList.remove('active');
+
+  // --- Helper: abrir modal de perfil con fallbacks ---
+  function abrirProfileModal() {
+    if (typeof window.showProfileModal === 'function') {
+      try { window.showProfileModal(); return; } catch (_) {}
+    }
+    if (window.auth && !window.auth.currentUser) {
+      abrirAuthModal();
+      return;
+    }
+    const modal = document.getElementById('profileModal');
+    if (modal) {
+      modal.classList.add('show');
+      document.body.style.overflow = 'hidden';
+    }
+  }
+
+  // --- Delegación global de clicks ---
+  document.addEventListener('click', function(e) {
+
+    // 1) Click en el avatar del nav → toggle dropdown
+    if (e.target.closest('#userAvatarBtn')) {
+      e.stopPropagation();
+      const dd = document.getElementById('userDropdown');
+      if (dd) dd.classList.toggle('active');
+      return;
+    }
+
+    // 2) Click en "Iniciar sesión" (funciona aunque se regenere)
+    if (e.target.closest('#loginBtnItem')) {
+      abrirAuthModal();
+      const dd = document.getElementById('userDropdown');
+      if (dd) dd.classList.remove('active');
+      return;
+    }
+
+    // 3) Click en "Cerrar sesión" (dinámico)
+    if (e.target.closest('#logoutBtnItem')) {
+      if (window.auth && typeof window.auth.signOut === 'function') {
+        window.auth.signOut().then(() => {
+          const dd = document.getElementById('userDropdown');
+          if (dd) dd.classList.remove('active');
+        });
+      }
+      return;
+    }
+
+    // 4) Click en el header del dropdown → abrir perfil
+    if (e.target.closest('#profileDropdownBtn')) {
+      abrirProfileModal();
+      const dd = document.getElementById('userDropdown');
+      if (dd) dd.classList.remove('active');
+      return;
+    }
+
+    // 5) Click fuera del menú de usuario → cerrar dropdown
+    if (!e.target.closest('.user-menu')) {
+      const dd = document.getElementById('userDropdown');
+      if (dd) dd.classList.remove('active');
+    }
   });
 
-  document.querySelectorAll('.auth-tab').forEach(tab => {
-    tab.addEventListener('click', () => {
-      document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-      const target = tab.dataset.tab;
-      document.getElementById('authLoginForm').style.display = target === 'login' ? '' : 'none';
-      document.getElementById('authRegisterForm').style.display = target === 'register' ? '' : 'none';
-    });
+  // --- Tabs de login/registro con delegación ---
+  document.addEventListener('click', function(e) {
+    const tab = e.target.closest('.auth-tab');
+    if (!tab) return;
+
+    document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+
+    const target = tab.dataset.tab;
+    const loginForm = document.getElementById('authLoginForm');
+    const registerForm = document.getElementById('authRegisterForm');
+    if (loginForm)    loginForm.style.display    = target === 'login'    ? 'flex' : 'none';
+    if (registerForm) registerForm.style.display = target === 'register' ? 'flex' : 'none';
   });
 })();
 
