@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" data-quality="media">
+<html lang="es" data-quality="alta">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
@@ -770,7 +770,7 @@ details[open] summary::after { transform: rotate(180deg); color: var(--neon-1); 
 }
 
 /* ============================================
-   CONFIG MODAL — SIMPLIFICADO (solo calidad, tema, cursor)
+   CONFIG MODAL — SIMPLIFICADO (solo tema y cursor)
    ============================================ */
 #configModal { position: fixed; inset: 0; background: rgba(3,4,8,0.92); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); z-index: 100010; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.35s ease; padding: 20px; padding-top: calc(20px + var(--safe-top)); padding-bottom: calc(20px + var(--safe-bottom)); }
 #configModal.show { opacity: 1; pointer-events: auto; }
@@ -784,16 +784,6 @@ details[open] summary::after { transform: rotate(180deg); color: var(--neon-1); 
 #configModal .config-group { margin-bottom: 24px; }
 #configModal .config-group-label { font-family: 'Orbitron', sans-serif; font-size: 0.7rem; letter-spacing: 2px; font-weight: 700; color: #b114ff; text-transform: uppercase; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 #configModal .config-group-label::before { content: ''; width: 18px; height: 2px; background: #b114ff; box-shadow: 0 0 8px #b114ff; }
-#configModal .config-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-@media (max-width: 400px) { #configModal .config-options { grid-template-columns: 1fr; } }
-#configModal .config-option { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 14px 10px; cursor: pointer; transition: all 0.3s; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 6px; color: #8a90a0; user-select: none; min-height: 96px; justify-content: center; }
-#configModal .config-option:hover { background: rgba(0,240,255,0.05); border-color: rgba(0,240,255,0.3); transform: translateY(-2px); }
-#configModal .config-option.active { background: linear-gradient(135deg, rgba(0,240,255,0.12), rgba(177,20,255,0.12)); border-color: #00f0ff; color: #fff; box-shadow: 0 0 25px rgba(0,240,255,0.25); }
-#configModal .config-option i { font-size: 1.4rem; color: inherit; }
-#configModal .config-option.active i { color: #00f0ff; text-shadow: 0 0 12px #00f0ff; }
-#configModal .config-option-name { font-family: 'Orbitron', sans-serif; font-size: 0.72rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
-#configModal .config-option-desc { font-size: 0.62rem; color: #4a5266; line-height: 1.3; }
-#configModal .config-option.active .config-option-desc { color: #8a90a0; }
 
 #configModal .config-theme-dots { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 100%; }
 #configModal .config-theme-dot { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 14px 10px; border-radius: 14px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); cursor: pointer; transition: all 0.25s var(--ease-out-expo); color: #8a90a0; min-height: 82px; width: 100%; }
@@ -814,8 +804,6 @@ details[open] summary::after { transform: rotate(180deg); color: var(--neon-1); 
 #configModal .config-switch::after { content: ''; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #8a90a0; transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1); }
 #configModal .config-toggle-row.active .config-switch { background: linear-gradient(135deg, #00f0ff, #b114ff); box-shadow: 0 0 15px rgba(0,240,255,0.4); }
 #configModal .config-toggle-row.active .config-switch::after { left: 23px; background: #fff; box-shadow: 0 0 8px rgba(0,240,255,0.6); }
-#configModal .config-detected { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 100px; background: rgba(0,240,255,0.1); border: 1px solid rgba(0,240,255,0.3); color: #00f0ff; font-family: 'JetBrains Mono', monospace; font-size: 0.62rem; letter-spacing: 1px; text-transform: uppercase; margin-left: auto; }
-#configModal .config-detected i { font-size: 0.6rem; }
 #configModal .config-save { width: 100%; margin-top: 8px; padding: 14px; border-radius: 100px; background: linear-gradient(135deg, #00f0ff, #b114ff); color: #04050a; font-family: 'Orbitron', sans-serif; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; border: none; cursor: pointer; transition: all 0.25s; box-shadow: 0 0 30px rgba(0,240,255,0.35); }
 #configModal .config-save:hover { transform: translateY(-2px); box-shadow: 0 10px 40px rgba(0,240,255,0.5); color: #fff; }
 
@@ -857,7 +845,7 @@ details[open] summary::after { transform: rotate(180deg); color: var(--neon-1); 
 }
 
 /* ============================================================================
-   v29 — SISTEMA DE CALIDAD VISUAL ULTRA-OPTIMIZADO (idéntico a video-player)
+   v29 — SISTEMA DE CALIDAD VISUAL — SIEMPRE EN ALTA
    ============================================================================ */
 html {
   --q-blur-aurora: 28px;
@@ -878,27 +866,7 @@ html {
   --q-panel-bg: color-mix(in srgb, var(--bg-panel) 92%, transparent);
   --q-vignette-strength: 80%;
 }
-html[data-quality="fluida"] {
-  --q-blur-aurora: 20px; --q-aurora-opacity: 0.18; --q-aurora-anim: 0s;
-  --q-grid-opacity: 0.12; --q-grid-size: 46px; --q-grid-anim: 0s;
-  --q-noise-opacity: 0; --q-scanlines-opacity: 0; --q-hud-opacity: 0;
-  --q-backdrop-blur: 0px; --q-backdrop-sat: 1; --q-neon-glow: 0;
-  --q-reveal-dur: 0.35s;
-  --q-nav-bg: var(--bg-deep); --q-nav-bg-scrolled: var(--bg-deep);
-  --q-panel-bg: var(--bg-panel);
-  --q-vignette-strength: 60%;
-}
-html[data-quality="media"] {
-  --q-blur-aurora: 24px; --q-aurora-opacity: 0.3; --q-aurora-anim: 0s;
-  --q-grid-opacity: 0.2; --q-grid-size: 54px; --q-grid-anim: 0s;
-  --q-noise-opacity: 0.015; --q-scanlines-opacity: 0.15; --q-hud-opacity: 0.5;
-  --q-backdrop-blur: 6px; --q-backdrop-sat: 1.2; --q-neon-glow: 0.5;
-  --q-reveal-dur: 0.55s;
-  --q-nav-bg: color-mix(in srgb, var(--bg-deep) 82%, transparent);
-  --q-nav-bg-scrolled: color-mix(in srgb, var(--bg-deep) 96%, transparent);
-  --q-panel-bg: color-mix(in srgb, var(--bg-panel) 96%, transparent);
-  --q-vignette-strength: 75%;
-}
+/* Forzado permanente a "alta" */
 html[data-quality="alta"] {
   --q-blur-aurora: 28px;
   --q-aurora-opacity: 0.36;
@@ -936,13 +904,10 @@ html[data-quality="alta"] {
 .aurora { filter: blur(var(--q-blur-aurora)) !important; opacity: var(--q-aurora-opacity) !important; animation: none !important; }
 .grid-floor { opacity: var(--q-grid-opacity) !important; background-size: var(--q-grid-size) var(--q-grid-size) !important; animation: none !important; }
 .noise { opacity: var(--q-noise-opacity) !important; }
-html[data-quality="fluida"] .noise { display: none !important; }
 .scanlines { opacity: var(--q-scanlines-opacity) !important; }
-html[data-quality="fluida"] .scanlines { display: none !important; }
 html[data-quality="media"] .scanlines,
 html[data-quality="alta"] .scanlines { mix-blend-mode: normal; }
 .hud-frame { opacity: var(--q-hud-opacity) !important; }
-html[data-quality="fluida"] .hud-frame { display: none !important; }
 .vignette { background: radial-gradient(ellipse at center, transparent 40%, color-mix(in srgb, var(--bg-deep) var(--q-vignette-strength), transparent) 100%) !important; }
 .nav { background: var(--q-nav-bg) !important; backdrop-filter: blur(var(--q-backdrop-blur)) saturate(var(--q-backdrop-sat)) !important; -webkit-backdrop-filter: blur(var(--q-backdrop-blur)) saturate(var(--q-backdrop-sat)) !important; }
 .nav.scrolled { background: var(--q-nav-bg-scrolled) !important; }
@@ -961,23 +926,6 @@ details,
   -webkit-backdrop-filter: blur(var(--q-backdrop-blur)) saturate(var(--q-backdrop-sat));
 }
 
-html[data-quality="fluida"] .nav,
-html[data-quality="fluida"] .nav.scrolled,
-html[data-quality="fluida"] .user-dropdown,
-html[data-quality="fluida"] .auth-modal,
-html[data-quality="fluida"] .profile-modal,
-html[data-quality="fluida"] #configModal { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; background: var(--bg-deep) !important; }
-html[data-quality="fluida"] .user-dropdown { background: var(--bg-panel) !important; }
-html[data-quality="fluida"] .top-buttons,
-html[data-quality="fluida"] .desc,
-html[data-quality="fluida"] .rating-section,
-html[data-quality="fluida"] .genre-chip,
-html[data-quality="fluida"] details,
-html[data-quality="fluida"] .ep-btn {
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  background: rgba(4,5,10,0.85) !important;
-}
 html[data-quality="alta"] .top-buttons,
 html[data-quality="alta"] .desc,
 html[data-quality="alta"] .rating-section,
@@ -1017,19 +965,6 @@ html[data-quality="alta"] .user-dropdown {
   html[data-quality="alta"] .hud-frame { display: none !important; }
 }
 
-html[data-quality="fluida"] .nav-logo .logo-img { animation: none !important; filter: none !important; }
-html[data-quality="fluida"] .nav-logo .dot { animation: none !important; box-shadow: none !important; }
-html[data-quality="fluida"] .nav-logo .txt { animation: none !important; background-image: linear-gradient(135deg, #fff, var(--neon-1)) !important; -webkit-background-clip: text !important; background-clip: text !important; -webkit-text-fill-color: transparent !important; color: transparent !important; }
-html[data-quality="fluida"] .nav-status .status-led { animation: none !important; box-shadow: none !important; }
-html[data-quality="fluida"] .theme-dot.active::after { animation: none !important; }
-html[data-quality="fluida"] .pwa-icon { animation: none !important; box-shadow: none !important; }
-html[data-quality="fluida"] .loader-logo path,
-html[data-quality="fluida"] .loader-logo circle,
-html[data-quality="fluida"] .loader-logo line { filter: none !important; }
-html[data-quality="fluida"] .loader-progress-bar,
-html[data-quality="fluida"] .progress-bar { box-shadow: none !important; }
-html[data-quality="fluida"] #toast { box-shadow: none !important; }
-
 html[data-quality="alta"] .nav-logo .logo-img { animation: none !important; filter: drop-shadow(0 0 10px color-mix(in srgb, var(--neon-1) 55%, transparent)) !important; }
 html[data-quality="alta"] .nav-logo .dot { animation: none !important; }
 html[data-quality="alta"] .nav-logo .txt { animation: none !important; background-position: 0% 50% !important; }
@@ -1043,21 +978,20 @@ html[data-quality="alta"] .pwa-icon { animation: none !important; }
 }
 
 .cursor-dot { box-shadow: 0 0 calc(12px * var(--q-neon-glow)) var(--neon-1) !important; }
-html[data-quality="fluida"] .cursor-dot { box-shadow: none !important; }
-html[data-quality="fluida"] .cursor-ring { border-color: color-mix(in srgb, var(--neon-1) 40%, transparent) !important; }
-html[data-quality="fluida"] .cyber-btn-icon:hover,
-html[data-quality="fluida"] .config-nav-btn:hover { box-shadow: none !important; transform: none !important; }
-html[data-quality="fluida"] .back:hover,
-html[data-quality="fluida"] .share-detail:hover { box-shadow: none !important; transform: none !important; }
-html[data-quality="fluida"] .ep-btn:hover { transform: none !important; box-shadow: none !important; }
-html[data-quality="fluida"] .rec-card:hover { transform: none !important; box-shadow: none !important; }
-html[data-quality="fluida"] .genre-chip:hover { transform: none !important; box-shadow: none !important; }
-html[data-quality="fluida"] .anime-cover img { box-shadow: 0 15px 30px rgba(0,0,0,0.6) !important; }
-html[data-quality="fluida"] .anime-cover img:hover { transform: none !important; }
-html[data-quality="fluida"] .aurora,
-html[data-quality="fluida"] .grid-floor,
-html[data-quality="fluida"] .noise,
-html[data-quality="fluida"] .scanlines { display: none !important; }
+html[data-quality="alta"] .cursor-ring { border-color: color-mix(in srgb, var(--neon-1) 40%, transparent) !important; }
+html[data-quality="alta"] .cyber-btn-icon:hover,
+html[data-quality="alta"] .config-nav-btn:hover { box-shadow: none !important; transform: none !important; }
+html[data-quality="alta"] .back:hover,
+html[data-quality="alta"] .share-detail:hover { box-shadow: none !important; transform: none !important; }
+html[data-quality="alta"] .ep-btn:hover { transform: none !important; box-shadow: none !important; }
+html[data-quality="alta"] .rec-card:hover { transform: none !important; box-shadow: none !important; }
+html[data-quality="alta"] .genre-chip:hover { transform: none !important; box-shadow: none !important; }
+html[data-quality="alta"] .anime-cover img { box-shadow: 0 15px 30px rgba(0,0,0,0.6) !important; }
+html[data-quality="alta"] .anime-cover img:hover { transform: none !important; }
+html[data-quality="alta"] .aurora,
+html[data-quality="alta"] .grid-floor,
+html[data-quality="alta"] .noise,
+html[data-quality="alta"] .scanlines { display: none !important; }
 
 .rating-section,
 .recommendations { content-visibility: auto; contain-intrinsic-size: 300px; }
@@ -1108,7 +1042,7 @@ html[data-quality="fluida"] .scanlines { display: none !important; }
   </a>
 
   <div class="nav-actions">
-    <button id="shareNavBtn" class="cyber-btn-icon" title="Compartir" aria-label="Compartir"><i class="fas fa-share-alt"></i></button>
+    <!-- Botón de compartir del nav eliminado (queda solo el del top-buttons) -->
     <div class="theme-dots" role="group" aria-label="Cambiar tema de color"></div>
     <button id="configBtn" class="config-nav-btn" title="Configuración" aria-label="Configuración"><i class="fas fa-sliders-h"></i></button>
     <div class="user-menu">
@@ -1167,24 +1101,12 @@ html[data-quality="fluida"] .scanlines { display: none !important; }
   <button class="pwa-close-btn" id="pwaCloseBtn" aria-label="Cerrar"><i class="fas fa-times"></i></button>
 </div>
 
-<!-- ═══ CONFIG (solo calidad, tema, cursor) ═══ -->
+<!-- ═══ CONFIG (solo tema y cursor) ═══ -->
 <div id="configModal">
   <div class="config-card">
     <button class="config-close" onclick="closeConfigModal()" aria-label="Cerrar"><i class="fas fa-times"></i></button>
     <div class="config-title"><i class="fas fa-sliders-h"></i> CONFIGURACIÓN</div>
     <div class="config-subtitle">Personaliza tu experiencia</div>
-
-    <div class="config-group">
-      <div class="config-group-label">
-        Calidad visual
-        <span class="config-detected" id="detectedQuality"><i class="fas fa-bolt"></i> Detectado</span>
-      </div>
-      <div class="config-options" id="qualityOptions">
-        <div class="config-option" data-quality="fluida"><i class="fas fa-feather"></i><div class="config-option-name">Fluida</div><div class="config-option-desc">Máximo rendimiento</div></div>
-        <div class="config-option" data-quality="media"><i class="fas fa-balance-scale"></i><div class="config-option-name">Media</div><div class="config-option-desc">Balance</div></div>
-        <div class="config-option" data-quality="alta"><i class="fas fa-gem"></i><div class="config-option-name">Alta</div><div class="config-option-desc">Máxima fidelidad</div></div>
-      </div>
-    </div>
 
     <div class="config-group">
       <div class="config-group-label">Color de tema</div>
@@ -1253,11 +1175,11 @@ html[data-quality="fluida"] .scanlines { display: none !important; }
 </div>
 
 <script src="../js/core/themes.js"></script>
-<script src="../js/core/app-core.js"></script>   <!-- ✅ NUEVO, va ANTES -->
+<script src="../js/core/app-core.js"></script>
 <script src="../data/catalogo.js"></script>
 <script src="../data/videos.js"></script>
 <script src="../js/utils/gifs.js"></script>
-<script src="../js/pages/anime-detail-core.js?v=20250413"></script>
+<script src="../js/pages/anime-detail-core.js?v=20251001"></script>
 
 <script>
   (function() {
@@ -1271,7 +1193,7 @@ html[data-quality="fluida"] .scanlines { display: none !important; }
 
 <script>
 /* ============================================================
-   CONFIG v29 — Calidad, tema, cursor (sin chroma/particles/etc.)
+   CONFIG v30 — Calidad SIEMPRE alta · solo tema y cursor
    ============================================================ */
 (function() {
   'use strict';
@@ -1293,53 +1215,46 @@ html[data-quality="fluida"] .scanlines { display: none !important; }
   const STORAGE_KEY = 'archinime_config_v29';
   const LEGACY_KEYS = ['archinime_config_v28','archinime_config_v27','archinime_config_v26'];
 
-  function detectarCalidad() {
-    if (isMobileDevice()) return 'fluida';
-    const cores = navigator.hardwareConcurrency || 2;
-    const ram = navigator.deviceMemory || 4;
-    const dpr = window.devicePixelRatio || 1;
-    const isLowEnd = cores <= 4 && ram <= 2;
-    const isMidEnd = cores >= 4 && cores < 8 && ram >= 3;
-    const isHighEnd = cores >= 8 && ram >= 6;
-    if (isHighEnd) return 'alta';
-    if (isMidEnd) return 'alta';
-    if (isLowEnd) return 'media';
-    if (dpr >= 2) return 'media';
-    return 'media';
-  }
+  // Calidad fija y obligatoria
+  const FIXED_QUALITY = 'alta';
 
-  const configPorDefecto = { quality: null, cursor: false };
+  const configPorDefecto = {
+    quality: FIXED_QUALITY,
+    cursor: false
+  };
 
   function cargarConfig() {
+    let base = Object.assign({}, configPorDefecto);
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) return Object.assign({}, configPorDefecto, JSON.parse(raw));
-      for (const key of LEGACY_KEYS) {
-        const old = localStorage.getItem(key);
-        if (old) {
-          const parsed = JSON.parse(old);
-          return Object.assign({}, configPorDefecto, { quality: parsed.quality, cursor: false });
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        base.cursor = parsed.cursor === true;
+      } else {
+        for (const key of LEGACY_KEYS) {
+          const old = localStorage.getItem(key);
+          if (old) {
+            base.cursor = false;
+            break;
+          }
         }
       }
     } catch(e) {}
-    return null;
+    base.quality = FIXED_QUALITY;
+    return base;
   }
-  function guardarConfig(c) { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(c)); } catch(e) {} }
+  function guardarConfig(c) {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(Object.assign({}, c, { quality: FIXED_QUALITY })));
+    } catch(e) {}
+  }
 
   let config = cargarConfig();
-  const detectedQuality = detectarCalidad();
-  if (!config) {
-    config = Object.assign({}, configPorDefecto, { quality: detectedQuality, cursor: false });
-    guardarConfig(config);
-  }
-  if (!config.quality) config.quality = detectedQuality;
-  if (config.cursor === undefined) config.cursor = false;
-
   window.__archinimeConfig = config;
 
   function aplicarConfig() {
     const html = document.documentElement;
-    html.dataset.quality = config.quality;
+    html.dataset.quality = FIXED_QUALITY;
     if (config.cursor === true) html.classList.remove('custom-cursor-off');
     else html.classList.add('custom-cursor-off');
     window.dispatchEvent(new CustomEvent('archinime:config-changed', { detail: config }));
@@ -1347,20 +1262,12 @@ html[data-quality="fluida"] .scanlines { display: none !important; }
   aplicarConfig();
 
   const modal = document.getElementById('configModal');
-  const qualityOptions = document.querySelectorAll('#qualityOptions .config-option');
   const toggleCursor = document.getElementById('toggleCursor');
-  const detectedLabel = document.getElementById('detectedQuality');
-
-  if (detectedLabel) {
-    const nombres = { 'fluida': 'Fluida', 'media': 'Media', 'alta': 'Alta' };
-    detectedLabel.innerHTML = `<i class="fas fa-bolt"></i> Detectado: ${nombres[detectedQuality] || 'Media'}`;
-  }
 
   let draft = null;
 
   function pintarUI() {
     if (!draft) return;
-    qualityOptions.forEach(opt => opt.classList.toggle('active', opt.dataset.quality === draft.quality));
     toggleCursor?.classList.toggle('active', draft.cursor === true);
   }
 
@@ -1380,18 +1287,6 @@ html[data-quality="fluida"] .scanlines { display: none !important; }
   document.getElementById('configBtn')?.addEventListener('click', abrirConfigModal);
   modal.addEventListener('click', e => { if (e.target === modal) closeConfigModal(); });
 
-  qualityOptions.forEach(opt => {
-    opt.addEventListener('click', () => {
-      qualityOptions.forEach(o => o.classList.remove('active'));
-      opt.classList.add('active');
-      config.quality = opt.dataset.quality;
-      guardarConfig(config);
-      window.__archinimeConfig = config;
-      showToast('🔄 Aplicando calidad: ' + config.quality);
-      setTimeout(() => window.location.reload(), 400);
-    });
-  });
-
   if (toggleCursor) {
     toggleCursor.addEventListener('click', () => {
       draft.cursor = !draft.cursor;
@@ -1401,6 +1296,7 @@ html[data-quality="fluida"] .scanlines { display: none !important; }
 
   window.saveConfigAndClose = function() {
     config = Object.assign({}, draft);
+    config.quality = FIXED_QUALITY;
     guardarConfig(config);
     window.__archinimeConfig = config;
     aplicarConfig();
@@ -1533,8 +1429,7 @@ window.showToast = showToast;
   const isTouch = 'ontouchstart' in window;
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const LOW_END = document.documentElement.classList.contains('low-end');
-  const QUALITY = window.__archinimeConfig?.quality || 'media';
-  if (isTouch || prefersReduced || LOW_END || QUALITY === 'fluida') return;
+  if (isTouch || prefersReduced || LOW_END) return;
   document.addEventListener('click', e => {
     const r = document.createElement('div');
     r.className = 'ripple';
@@ -1593,14 +1488,14 @@ window.showToast = showToast;
   window.__deferredInstallPrompt = null;
   const isStandalone = () => window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
   const isIos = () => /iphone|ipad|ipod/i.test(navigator.userAgent);
-  const yaMostrada = sessionStorage.getItem('archinime_pwa_detail_v29_shown') === '1';
+  const yaMostrada = sessionStorage.getItem('archinime_pwa_detail_v30_shown') === '1';
 
   window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); window.__deferredInstallPrompt = e; });
 
   function mostrarPwaNotif() {
     if (!pwaNotif || isStandalone() || yaMostrada) return;
     pwaNotif.classList.add('show');
-    sessionStorage.setItem('archinime_pwa_detail_v29_shown', '1');
+    sessionStorage.setItem('archinime_pwa_detail_v30_shown', '1');
     setTimeout(() => pwaNotif.classList.remove('show'), 12000);
   }
   window.addEventListener('load', () => setTimeout(mostrarPwaNotif, 2500));
@@ -1626,13 +1521,6 @@ window.showToast = showToast;
 })();
 
 /* ============================================================
-   NAV SHARE
-   ============================================================ */
-document.getElementById('shareNavBtn')?.addEventListener('click', () => {
-  document.getElementById('share-detail')?.click();
-});
-
-/* ============================================================
    SERVICE WORKER
    ============================================================ */
 if ('serviceWorker' in navigator) {
@@ -1643,7 +1531,7 @@ if ('serviceWorker' in navigator) {
   });
 }
 
-console.log('%c✅ Archinime Detail v29 · optimized · Quality: ' + (window.__archinimeConfig?.quality || 'media'), 'color:#00f0ff;font-family:monospace;font-weight:bold;');
+console.log('%c✅ Archinime Detail v30 · Calidad forzada: ALTA · Cursor: ' + (window.__archinimeConfig?.cursor ? 'ON' : 'OFF'), 'color:#00f0ff;font-family:monospace;font-weight:bold;');
 </script>
 
 </body>
