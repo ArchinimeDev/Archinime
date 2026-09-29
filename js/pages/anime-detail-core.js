@@ -17,6 +17,8 @@
   }
 
   // ========== FIREBASE ==========
+  // app-core.js ya inicializó Firebase y expuso auth/db en window.
+  // Los tomamos dentro de la IIFE → sin conflicto de scope global.
   const auth = window.auth;
   const db   = window.db;
 
@@ -73,6 +75,9 @@
             if (!userInteractedDetail) {
               userInteractedDetail = true;
               currentAudio.play().catch(err => console.warn('No se pudo reproducir:', err));
+              ['click', 'touchstart', 'keydown'].forEach(evt => {
+                document.removeEventListener(evt, resumeOnce, { once: true });
+              });
             }
           };
           ['click', 'touchstart', 'keydown'].forEach(evt => {
