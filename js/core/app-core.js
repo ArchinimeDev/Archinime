@@ -1,7 +1,6 @@
 // app-core.js
 // Inicialización central de Firebase y estado del usuario
-// v24.3 - Modal de perfil rediseñado: círculo sólido + paleta nativa + presets + chip hex
-// v24.2 - (revertido) botón "Opciones" vuelve a abrir modal interno
+// v24.5 - DEFAULT_AVATAR dinámico según la profundidad de la página (funciona en / y /pages/)
 
 // ========== CONFIGURACIÓN DE FIREBASE ==========
 const firebaseConfig = {
@@ -33,6 +32,21 @@ let lastProfileUpdate = 0;
 window.currentUser = null;
 const CLOUDINARY_URL = 'https://api.cloudinary.com/v1_1/dbcqcai1q/upload';
 const CLOUDINARY_PRESET = 'stickers_archinime';
+
+// ✅ FIX v24.5: ruta dinámica del avatar según profundidad
+// Funciona en / (index), /pages/ (anime-detail, video-player), etc.
+const DEFAULT_AVATAR = (() => {
+  // Si estamos dentro de /pages/ o cualquier subcarpeta, subir un nivel.
+  // Si estamos en la raíz del sitio, usar ruta directa.
+  const path = window.location.pathname;
+  // Cuenta cuántos '/' hay después del dominio del proyecto
+  // Ej: /Archinime/pages/anime-detail.html → está en subcarpeta
+  //     /Archinime/index.html → está en raíz
+  // Simplificamos: si el path contiene '/pages/' usamos '../'
+  if (path.includes('/pages/')) return '../assets/img/invitado.avif';
+  return 'assets/img/invitado.avif';
+})();
+window.DEFAULT_AVATAR = DEFAULT_AVATAR;
 
 // Colores preset para el modal
 const PRESET_COLORS_MODAL = ['#00f0ff', '#b114ff', '#ff1a6b', '#ffd700', '#00ff33', '#00aaff'];
@@ -107,28 +121,23 @@ function renderProfileColorPresets(activeColor) {
 }
 
 function updateProfileColorPreview(color) {
-  // Círculo sólido del modal
   const circle = document.getElementById('profileColorCircle');
   if (circle) {
     circle.style.background = color;
     circle.style.boxShadow = `0 0 0 3px rgba(255,255,255,0.08), 0 0 18px ${color}, 0 0 32px ${color}`;
   }
-  // Dot del chip hex
   const dot = document.getElementById('profileColorDot');
   if (dot) {
     dot.style.background = color;
     dot.style.boxShadow = `0 0 10px ${color}, 0 0 18px ${color}80`;
   }
-  // Texto HEX
   const hexText = document.getElementById('profileColorHexText');
   if (hexText) hexText.textContent = (color || '#00F0FF').toUpperCase();
-  // Avatar del modal
   const avatar = document.getElementById('profileAvatar');
   if (avatar) {
     avatar.style.borderColor = color;
     avatar.style.boxShadow = `0 0 25px ${color}80, 0 0 45px ${color}40`;
   }
-  // Marcar preset activo
   document.querySelectorAll('#profileColorPresets .preset-dot').forEach(el => {
     if ((el.dataset.color || '').toLowerCase() === (color || '').toLowerCase()) {
       el.classList.add('active');
@@ -149,7 +158,7 @@ function updateUserUI(user) {
   const loginItem = document.getElementById('loginBtnItem');
 
   if (user) {
-    const photo = user.photoURL || 'assets/img/invitado.avif';
+    const photo = user.photoURL || DEFAULT_AVATAR;
     if (avatar) avatar.src = photo;
     if (dAvatar) dAvatar.src = photo;
     if (dName) dName.textContent = user.displayName || (user.email ? user.email.split('@')[0] : 'Usuario');
@@ -173,8 +182,8 @@ function updateUserUI(user) {
       }
     }).catch(console.error);
   } else {
-    if (avatar) { avatar.src = 'assets/img/invitado.avif'; avatar.style.borderColor = 'var(--neon-blue)'; avatar.style.boxShadow = 'none'; }
-    if (dAvatar) { dAvatar.src = 'assets/img/invitado.avif'; dAvatar.style.borderColor = 'var(--neon-blue)'; dAvatar.style.boxShadow = 'none'; }
+    if (avatar) { avatar.src = DEFAULT_AVATAR; avatar.style.borderColor = 'var(--neon-blue)'; avatar.style.boxShadow = 'none'; }
+    if (dAvatar) { dAvatar.src = DEFAULT_AVATAR; dAvatar.style.borderColor = 'var(--neon-blue)'; dAvatar.style.boxShadow = 'none'; }
     if (dName) { dName.textContent = 'Invitado'; dName.style.color = 'var(--neon-blue)'; dName.style.textShadow = 'none'; }
     if (loginItem) {
       loginItem.innerHTML = '<i class="fas fa-sign-in-alt"></i> Iniciar sesión';
@@ -268,14 +277,13 @@ function showProfileModal() {
     return;
   }
   const avatar = document.getElementById('profileAvatar');
-  if (avatar) avatar.src = currentUser.photoURL || 'assets/img/invitado.avif';
+  if (avatar) avatar.src = currentUser.photoURL || DEFAULT_AVATAR;
   newAvatarUrl = currentUser.photoURL || null;
   const uidInput = document.getElementById('profileUid');
   if (uidInput) uidInput.value = currentUser.uid;
   const nameInput = document.getElementById('profileDisplayName');
   if (nameInput) nameInput.value = currentUser.displayName || (currentUser.email ? currentUser.email.split('@')[0] : 'Usuario');
 
-  // Color inicial + render de presets + preview
   let initialColor = getNeonColor(currentUser.uid);
   const colorInput = document.getElementById('profileNameColor');
   if (colorInput) colorInput.value = initialColor;
@@ -293,7 +301,6 @@ function showProfileModal() {
     renderProfileColorPresets(color);
   }).catch(console.error);
 
-  // Render inmediato con el color por defecto (mientras llega Firestore)
   updateProfileColorPreview(initialColor);
   renderProfileColorPresets(initialColor);
 
@@ -391,7 +398,7 @@ async function guardarCambiosPerfil() {
       const batch = db.batch();
       snap.forEach(d => batch.update(d.ref, {
         userName: name,
-        userAvatar: newAvatarUrl || currentUser.photoURL || 'assets/img/invitado.avif',
+        userAvatar: newAvatarUrl || currentUser.photoURL || DEFAULT_AVATAR,
         customColor: color
       }));
       if (snap.size > 0) await batch.commit();
@@ -407,12 +414,12 @@ async function guardarCambiosPerfil() {
     const dropdownAvatar = document.getElementById('dropdownAvatar');
     const dropdownName = document.getElementById('dropdownName');
     if (userAvatarBtn) {
-      userAvatarBtn.src = newAvatarUrl || 'assets/img/invitado.avif';
+      userAvatarBtn.src = newAvatarUrl || DEFAULT_AVATAR;
       userAvatarBtn.style.borderColor = color;
       userAvatarBtn.style.boxShadow = `0 0 20px ${color}`;
     }
     if (dropdownAvatar) {
-      dropdownAvatar.src = newAvatarUrl || 'assets/img/invitado.avif';
+      dropdownAvatar.src = newAvatarUrl || DEFAULT_AVATAR;
       dropdownAvatar.style.borderColor = color;
       dropdownAvatar.style.boxShadow = `0 0 20px ${color}`;
     }
@@ -443,7 +450,6 @@ async function guardarCambiosPerfil() {
 
 // ========== SETUP DE LISTENERS ==========
 function setupAuthUI() {
-  // Tabs de login/registro
   document.querySelectorAll('.auth-tab').forEach(tab => {
     tab.addEventListener('click', () => {
       document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
@@ -456,7 +462,6 @@ function setupAuthUI() {
     });
   });
 
-  // Avatar en el modal de perfil
   const avatarInput = document.getElementById('profileAvatarInput');
   if (avatarInput) {
     avatarInput.addEventListener('change', async (e) => {
@@ -488,14 +493,12 @@ function setupAuthUI() {
     });
   }
 
-  // Listener del color picker nativo → actualiza preview en vivo
   const colorInput = document.getElementById('profileNameColor');
   if (colorInput) {
     colorInput.addEventListener('input', (e) => updateProfileColorPreview(e.target.value));
     colorInput.addEventListener('change', (e) => updateProfileColorPreview(e.target.value));
   }
 
-  // Click en el header del dropdown → abre el modal
   const profileDropdownBtn = document.getElementById('profileDropdownBtn');
   if (profileDropdownBtn) {
     profileDropdownBtn.addEventListener('click', (e) => {
@@ -504,7 +507,6 @@ function setupAuthUI() {
     });
   }
 
-  // Toggle del dropdown de usuario
   const userAvatarBtn = document.getElementById('userAvatarBtn');
   if (userAvatarBtn) {
     userAvatarBtn.addEventListener('click', e => {
@@ -514,7 +516,6 @@ function setupAuthUI() {
     });
   }
 
-  // Cerrar dropdown al hacer clic fuera
   document.addEventListener('click', e => {
     const dropdown = document.getElementById('userDropdown');
     if (dropdown && !e.target.closest('.user-menu')) {
@@ -546,4 +547,4 @@ window.enableBodyScroll = enableBodyScroll;
 window.updateProfileColorPreview = updateProfileColorPreview;
 window.renderProfileColorPresets = renderProfileColorPresets;
 
-console.log('✅ app-core.js cargado correctamente (v24.3)');
+console.log('✅ app-core.js cargado correctamente (v24.5) · DEFAULT_AVATAR:', DEFAULT_AVATAR);
