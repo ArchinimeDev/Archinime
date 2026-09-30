@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" data-quality="media">
+<html lang="es" data-quality="alta">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -931,16 +931,6 @@ html.theme-has-video .footer-bottom { text-shadow: 0 2px 10px rgba(0,0,0,0.85), 
 #configModal .config-group { margin-bottom: 24px; }
 #configModal .config-group-label { font-family: 'Orbitron', sans-serif; font-size: 0.7rem; letter-spacing: 2px; font-weight: 700; color: #b114ff; text-transform: uppercase; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 #configModal .config-group-label::before { content: ''; width: 18px; height: 2px; background: #b114ff; box-shadow: 0 0 8px #b114ff; }
-#configModal .config-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-@media (max-width: 400px) { #configModal .config-options { grid-template-columns: 1fr; } }
-#configModal .config-option { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 14px 10px; cursor: pointer; transition: all 0.3s; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 6px; color: #8a90a0; user-select: none; }
-#configModal .config-option:hover { background: rgba(0,240,255,0.05); border-color: rgba(0,240,255,0.3); transform: translateY(-2px); }
-#configModal .config-option.active { background: linear-gradient(135deg, rgba(0,240,255,0.12), rgba(177,20,255,0.12)); border-color: #00f0ff; color: #fff; box-shadow: 0 0 25px rgba(0,240,255,0.25); }
-#configModal .config-option i { font-size: 1.4rem; color: inherit; }
-#configModal .config-option.active i { color: #00f0ff; text-shadow: 0 0 12px #00f0ff; }
-#configModal .config-option-name { font-family: 'Orbitron', sans-serif; font-size: 0.72rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
-#configModal .config-option-desc { font-size: 0.62rem; color: #4a5266; line-height: 1.3; }
-#configModal .config-option.active .config-option-desc { color: #8a90a0; }
 #configModal .config-toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; margin-bottom: 10px; cursor: pointer; transition: all 0.25s; }
 #configModal .config-toggle-row:hover { border-color: rgba(0,240,255,0.25); }
 #configModal .config-toggle-info { display: flex; align-items: center; gap: 12px; }
@@ -951,8 +941,6 @@ html.theme-has-video .footer-bottom { text-shadow: 0 2px 10px rgba(0,0,0,0.85), 
 #configModal .config-switch::after { content: ''; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #8a90a0; transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1); }
 #configModal .config-toggle-row.active .config-switch { background: linear-gradient(135deg, #00f0ff, #b114ff); box-shadow: 0 0 15px rgba(0,240,255,0.4); }
 #configModal .config-toggle-row.active .config-switch::after { left: 23px; background: #fff; box-shadow: 0 0 8px rgba(0,240,255,0.6); }
-#configModal .config-detected { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 100px; background: rgba(0,240,255,0.1); border: 1px solid rgba(0,240,255,0.3); color: #00f0ff; font-family: 'JetBrains Mono', monospace; font-size: 0.62rem; letter-spacing: 1px; text-transform: uppercase; margin-left: auto; }
-#configModal .config-detected i { font-size: 0.6rem; }
 #configModal .config-save { width: 100%; margin-top: 8px; padding: 14px; border-radius: 100px; background: linear-gradient(135deg, #00f0ff, #b114ff); color: #04050a; font-family: 'Orbitron', sans-serif; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; border: none; cursor: pointer; transition: all 0.25s; box-shadow: 0 0 30px rgba(0,240,255,0.35); }
 #configModal .config-save:hover { transform: translateY(-2px); box-shadow: 0 10px 40px rgba(0,240,255,0.5); color: #fff; }
 #configModal .config-theme-dots { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
@@ -980,7 +968,7 @@ html[data-chroma="on"] #stageContainer { display: block !important; }
 @media (max-width: 900px) { .nav { padding-top: calc(12px + var(--safe-top)) !important; padding-bottom: 12px !important; } .nav.scrolled { padding-top: calc(10px + var(--safe-top)) !important; padding-bottom: 10px !important; } }
 
 /* ============================================================================
-   v29 — SISTEMA DE CALIDAD VISUAL ULTRA-OPTIMIZADO
+   v30 — SISTEMA DE CALIDAD VISUAL · SIEMPRE EN ALTA
    ============================================================================ */
 html {
   --q-blur-aurora: 28px;
@@ -1004,37 +992,6 @@ html {
   --q-card-shadow: 0 8px 24px rgba(0,0,0,0.5);
   --q-card-shadow-hover: 0 20px 50px rgba(0,0,0,0.7), 0 0 30px color-mix(in srgb, var(--neon-1) 20%, transparent);
   --q-text-shadow-hero: 0 4px 20px rgba(0,0,0,0.9);
-}
-html[data-quality="fluida"] {
-  --q-blur-aurora: 20px; --q-aurora-opacity: 0.18;
-  --q-grid-opacity: 0.12; --q-grid-size: 46px;
-  --q-noise-opacity: 0; --q-scanlines-opacity: 0; --q-hud-opacity: 0;
-  --q-backdrop-blur: 0px; --q-backdrop-sat: 1; --q-neon-glow: 0;
-  --q-card-hover-y: -2px; --q-card-hover-scale: 1;
-  --q-reveal-dur: 0.35s;
-  --q-nav-bg: var(--bg-deep); --q-nav-bg-scrolled: var(--bg-deep);
-  --q-glass-bg: var(--bg-panel);
-  --q-panel-bg: var(--bg-panel);
-  --q-vignette-strength: 60%;
-  --q-card-shadow: 0 3px 10px rgba(0,0,0,0.5);
-  --q-card-shadow-hover: 0 6px 14px rgba(0,0,0,0.6);
-  --q-text-shadow-hero: none;
-}
-html[data-quality="media"] {
-  --q-blur-aurora: 24px; --q-aurora-opacity: 0.3;
-  --q-grid-opacity: 0.2; --q-grid-size: 54px;
-  --q-noise-opacity: 0.015; --q-scanlines-opacity: 0.15; --q-hud-opacity: 0.5;
-  --q-backdrop-blur: 6px; --q-backdrop-sat: 1.2; --q-neon-glow: 0.55;
-  --q-card-hover-y: -5px; --q-card-hover-scale: 1.01;
-  --q-reveal-dur: 0.55s;
-  --q-nav-bg: color-mix(in srgb, var(--bg-deep) 82%, transparent);
-  --q-nav-bg-scrolled: color-mix(in srgb, var(--bg-deep) 96%, transparent);
-  --q-glass-bg: linear-gradient(160deg, rgba(20, 22, 34, 0.85), rgba(10, 12, 20, 0.8));
-  --q-panel-bg: color-mix(in srgb, var(--bg-panel) 96%, transparent);
-  --q-vignette-strength: 75%;
-  --q-card-shadow: 0 5px 16px rgba(0,0,0,0.5);
-  --q-card-shadow-hover: 0 12px 30px rgba(0,0,0,0.6), 0 0 20px color-mix(in srgb, var(--neon-1) 18%, transparent);
-  --q-text-shadow-hero: 0 2px 10px rgba(0,0,0,0.7);
 }
 html[data-quality="alta"] {
   --q-blur-aurora: 28px; --q-aurora-opacity: 0.36;
@@ -1088,35 +1045,7 @@ html[data-quality="fluida"] .hud-frame { display: none !important; }
 #configModal { backdrop-filter: blur(calc(var(--q-backdrop-blur) * 0.7)) !important; -webkit-backdrop-filter: blur(calc(var(--q-backdrop-blur) * 0.7)) !important; }
 #eventModal { backdrop-filter: blur(calc(var(--q-backdrop-blur) * 0.5)) !important; -webkit-backdrop-filter: blur(calc(var(--q-backdrop-blur) * 0.5)) !important; }
 
-html[data-quality="fluida"] .nav,
-html[data-quality="fluida"] .nav.scrolled,
-html[data-quality="fluida"] #searchSuggestions,
-html[data-quality="fluida"] .user-dropdown,
-html[data-quality="fluida"] .notif-dropdown,
-html[data-quality="fluida"] .side-panel,
-html[data-quality="fluida"] .filter-dropdown,
-html[data-quality="fluida"] .cmd-panel,
-html[data-quality="fluida"] .cmd-overlay,
-html[data-quality="fluida"] .mobile-menu,
-html[data-quality="fluida"] .auth-modal,
-html[data-quality="fluida"] .profile-modal,
-html[data-quality="fluida"] .detail-modal,
-html[data-quality="fluida"] #configModal,
-html[data-quality="fluida"] #eventModal,
-html[data-quality="fluida"] .search-wrapper,
-html[data-quality="fluida"] #pwaNotif,
-html[data-quality="fluida"] .motion-nav-btn { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; background: var(--bg-deep) !important; }
-html[data-quality="fluida"] #searchSuggestions,
-html[data-quality="fluida"] .user-dropdown,
-html[data-quality="fluida"] .notif-dropdown,
-html[data-quality="fluida"] .side-panel,
-html[data-quality="fluida"] .filter-dropdown,
-html[data-quality="fluida"] .cmd-panel { background: var(--bg-panel) !important; }
-html[data-quality="fluida"] #pwaNotif { background: linear-gradient(135deg, rgba(10,12,20,0.98), rgba(20,10,35,0.98)) !important; }
-html[data-quality="fluida"] .motion-nav-btn { background: rgba(10,12,20,0.9) !important; }
-
 .bento-item, .community-msg { background: var(--q-glass-bg) !important; backdrop-filter: blur(calc(var(--q-backdrop-blur) * 0.6)) !important; -webkit-backdrop-filter: blur(calc(var(--q-backdrop-blur) * 0.6)) !important; }
-html[data-quality="fluida"] .bento-item, html[data-quality="fluida"] .community-msg { background: var(--bg-panel) !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
 html[data-quality="alta"] .bento-item,
 html[data-quality="alta"] .community-msg {
   backdrop-filter: none !important;
@@ -1207,10 +1136,6 @@ html[data-quality="fluida"] .community-msg:hover { box-shadow: none !important; 
 html[data-quality="fluida"] .bento-item:hover .bento-icon { transform: none !important; }
 html[data-quality="fluida"] .footer-socials a:hover { box-shadow: none !important; transform: none !important; }
 
-/* ============================================================
-   Video de fondo — SIN filter forzado (se ve más oscuro, igual
-   que anime-detail). Se deja que themes.js aplique su filtro.
-   ============================================================ */
 html body #themeBgVideo {
   transform: translate3d(0, 0, 0) !important;
   backface-visibility: hidden !important;
@@ -1222,12 +1147,6 @@ html body #themeBgVideo {
 }
 html body #themeBgVideo.active { opacity: 0.85 !important; }
 
-/* ============================================================
-   v29.1 — CHROMA / PANTALLA VERDE DESACTIVADO
-   Los elementos siguen existiendo en el DOM (themes.js no falla),
-   pero quedan invisibles y sin consumo. El toggle de la config
-   queda forzado a false desde JS.
-   ============================================================ */
 #stageContainer,
 #fgContainer,
 #fgCanvas,
@@ -1240,11 +1159,7 @@ html body #themeBgVideo.active { opacity: 0.85 !important; }
   width: 0 !important;
   height: 0 !important;
 }
-
-/* Aunque por alguna razón se ponga data-chroma="on", no se ve */
 html[data-chroma="on"] #stageContainer { display: none !important; }
-
-/* Aviso del "motion-audio-notice" no se usa para chroma */
 #motionAudioNotice { display: none !important; }
 </style>
 </head>
@@ -1335,7 +1250,7 @@ html[data-chroma="on"] #stageContainer { display: none !important; }
 </nav>
 
 <section class="hero" id="hero">
-  <div class="hero-eyebrow"><span class="pulse"></span><span>Nueva era · v29</span></div>
+  <div class="hero-eyebrow"><span class="pulse"></span><span>Nueva era · v30</span></div>
   <h1 class="hero-title">
     <span class="line"><span class="word grad-1">La nueva</span></span>
     <span class="line"><span class="word grad-2 glitch-wrap" data-text="experiencia">experiencia</span></span>
@@ -1344,7 +1259,6 @@ html[data-chroma="on"] #stageContainer { display: none !important; }
   <p class="hero-sub">Una plataforma donde el diseño y la tecnología se encuentran. <span class="scramble" data-scramble="Streaming · Comunidad · HD">Streaming · Comunidad · HD</span></p>
   <div class="hero-actions">
     <button class="btn btn-primary magnetic" data-hover onclick="document.getElementById('catalog').scrollIntoView({behavior:'smooth'})"><i class="fas fa-play"></i><span>Explorar catálogo</span></button>
-    <button class="btn btn-secondary" data-hover data-cmd-open><i class="fas fa-terminal"></i><span>Abrir consola</span></button>
   </div>
   <div class="hero-chips">
     <div class="chip"><span class="chip-dot c1"></span> 4K HDR · Streaming</div>
@@ -1584,7 +1498,7 @@ html[data-chroma="on"] #stageContainer { display: none !important; }
     </div>
   </div>
   <div class="footer-bottom">
-    <span class="footer-copy">© 2025 ARCHINIME · NEXT v29</span>
+    <span class="footer-copy">© 2025 ARCHINIME · NEXT v30</span>
     <div class="footer-socials">
       <a href="#" data-hover aria-label="Twitter"><i class="fab fa-twitter"></i></a>
       <a href="#" data-hover aria-label="Discord"><i class="fab fa-discord"></i></a>
@@ -1642,7 +1556,6 @@ html[data-chroma="on"] #stageContainer { display: none !important; }
   </div>
 </div>
 
-<!-- #stageContainer se mantiene en el DOM (themes.js / JS no falla), pero oculto por CSS -->
 <div id="stageContainer">
   <div id="fgContainer">
     <canvas id="fgCanvas"></canvas>
@@ -1667,25 +1580,12 @@ html[data-chroma="on"] #stageContainer { display: none !important; }
     <div class="config-subtitle">Personaliza tu experiencia</div>
 
     <div class="config-group">
-      <div class="config-group-label">
-        Calidad visual
-        <span class="config-detected" id="detectedQuality"><i class="fas fa-bolt"></i> Detectado</span>
-      </div>
-      <div class="config-options" id="qualityOptions">
-        <div class="config-option" data-quality="fluida"><i class="fas fa-feather"></i><div class="config-option-name">Fluida</div><div class="config-option-desc">Máximo rendimiento</div></div>
-        <div class="config-option" data-quality="media"><i class="fas fa-balance-scale"></i><div class="config-option-name">Media</div><div class="config-option-desc">Balance</div></div>
-        <div class="config-option" data-quality="alta"><i class="fas fa-gem"></i><div class="config-option-name">Alta</div><div class="config-option-desc">Máxima fidelidad</div></div>
-      </div>
-    </div>
-
-    <div class="config-group">
       <div class="config-group-label">Color de tema</div>
       <div class="config-theme-dots"></div>
     </div>
 
     <div class="config-group">
       <div class="config-group-label">Efectos</div>
-      <!-- Toggle de chroma eliminado visualmente: el chroma queda forzado a false -->
       <div class="config-toggle-row" id="toggleBgVideo" data-key="bgVideo">
         <div class="config-toggle-info"><i class="fas fa-film"></i><div><div class="config-toggle-name">Video de fondo</div><div class="config-toggle-desc">Galaxia animada</div></div></div>
         <div class="config-switch"></div>
@@ -1717,7 +1617,7 @@ html[data-chroma="on"] #stageContainer { display: none !important; }
       <div class="cmd-item" data-cmd="catalog"><div class="cmd-item-icon"><i class="fas fa-film"></i></div><div class="cmd-item-text"><div class="cmd-item-title">Ver Catálogo</div><div class="cmd-item-desc">Explorar todos los animes</div></div><span class="cmd-item-shortcut">C</span></div>
       <div class="cmd-item" data-cmd="features"><div class="cmd-item-icon"><i class="fas fa-cube"></i></div><div class="cmd-item-text"><div class="cmd-item-title">Ver Features</div><div class="cmd-item-desc">Características de la plataforma</div></div><span class="cmd-item-shortcut">F</span></div>
       <div class="cmd-item" data-cmd="community"><div class="cmd-item-icon"><i class="fas fa-users"></i></div><div class="cmd-item-text"><div class="cmd-item-title">Ver Comunidad</div><div class="cmd-item-desc">Últimos mensajes del chat</div></div><span class="cmd-item-shortcut">O</span></div>
-      <div class="cmd-item" data-cmd="config"><div class="cmd-item-icon"><i class="fas fa-sliders-h"></i></div><div class="cmd-item-text"><div class="cmd-item-title">Configuración</div><div class="cmd-item-desc">Calidad visual y efectos</div></div><span class="cmd-item-shortcut">K</span></div>
+      <div class="cmd-item" data-cmd="config"><div class="cmd-item-icon"><i class="fas fa-sliders-h"></i></div><div class="cmd-item-text"><div class="cmd-item-title">Configuración</div><div class="cmd-item-desc">Tema y efectos visuales</div></div><span class="cmd-item-shortcut">K</span></div>
       <div class="cmd-item" data-cmd="theme-cyan"><div class="cmd-item-icon" style="color:#00f0ff;border-color:rgba(0,240,255,0.3);background:rgba(0,240,255,0.1);"><i class="fas fa-palette"></i></div><div class="cmd-item-text"><div class="cmd-item-title">Tema Cyan</div><div class="cmd-item-desc">Paleta clásica</div></div><span class="cmd-item-shortcut">1</span></div>
       <div class="cmd-item" data-cmd="theme-magenta"><div class="cmd-item-icon" style="color:#ff1a6b;border-color:rgba(255,26,107,0.3);background:rgba(255,26,107,0.1);"><i class="fas fa-palette"></i></div><div class="cmd-item-text"><div class="cmd-item-title">Tema Magenta</div><div class="cmd-item-desc">Paleta vibrante</div></div><span class="cmd-item-shortcut">2</span></div>
       <div class="cmd-item" data-cmd="theme-emerald"><div class="cmd-item-icon" style="color:#7dff5c;border-color:rgba(125,255,92,0.3);background:rgba(125,255,92,0.1);"><i class="fas fa-palette"></i></div><div class="cmd-item-text"><div class="cmd-item-title">Tema Emerald</div><div class="cmd-item-desc">Paleta natural</div></div><span class="cmd-item-shortcut">3</span></div>
@@ -1812,7 +1712,6 @@ html[data-chroma="on"] #stageContainer { display: none !important; }
   </div>
 </div>
 
-<!-- EventModal SIN descripción (solo cover + título + meta + botón) -->
 <div id="eventModal">
   <div class="event-card">
     <div class="event-close" onclick="closeEventModal()"><i class="fas fa-times"></i></div>
@@ -1877,24 +1776,11 @@ html[data-chroma="on"] #stageContainer { display: none !important; }
   const STORAGE_KEY = 'archinime_config_v29';
   const LEGACY_KEYS = ['archinime_config_v28','archinime_config_v27','archinime_config_v26','archinime_config_v25'];
 
-  function detectarCalidad() {
-    if (isMobileDevice()) return 'fluida';
-    const cores = navigator.hardwareConcurrency || 2;
-    const ram = navigator.deviceMemory || 4;
-    const dpr = window.devicePixelRatio || 1;
-    const isLowEnd = cores <= 4 && ram <= 2;
-    const isMidEnd = cores >= 4 && cores < 8 && ram >= 3;
-    const isHighEnd = cores >= 8 && ram >= 6;
-    if (isHighEnd) return 'alta';
-    if (isMidEnd) return 'alta';
-    if (isLowEnd) return 'media';
-    if (dpr >= 2) return 'media';
-    return 'media';
-  }
+  /* CALIDAD FIJA — siempre alta */
+  const FIXED_QUALITY = 'alta';
 
-  /* CHROMA FORZADO A FALSE — se mantiene la clave para no romper el resto del código */
   const configPorDefecto = {
-    quality: null,
+    quality: FIXED_QUALITY,
     chroma: false,
     bgVideo: true,
     music: true,
@@ -1903,55 +1789,45 @@ html[data-chroma="on"] #stageContainer { display: none !important; }
   };
 
   function cargarConfig() {
+    let base = Object.assign({}, configPorDefecto);
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) {
-        const parsed = Object.assign({}, configPorDefecto, JSON.parse(raw));
-        parsed.chroma = false;
-        return parsed;
-      }
-      for (const key of LEGACY_KEYS) {
-        const old = localStorage.getItem(key);
-        if (old) {
-          const parsed = JSON.parse(old);
-          return Object.assign({}, configPorDefecto, parsed, {
-            chroma: false,
-            cursor: false,
-            notifications: parsed.notifications !== false,
-            bgVideo: parsed.bgVideo !== false
-          });
+        const parsed = JSON.parse(raw);
+        base = Object.assign({}, configPorDefecto, parsed);
+      } else {
+        for (const key of LEGACY_KEYS) {
+          const old = localStorage.getItem(key);
+          if (old) {
+            const parsed = JSON.parse(old);
+            base = Object.assign({}, configPorDefecto, parsed, {
+              cursor: false,
+              notifications: parsed.notifications !== false,
+              bgVideo: parsed.bgVideo !== false
+            });
+            break;
+          }
         }
       }
     } catch(e) {}
-    return null;
+    /* Forzados: quality alta, chroma off */
+    base.quality = FIXED_QUALITY;
+    base.chroma = false;
+    return base;
   }
   function guardarConfig(c) {
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(c)); } catch(e) {}
+    try {
+      const toStore = Object.assign({}, c, { quality: FIXED_QUALITY, chroma: false });
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(toStore));
+    } catch(e) {}
   }
 
   let config = cargarConfig();
-  const detectedQuality = detectarCalidad();
-  if (!config) {
-    config = Object.assign({}, configPorDefecto, {
-      quality: detectedQuality,
-      bgVideo: true,
-      cursor: false,
-      notifications: true
-    });
-    guardarConfig(config);
-  }
-  if (!config.quality) config.quality = detectedQuality;
-  if (config.cursor === undefined) config.cursor = false;
-  if (config.notifications === undefined) config.notifications = true;
-  if (config.bgVideo === undefined) config.bgVideo = true;
-  config.chroma = false; /* forzado */
-
   window.__archinimeConfig = config;
 
   function aplicarConfig() {
     const html = document.documentElement;
-    html.dataset.quality = config.quality;
-    /* chroma siempre off */
+    html.dataset.quality = FIXED_QUALITY;
     config.chroma = false;
     html.removeAttribute('data-chroma');
 
@@ -1971,23 +1847,15 @@ html[data-chroma="on"] #stageContainer { display: none !important; }
   aplicarConfig();
 
   const modal = document.getElementById('configModal');
-  const qualityOptions = document.querySelectorAll('#qualityOptions .config-option');
   const toggleBgVideo = document.getElementById('toggleBgVideo');
   const toggleMusic = document.getElementById('toggleMusic');
   const toggleCursor = document.getElementById('toggleCursor');
   const toggleNotifications = document.getElementById('toggleNotifications');
-  const detectedLabel = document.getElementById('detectedQuality');
-
-  if (detectedLabel) {
-    const nombres = { 'fluida': 'Fluida', 'media': 'Media', 'alta': 'Alta' };
-    detectedLabel.innerHTML = `<i class="fas fa-bolt"></i> Detectado: ${nombres[detectedQuality] || 'Media'}`;
-  }
 
   let draft = null;
 
   function pintarUI() {
     if (!draft) return;
-    qualityOptions.forEach(opt => opt.classList.toggle('active', opt.dataset.quality === draft.quality));
     if (toggleBgVideo) toggleBgVideo.classList.toggle('active', !!draft.bgVideo);
     if (toggleMusic) toggleMusic.classList.toggle('active', !!draft.music);
     if (toggleCursor) toggleCursor.classList.toggle('active', draft.cursor === true);
@@ -2013,21 +1881,6 @@ html[data-chroma="on"] #stageContainer { display: none !important; }
 
   modal.addEventListener('click', e => { if (e.target === modal) closeConfigModal(); });
 
-  qualityOptions.forEach(opt => {
-    opt.addEventListener('click', () => {
-      qualityOptions.forEach(o => o.classList.remove('active'));
-      opt.classList.add('active');
-      const nuevaCalidad = opt.dataset.quality;
-      config.quality = nuevaCalidad;
-      guardarConfig(config);
-      window.__archinimeConfig = config;
-      if (typeof window.showToastSticker === 'function') {
-        try { window.showToastSticker('🔄 Aplicando calidad: ' + nuevaCalidad); } catch(_) {}
-      }
-      setTimeout(() => { window.location.reload(); }, 400);
-    });
-  });
-
   function bindToggle(el, key) {
     if (!el) return;
     el.addEventListener('click', () => { draft[key] = !draft[key]; pintarUI(); });
@@ -2039,7 +1892,9 @@ html[data-chroma="on"] #stageContainer { display: none !important; }
 
   window.saveConfigAndClose = function() {
     config = Object.assign({}, draft);
-    config.chroma = false; /* forzado */
+    /* Forzados SIEMPRE */
+    config.quality = FIXED_QUALITY;
+    config.chroma = false;
     guardarConfig(config);
     window.__archinimeConfig = config;
     aplicarConfig();
@@ -2175,7 +2030,7 @@ html[data-chroma="on"] #stageContainer { display: none !important; }
     if (sugg) sugg.addEventListener('click', () => setTimeout(() => searchWrapper.classList.remove('active'), 200));
   }
 
-  console.log('%c✅ Archinime v29 · Calidad: ' + config.quality + ' · Chroma: OFF (forzado) · bgVideo: ' + (config.bgVideo !== false ? 'ON' : 'OFF') + ' · Cursor: ' + (config.cursor ? 'ON' : 'OFF'), 'color:#00f0ff;font-family:monospace;font-weight:bold;');
+  console.log('%c✅ Archinime v30 · Calidad forzada: ALTA · bgVideo: ' + (config.bgVideo !== false ? 'ON' : 'OFF') + ' · Cursor: ' + (config.cursor ? 'ON' : 'OFF'), 'color:#00f0ff;font-family:monospace;font-weight:bold;');
 })();
 </script>
 
@@ -2264,8 +2119,8 @@ html[data-chroma="on"] #stageContainer { display: none !important; }
   }
   if (window.__archinimeConfig?.cursor === true) initCursor();
 
-  const QUALITY = window.__archinimeConfig?.quality || 'media';
-  const RIPPLE_OK = !prefersReduced && !isTouch && !LOW_END && QUALITY !== 'fluida';
+  const QUALITY = window.__archinimeConfig?.quality || 'alta';
+  const RIPPLE_OK = !prefersReduced && !isTouch && !LOW_END;
   if (RIPPLE_OK) {
     document.addEventListener('click', e => {
       const r = document.createElement('div');
@@ -2302,7 +2157,7 @@ html[data-chroma="on"] #stageContainer { display: none !important; }
   }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
   $$('.reveal').forEach((el, i) => { el.style.transitionDelay = (i % 6) * 0.06 + 's'; revealIO.observe(el); });
 
-  if (!isTouch && !prefersReduced && !LOW_END && QUALITY !== 'fluida') {
+  if (!isTouch && !prefersReduced && !LOW_END) {
     $$('.bento-item').forEach(card => {
       card.addEventListener('mousemove', e => {
         if (card._raf) cancelAnimationFrame(card._raf);
@@ -2316,7 +2171,7 @@ html[data-chroma="on"] #stageContainer { display: none !important; }
     });
   }
 
-  if (!isTouch && !prefersReduced && !LOW_END && QUALITY !== 'fluida') {
+  if (!isTouch && !prefersReduced && !LOW_END) {
     $$('.magnetic').forEach(btn => {
       btn.addEventListener('mousemove', e => {
         if (btn._raf) cancelAnimationFrame(btn._raf);
@@ -2350,9 +2205,7 @@ html[data-chroma="on"] #stageContainer { display: none !important; }
     }
     requestAnimationFrame(frame);
   }
-  if (QUALITY !== 'fluida') {
-    setTimeout(() => { $$('[data-scramble]').forEach(el => scramble(el, el.dataset.scramble, 1400)); }, 1600);
-  }
+  setTimeout(() => { $$('[data-scramble]').forEach(el => scramble(el, el.dataset.scramble, 1400)); }, 1600);
 
   const menuBtn = $('#menuBtn');
   const mobileMenu = $('#mobileMenu');
@@ -2968,7 +2821,7 @@ html[data-chroma="on"] #stageContainer { display: none !important; }
   })();
 
   function aplicarTilt() {
-    if (isTouch || prefersReduced || LOW_END || QUALITY === 'fluida') return;
+    if (isTouch || prefersReduced || LOW_END) return;
     document.querySelectorAll('.anime-card:not([data-tilt])').forEach(card => {
       card.dataset.tilt = 'true';
       card.addEventListener('mousemove', e => {
@@ -3064,7 +2917,6 @@ html[data-chroma="on"] #stageContainer { display: none !important; }
     document.body.classList.remove('no-scroll');
   };
 
-  /* Event modal — SIN descripción ahora */
   let eventQueue = [];
   let isEventModalShowing = false;
   function showNextEvent() {
@@ -3212,7 +3064,7 @@ html[data-chroma="on"] #stageContainer { display: none !important; }
   const dockProfileBtn = document.getElementById('dockProfileBtn');
   if (dockProfileBtn) { dockProfileBtn.addEventListener('click', () => { if (typeof showProfileModal === 'function') showProfileModal(); else if (typeof showAuthModal === 'function') showAuthModal(); }); }
 
-  /* CHROMA DESACTIVADO: las funciones quedan por compatibilidad, pero nunca se activan */
+  /* CHROMA DESACTIVADO */
   function randomizeFgPosition() {
     const container = document.getElementById('stageContainer');
     if (!container) return;
@@ -3225,9 +3077,9 @@ html[data-chroma="on"] #stageContainer { display: none !important; }
   const fgCanvas = document.getElementById('fgCanvas');
   const fgCtx = fgCanvas ? fgCanvas.getContext('2d', { willReadFrequently: true }) : null;
 
-  const CHROMA_QUALITY = window.__archinimeConfig?.quality || 'media';
-  const CHROMA_FRAME_SKIP = CHROMA_QUALITY === 'alta' ? 6 : (CHROMA_QUALITY === 'media' ? 14 : 30);
-  const CHROMA_MAX_W = CHROMA_QUALITY === 'alta' ? 480 : 320;
+  const CHROMA_QUALITY = 'alta';
+  const CHROMA_FRAME_SKIP = 6;
+  const CHROMA_MAX_W = 480;
 
   let currentAnim = null, isTransitioning = false, frameCount = 0, chromaRAF = null;
   window.chromaPaused = true;
@@ -3272,10 +3124,7 @@ html[data-chroma="on"] #stageContainer { display: none !important; }
     chromaRAF = requestAnimationFrame(processChroma);
   }
 
-  window.startChroma = function() {
-    /* DESACTIVADO */
-    return;
-  };
+  window.startChroma = function() { return; };
   window.stopChroma = function() {
     window.chromaPaused = true;
     if (chromaRAF !== null) { cancelAnimationFrame(chromaRAF); chromaRAF = null; }
@@ -3285,18 +3134,9 @@ html[data-chroma="on"] #stageContainer { display: none !important; }
     fgVideo.addEventListener('play', () => { if (!window.chromaPaused) window.startChroma(); });
   }
 
-  function activarChromaCompleto() {
-    /* DESACTIVADO — no se hace nada */
-    return;
-  }
-
-  /* No activar chroma aunque la config lo pida */
-  if (false && window.__archinimeConfig?.chroma && currentAnim) {
-    setTimeout(activarChromaCompleto, 800);
-  }
+  function activarChromaCompleto() { return; }
 
   window.addEventListener('archinime:config-changed', (e) => {
-    /* Forzamos stop del chroma siempre */
     window.stopChroma();
     if (fgVideo && !fgVideo.paused) fgVideo.pause();
   });
@@ -3306,11 +3146,7 @@ html[data-chroma="on"] #stageContainer { display: none !important; }
     if (fgVideo && !fgVideo.paused) fgVideo.pause();
   });
 
-  if (fgContainer) {
-    /* El click en fgContainer también desactivado (no aparece) */
-  }
-
-  log('🚀 Archinime NEXT v29 cargado · Chroma: OFF (forzado)');
+  log('🚀 Archinime NEXT v30 cargado · Chroma: OFF (forzado) · Calidad: ALTA (forzada)');
 })();
 
 /* MOTION PLAYER */
