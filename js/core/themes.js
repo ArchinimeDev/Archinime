@@ -38,7 +38,7 @@
       name: 'Galaxy',
       swatch: '#bf4dff',
       isDefault: true,
-      bgVideo: 'https://cdn.jsdelivr.net/gh/ArchinimeDev/Archinime@main/assets/videos/galaxia.mp4',
+      bgVideo: 'https://cdn.jsdelivr.net/gh/Archiriel/Archinime@main/assets/videos/galaxia.mp4',
       vars: {
         '--neon-1': '#bf4dff',   // Violeta neón
         '--neon-2': '#00f0ff',   // Cian clásico
@@ -55,7 +55,7 @@
       id: 'velocity',
       name: 'Velocity',
       swatch: '#ff3d00',
-      bgVideo: 'https://cdn.jsdelivr.net/gh/ArchinimeDev/Archinime@main/assets/videos/Fondo%20video%20Velocidad%20luz%20ne%C3%B3n%20brillante%20HD.mp4',
+      bgVideo: 'https://cdn.jsdelivr.net/gh/Archiriel/Archinime@main/assets/videos/Fondo%20video%20Velocidad%20luz%20ne%C3%B3n%20brillante%20HD.mp4',
       vars: {
         '--neon-1': '#ff3d00',   // Naranja eléctrico
         '--neon-2': '#00e5ff',   // Cian brillante
@@ -72,7 +72,7 @@
       id: 'party',
       name: 'Party',
       swatch: '#ff0080',
-      bgVideo: 'https://cdn.jsdelivr.net/gh/ArchinimeDev/Archinime@main/assets/videos/Luces%20de%20colores%20para%20fiestas%20%F0%9F%8C%88%20FONDO%20de%20PANTALLA%20con%20MOVIMIENTO.mp4',
+      bgVideo: 'https://cdn.jsdelivr.net/gh/Archiriel/Archinime@main/assets/videos/Luces%20de%20colores%20para%20fiestas%20%F0%9F%8C%88%20FONDO%20de%20PANTALLA%20con%20MOVIMIENTO.mp4',
       vars: {
         '--neon-1': '#ff0080',   // Rosa fucsia intenso
         '--neon-2': '#00ffea',   // Turquesa brillante
